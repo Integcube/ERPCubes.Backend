@@ -16,7 +16,6 @@ namespace ERPCubesApi.Controllers
         {
             _mediator = mediator;
         }
-        [Authorize]
         [HttpGet("all", Name = "GetAllMenu")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<AppMenuDto>> GetAllMenu()

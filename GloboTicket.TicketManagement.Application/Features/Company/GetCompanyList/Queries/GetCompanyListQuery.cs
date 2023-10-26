@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Lead.Queries.GetLeadList
+namespace ERPCubes.Application.Features.Company.GetCompanyList.Queries
 {
-    public class GetLeadListQuery : IRequest<List<GetLeadVm>>
+    public class GetCompanyListQuery:IRequest<List<GetCompanyVm>>
     {
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; set; }
         public int TenantId { get; set; }
     }
 }

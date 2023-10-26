@@ -17,7 +17,7 @@ namespace ERPCubesApi.Controllers
         }
         [HttpPost("all", Name = "GetAllLeads")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<LeadVm>>> GetAllCategories(GetLeadListQuery getLeadList)
+        public async Task<ActionResult<List<GetLeadVm>>> GetAllCategories(GetLeadListQuery getLeadList)
         {
             var dtos = await _mediator.Send(getLeadList);
             return Ok(dtos);

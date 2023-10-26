@@ -14,6 +14,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\GloboTicket.TicketManagement.Application\ERPCubes.Application.csproj" />
+	  <ProjectReference Include="..\GloboTicket.TicketManagement.Identity\ERPCubes.Identity.csproj" />
 	</ItemGroup>
 	
 </Project>

@@ -19,5 +19,6 @@ namespace ERPCubes.Domain.Entities
         public string? Link { get; set; } = string.Empty;
         public string? Level { get; set; } = string.Empty;
         public int ParentId { get; set; }
+        public int Order { get; set; }
     }
 }

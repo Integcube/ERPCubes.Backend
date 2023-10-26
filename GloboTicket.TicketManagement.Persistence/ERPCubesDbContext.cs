@@ -17,6 +17,7 @@ namespace ERPCubes.Persistence
 
         public DbSet<AppMenus> AppMenus { get; set; }
         public DbSet<Leads> Leads { get; set; }
+        public DbSet<CrmCompany> CrmCompany { get; set; }
 
     }
 }

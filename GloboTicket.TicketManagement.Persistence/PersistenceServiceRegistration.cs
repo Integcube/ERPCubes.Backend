@@ -1,5 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Persistence.Repositories;
+using ERPCubes.Persistence.Repositories.CRM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,7 @@ namespace ERPCubes.Persistence
                 options.UseNpgsql(configuration.GetConnectionString("GloboTicketTicketManagementConnectionString")));
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IAsyncCompanyRepository, CompanyRepository>();
 
             //services.AddScoped<ICategoryRepository, CategoryRepository>();
             //services.AddScoped<IEventRepository, EventRepository>();

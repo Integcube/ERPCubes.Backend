@@ -20,11 +20,11 @@ namespace ERPCubes.Identity
         {
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
 
-            services.AddDbContext<GloboTicketIdentityDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("GloboTicketIdentityConnectionString"),
-                b => b.MigrationsAssembly(typeof(GloboTicketIdentityDbContext).Assembly.FullName)));
+            services.AddDbContext<ERPCubesIdentityDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("GloboTicketIdentityConnectionString"),
+                b => b.MigrationsAssembly(typeof(ERPCubesIdentityDbContext).Assembly.FullName)));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<GloboTicketIdentityDbContext>().AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<ERPCubesIdentityDbContext>().AddDefaultTokenProviders();
 
             services.AddTransient<IAuthenticationService, AuthenticationService>();
 

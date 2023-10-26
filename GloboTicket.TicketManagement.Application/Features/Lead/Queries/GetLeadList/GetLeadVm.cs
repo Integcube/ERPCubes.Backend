@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Lead.Queries.GetLeadList
 {
-    public class LeadVm
+    public class GetLeadVm
     {
         public int LeadId { get; set; }
         public string FirstName { get; set; } = string.Empty;

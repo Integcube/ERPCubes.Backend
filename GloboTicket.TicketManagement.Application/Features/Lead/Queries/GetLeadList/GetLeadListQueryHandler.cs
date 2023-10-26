@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Lead.Queries.GetLeadList
 {
-    public class GetLeadListQueryHandler : IRequestHandler<GetLeadListQuery, List<LeadVm>>
+    public class GetLeadListQueryHandler : IRequestHandler<GetLeadListQuery, List<GetLeadVm>>
     {
         private readonly IMapper _mapper;
         private readonly IAsyncRepository<Leads> _leadRepository;
@@ -20,10 +20,11 @@ namespace ERPCubes.Application.Features.Lead.Queries.GetLeadList
             _mapper = mapper;
             _leadRepository = leadRepository;
         }
-        public async Task<List<LeadVm>> Handle(GetLeadListQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetLeadVm>> Handle(GetLeadListQuery request, CancellationToken cancellationToken)
         {
             var leads = await _leadRepository.ListAllAsync();
-            return _mapper.Map<List<LeadVm>>(leads);
+           
+            return _mapper.Map<List<GetLeadVm>>(leads);
         }
     }
 }
