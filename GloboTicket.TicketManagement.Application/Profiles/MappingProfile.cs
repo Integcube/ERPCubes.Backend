@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ERPCubes.Application.Features.AppMenu.Queries.GetMenuList;
-using ERPCubes.Application.Features.Company.GetCompanyList.Queries;
+using ERPCubes.Application.Features.Company.Queries.GetCompanyList;
 using ERPCubes.Application.Features.Lead.Queries.GetLeadList;
 using ERPCubes.Domain.Entities;
 

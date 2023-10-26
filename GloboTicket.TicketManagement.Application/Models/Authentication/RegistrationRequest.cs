@@ -11,6 +11,9 @@ namespace ERPCubes.Application.Models.Authentication
         public string LastName { get; set; } = string.Empty;
 
         [Required]
+        public int TenantId { get; set; }
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 

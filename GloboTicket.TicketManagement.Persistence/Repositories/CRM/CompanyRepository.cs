@@ -1,5 +1,5 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
-using ERPCubes.Application.Features.Company.GetCompanyList.Queries;
+using ERPCubes.Application.Features.Company.Queries.GetCompanyList;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
     {
 
         public CompanyRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity) { }
+
+        public Task DeleteCompany(string Id, int TenantId, int companyId)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<List<GetCompanyVm>> GetAllList(string Id, int TenantId)
         {
             List<GetCompanyVm> companyDetail = await (from a in _dbContext.CrmCompany.Where(a => a.TenantId == TenantId && a.IsDeleted == 0)

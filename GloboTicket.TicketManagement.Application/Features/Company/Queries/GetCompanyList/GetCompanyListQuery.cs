@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Company.GetCompanyList.Queries
+namespace ERPCubes.Application.Features.Company.Queries.GetCompanyList
 {
-    public class GetCompanyListQuery:IRequest<List<GetCompanyVm>>
+    public class GetCompanyListQuery : IRequest<List<GetCompanyVm>>
     {
         public string Id { get; set; }
         public int TenantId { get; set; }

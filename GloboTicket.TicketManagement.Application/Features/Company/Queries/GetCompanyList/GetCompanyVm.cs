@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Company.GetCompanyList.Queries
+namespace ERPCubes.Application.Features.Company.Queries.GetCompanyList
 {
     public class GetCompanyVm
     {

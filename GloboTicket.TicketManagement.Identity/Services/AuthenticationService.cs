@@ -71,7 +71,8 @@ namespace ERPCubes.Identity.Services
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                TenantId = request.TenantId,
             };
 
             var existingEmail = await _userManager.FindByEmailAsync(request.Email);
