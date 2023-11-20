@@ -1,4 +1,8 @@
-﻿using ERPCubes.Application.Features.Lead.Queries.GetLeadList;
+﻿using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -15,11 +19,46 @@ namespace ERPCubesApi.Controllers
         {
             _mediator = mediator;
         }
+        [Authorize]
         [HttpPost("all", Name = "GetAllLeads")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetLeadVm>>> GetAllCategories(GetLeadListQuery getLeadList)
+        public async Task<ActionResult<List<GetLeadVm>>> GetAllLeads(GetLeadListQuery getLeadList)
         {
             var dtos = await _mediator.Send(getLeadList);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("allStatus", Name = "GetAllLeadStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetLeadVm>>> GetAllLeadStatus(GetLeadStatusListQuery getLeadList)
+        {
+            var dtos = await _mediator.Send(getLeadList);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("allSource", Name = "GetAllLeadSource")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetLeadVm>>> GetAllLeadSource(GetLeadSourceListQuery getLeadList)
+        {
+            var dtos = await _mediator.Send(getLeadList);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("delete", Name = "DeleteLead")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteLead(DeleteLeadCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("save", Name = "SaveLead")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> SaveLead(SaveLeadCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
             return Ok(dtos);
         }
     }

@@ -14,5 +14,6 @@ namespace ERPCubes.Identity
         public ERPCubesIdentityDbContext(DbContextOptions<ERPCubesIdentityDbContext> options) : base(options)
         {
         }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }

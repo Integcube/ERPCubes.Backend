@@ -1,6 +1,6 @@
-﻿using ERPCubes.Application.Features.Company.Commands.DeleteCompany;
-using ERPCubes.Application.Features.Company.Queries.GetCompanyList;
-using ERPCubes.Application.Features.Lead.Queries.GetLeadList;
+﻿using ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
+using ERPCubes.Application.Features.Crm.Company.Queries.GetCompanyList;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -23,6 +23,15 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult<List<GetCompanyVm>>> GetAllCategories(GetCompanyListQuery getCompanyList)
         {
             var dtos = await _mediator.Send(getCompanyList);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("save", Name = "SaveCompany")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<List<ActionResult>>> SaveComapny(SaveCompanyCommand saveCompany)
+        {
+            var dtos = await _mediator.Send(saveCompany);
             return Ok(dtos);
         }
         [Authorize]

@@ -17,10 +17,13 @@ namespace ERPCubes.Persistence
 
             services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IAsyncCompanyRepository, CompanyRepository>();
-
-            //services.AddScoped<ICategoryRepository, CategoryRepository>();
-            //services.AddScoped<IEventRepository, EventRepository>();
-            //services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IAsyncIndustryRepository, IndustryRepository>();
+            services.AddScoped<Application.Contracts.Persistence.IAsyncUserRepository, UsersRepository>();
+            services.AddScoped<IAsyncTagsRepository, TagsRepository>();
+            services.AddScoped<IAsyncLeadRepository, LeadRepository>();
+            services.AddScoped<IAsyncProductRepository, ProductRepository>();
+            services.AddScoped<IAsyncNoteRepository, NoteRepository>();
+            services.AddScoped<IAsyncTaskRepository, TaskRepository>();
 
             return services;    
         }

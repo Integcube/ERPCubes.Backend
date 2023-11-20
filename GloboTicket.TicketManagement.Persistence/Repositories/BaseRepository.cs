@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Contracts.Persistence;
+using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ERPCubes.Persistence.Repositories
@@ -6,10 +7,11 @@ namespace ERPCubes.Persistence.Repositories
     public class BaseRepository<T> : IAsyncRepository<T> where T : class
     {
         protected readonly ERPCubesDbContext _dbContext;
-
+        protected readonly ERPCubesIdentityDbContext _dbContextIdentity;
         public BaseRepository(ERPCubesDbContext dbContext, Identity.ERPCubesIdentityDbContext dbContextIdentity)
         {
             _dbContext = dbContext;
+            _dbContextIdentity = dbContextIdentity;
         }
 
         public virtual async Task<T?> GetByIdAsync(Guid id)
