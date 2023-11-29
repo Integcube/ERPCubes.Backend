@@ -1,4 +1,7 @@
-﻿using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
+﻿using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
+using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +31,30 @@ namespace ERPCubesApi.Controllers
         {
             var dtos = await _mediator.Send(getTaskList);
             return Ok(dtos);
+        }
+        [HttpPost("delete", Name = "DeleteTask")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task DeleteTask(DeleteTaskCommand deletetask)
+        {
+            var dtos = await _mediator.Send(deletetask);
+        }
+        [HttpPost("updateStatus", Name = "UpdateTaskStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task UpdateTaskStatus(UpdateTaskStatusCommand updateTaskStatus)
+        {
+            var dtos = await _mediator.Send(updateTaskStatus);
+        }
+        [HttpPost("save", Name = "SaveTask")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task SaveTask(SaveTaskCommand saveTask)
+        {
+            var dtos = await _mediator.Send(saveTask);
         }
     }
 }

@@ -39,11 +39,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id)
+        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus)
         {
             try
             {
-                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
+                List<int> StatusIds = new List<int>();
+                if (!string.IsNullOrEmpty(LeadStatus))
+                    StatusIds = (LeadStatus.Split(',').Select(Int32.Parse).ToList());
+                List<string> OwnerIds = new List<string>();
+                if (!string.IsNullOrEmpty(LeadOwner))
+                {
+                    OwnerIds = LeadOwner.Split(',')
+                                        .Select(owner => owner.Trim())
+                                        .ToList();
+                }
+                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && (CreatedDate == null || a.CreatedDate>=CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status)))
                                                join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
                                                join i in _dbContext.CrmIndustry.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
                                                from ii in all.DefaultIfEmpty()
@@ -75,6 +85,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    ProductId = a.ProductId,
                                                    ProductTitle = pp.ProductName,
                                                    CreatedDate = a.CreatedDate,
+                                                   ModifiedDate = a.LastModifiedDate,
                                                }
                                               ).OrderByDescending(a => a.LeadId).ToListAsync();
                 return Leads;

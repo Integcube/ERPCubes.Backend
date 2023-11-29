@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
+﻿namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
 {
     public class GetLeadVm
     {
@@ -30,5 +24,6 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
         public int ProductId { get; set; }
         public string ProductTitle { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
+        public DateTime? ModifiedDate { get; set; }
     }
 }

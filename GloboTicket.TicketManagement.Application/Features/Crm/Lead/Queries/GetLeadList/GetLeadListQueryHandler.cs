@@ -31,7 +31,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
             List<GetLeadVm> leads = new List<GetLeadVm>();
             try
             {
-                leads = await _leadRepository.GetAllLeads(request.TenantId, request.Id);
+                leads = await _leadRepository.GetAllLeads(request.TenantId, request.Id, request.CreatedDate, request.ModifiedDate, request.LeadOwner, request.LeadStatus);
             }
             catch (Exception ex)
             {

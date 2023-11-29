@@ -30,6 +30,16 @@ namespace ERPCubes.Persistence
         public DbSet<CrmTaskTags> CrmTaskTags { get; set; }
         public DbSet<CrmTaskPriority> CrmTaskPriority { get; set; }
         public DbSet<CrmTaskStatus> CrmTaskStatus { get; set; }
+        public DbSet<CrmCustomLists> CrmCustomLists { get; set; }
+        public DbSet<CrmCalenderEvents> CrmCalenderEvents { get; set; }
+        public DbSet<CrmCalendarEventsType> CrmCalendarEventsType { get; set; }
+        public DbSet<CrmTeam> CrmTeam { get; set; }
+        public DbSet<CrmTeamMember> CrmTeamMember { get; set; }
+        public DbSet<CrmUserActivityLog> CrmUserActivityLog { get; set; }
+        public DbSet<CrmUserActivityType> CrmUserActivityType { get; set; }
+        public DbSet<CrmEmail> CrmEmail { get; set; }
+        public DbSet<CrmCall> CrmCall { get; set; }
+        public DbSet<CrmMeeting> CrmMeeting { get; set; }
 
     }
 }

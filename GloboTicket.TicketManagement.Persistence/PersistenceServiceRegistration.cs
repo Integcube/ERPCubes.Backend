@@ -24,7 +24,13 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncProductRepository, ProductRepository>();
             services.AddScoped<IAsyncNoteRepository, NoteRepository>();
             services.AddScoped<IAsyncTaskRepository, TaskRepository>();
-
+            services.AddScoped<IAsyncCustomListRepository, CustomListRepository>();
+            services.AddScoped<IAsyncCalenderRepository, CalenderRepository>();
+            services.AddScoped<IAsyncTeamRepository, TeamRepository>();
+            services.AddScoped<IAsyncUserActivityRepository, UserActivityRepository>();
+            services.AddScoped<IAsyncEmailRepository, EmailRepository>();
+            services.AddScoped<IAsyncCallRepository, CallRepository>();
+            services.AddScoped<IAsyncMeetingRepository, MeetingRepository>();
             return services;    
         }
     }
