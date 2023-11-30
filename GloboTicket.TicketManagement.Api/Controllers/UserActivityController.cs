@@ -16,6 +16,7 @@ namespace ERPCubesApi.Controllers
         }
 
         [HttpPost("Get")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<GetUserActivityVm>>> GetUserActivityAsync(GetUserActivityQuery request)
         {
             var dtos = await _mediator.Send(request);

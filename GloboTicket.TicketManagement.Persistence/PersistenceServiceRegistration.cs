@@ -27,7 +27,7 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncCustomListRepository, CustomListRepository>();
             services.AddScoped<IAsyncCalenderRepository, CalenderRepository>();
             services.AddScoped<IAsyncTeamRepository, TeamRepository>();
-            services.AddScoped<IAsyncUserActivityRepository, UserActivityRepository>();
+            services.AddScoped<IAsyncUserActivityRepository, ActivityRepository>();
             services.AddScoped<IAsyncEmailRepository, EmailRepository>();
             services.AddScoped<IAsyncCallRepository, CallRepository>();
             services.AddScoped<IAsyncMeetingRepository, MeetingRepository>();

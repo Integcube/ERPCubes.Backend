@@ -12,16 +12,13 @@ namespace ERPCubes.Domain.Entities
     {
         [Key]
         public int ActivityId { get; set; }
-        [Required]
         public string UserId { get; set; } = string.Empty;
-        [Required]
         public int ActivityType { get; set; }
-        [Required]
         public int ActivityStatus { get; set; }
-        [Required]
         public string Detail { get; set; } = string.Empty;
-        [Required]
         public int TenantId { get; set; }
-
+        public int Id { get; set; }
+        public int IsLead { get; set; }
+        public int IsCompany { get; set; }
     }
 }
