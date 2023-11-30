@@ -27,7 +27,7 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Queries.GetMeetingList
             List<GetMeetingVm> meetings = new List<GetMeetingVm>();
             try
             {
-                meetings = await _meetingRepository.GetAllList(request.Id, request.TenantId);
+                meetings = await _meetingRepository.GetAllList(request.Id, request.TenantId, request.LeadId, request.CompanyId);
             }
             catch (Exception ex)
             {

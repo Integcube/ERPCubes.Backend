@@ -3,11 +3,13 @@ using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
 using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallList;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,11 +44,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId)
+        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
         {
             try
             {
-                List<GetCallVm> Call = await (from a in _dbContext.CrmCall.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId)
+                List<GetCallVm> Call = await (from a in _dbContext.CrmCall.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
                                                select new GetCallVm
                                                {
                                                    CallId = a.CallId,
@@ -57,7 +59,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    CreatedBy = a.CreatedBy,
                                                    CreatedDate=a.CreatedDate
 
-                                               }).ToListAsync();
+                                               }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Call;
             }
@@ -78,9 +80,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmCall addCall = new CrmCall();
                     addCall.Subject = call.Subject;
                     addCall.Response = call.Response;
-                    addCall.StartTime = call.StartTime;
-                    addCall.EndTime = call.EndTime;
-                    //addCall.CreatedBy = call.Id;
+                    addCall.StartTime = call.StartTime.ToUniversalTime();
+                    addCall.EndTime = call.EndTime.ToUniversalTime();
+                    addCall.CreatedBy = call.Id;
                     addCall.CreatedDate = localDateTime.ToUniversalTime();
 
                     if (call.CompanyId == -1)
@@ -103,7 +105,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     }
                     if (call.LeadId == -1 && call.CompanyId == -1)
                     {
-                        call.CompanyId = -1;
+                        addCall.Id = -1;
                     }
 
                     await _dbContext.AddAsync(addCall);
@@ -121,9 +123,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     {
                         existingCall.Subject = call.Subject;
                         existingCall.Response = call.Response;
-                        existingCall.StartTime = call.StartTime;
-                        existingCall.EndTime = call.EndTime;
-                        //existingCall.CreatedBy = call.Id;
+                        existingCall.StartTime = call.StartTime.ToUniversalTime();
+                        existingCall.EndTime = call.EndTime.ToUniversalTime();
+                        existingCall.CreatedBy = call.Id;
                         existingCall.CreatedDate = localDateTime.ToUniversalTime();
 
                         if (call.CompanyId == -1)
@@ -146,7 +148,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         }
                         if (call.LeadId == -1 && call.CompanyId == -1)
                         {
-                            call.CompanyId = -1;
+                            existingCall.Id = -1;
                         }
                         await _dbContext.SaveChangesAsync();
                     }

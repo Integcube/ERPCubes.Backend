@@ -10,6 +10,7 @@ using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,11 +25,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         
 
-        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId)
+        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
         {
             try
             {
-                List<GetMeetingVm> Meeting = await (from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId)
+                List<GetMeetingVm> Meeting = await (from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
                                                     select new GetMeetingVm
                                                     {
                                                         MeetingId = a.MeetingId,
@@ -39,7 +40,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                         CreatedBy = a.CreatedBy,
                                                         CreatedDate = a.CreatedDate
 
-                                                    }).ToListAsync();
+                                                    }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Meeting;
             }
