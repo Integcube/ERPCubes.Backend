@@ -26,7 +26,7 @@ namespace ERPCubes.Application.Features.Product.Queries.GetProductList
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Getting about company list failed due to an error: {ex.Message}");
+                _logger.LogError($"Getting about product list failed due to an error: {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
             return products;

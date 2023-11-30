@@ -22,9 +22,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public MeetingRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
         }
-
-        
-
         public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
         {
             try
