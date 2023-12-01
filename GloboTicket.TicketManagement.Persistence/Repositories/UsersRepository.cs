@@ -26,6 +26,7 @@ namespace ERPCubes.Persistence.Repositories
                                        Email = a.Email,
                                        UserName = a.UserName,
                                        PhoneNumber = a.PhoneNumber,
+                                       Name = a.FirstName + " " +a.LastName,
                                    }).ToListAsync();
                 return users;
             }

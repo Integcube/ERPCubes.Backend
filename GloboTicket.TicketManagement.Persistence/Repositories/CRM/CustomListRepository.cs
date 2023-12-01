@@ -27,7 +27,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 CrmCustomLists? List = await (from a in _dbContext.CrmCustomLists.Where(a => a.ListId == request.ListId)
-                                             select a).FirstOrDefaultAsync();
+                                              select a).FirstOrDefaultAsync();
                 if (List == null)
                 {
                     throw new NotFoundException(request.ListTitle, request.ListId);
@@ -37,9 +37,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     List.IsDeleted = 1;
                     await _dbContext.SaveChangesAsync();
                 }
-             
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
@@ -49,7 +48,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetCustomListVm> List = await (from a in _dbContext.CrmCustomLists.Where(a =>a.IsDeleted == 0 && (a.CreatedBy == Id || a.IsPublic == 1) && a.Type == Type && a.TenantId == TenantId)
+                List<GetCustomListVm> List = await (from a in _dbContext.CrmCustomLists.Where(a => a.IsDeleted == 0 && (a.CreatedBy == Id || a.IsPublic == 1) && a.Type == Type && a.TenantId == TenantId)
                                                     select new GetCustomListVm
                                                     {
                                                         ListId = a.ListId,
@@ -88,8 +87,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 else
                 {
-                    CrmCustomLists? List = await(from a in _dbContext.CrmCustomLists.Where(a => a.ListId == request.ListId)
-                                                 select a).FirstOrDefaultAsync();
+                    CrmCustomLists? List = await (from a in _dbContext.CrmCustomLists.Where(a => a.ListId == request.ListId)
+                                                  select a).FirstOrDefaultAsync();
                     if (List == null)
                     {
                         throw new NotFoundException(request.ListTitle, request.ListId);
@@ -118,8 +117,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                CrmCustomLists? List = await(from a in _dbContext.CrmCustomLists.Where(a => a.ListId == request.ListId)
-                                             select a).FirstOrDefaultAsync();
+                CrmCustomLists? List = await (from a in _dbContext.CrmCustomLists.Where(a => a.ListId == request.ListId)
+                                              select a).FirstOrDefaultAsync();
                 if (List == null)
                 {
                     throw new NotFoundException(request.ListTitle, request.ListId);
@@ -129,7 +128,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     List.Filter = request.Filter;
                     await _dbContext.SaveChangesAsync();
                 }
-
             }
             catch (Exception ex)
             {
