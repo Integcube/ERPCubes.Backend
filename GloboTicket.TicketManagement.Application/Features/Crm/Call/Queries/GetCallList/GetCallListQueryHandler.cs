@@ -23,7 +23,7 @@ namespace ERPCubes.Application.Features.Crm.Call.Queries.GetCallList
             try
             {
                 List<GetCallVm> Calls = new List<GetCallVm>();
-                Calls = await _callRepository.GetAllList(request.Id, request.TenantId);
+                Calls = await _callRepository.GetAllList(request.Id, request.TenantId, request.LeadId, request.CompanyId);
                 return Calls;
             }
             catch (Exception ex)

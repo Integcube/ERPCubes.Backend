@@ -9,10 +9,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     public interface IAsyncProductRepository : IAsyncRepository<CrmProduct>
     {
         Task<List<GetProductVm>> GetAllProducts(int TenantId, string Id);
-
-        Task<List<GetProductVm>> GetDeletedProducts(int TenantId);
-
-        Task saveProductCommands(SaveProductCommand product);
+        Task SaveProduct(SaveProductCommand product);
         Task DeleteProduct(DeleteProductCommand productId);
 
     }

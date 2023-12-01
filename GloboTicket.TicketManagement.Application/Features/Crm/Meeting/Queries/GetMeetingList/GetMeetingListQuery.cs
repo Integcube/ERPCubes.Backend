@@ -12,5 +12,7 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Queries.GetMeetingList
     {
         public string Id { get; set; } = String.Empty;
         public int TenantId { get; set; }
+        public int LeadId { get; set; }
+        public int CompanyId { get; set; }
     }
 }

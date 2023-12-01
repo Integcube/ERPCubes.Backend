@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
 using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallList;
+using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

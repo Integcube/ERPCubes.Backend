@@ -27,7 +27,7 @@ namespace ERPCubes.Application.Features.Crm.Email.Commands.DeleteEmail
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Deleting task {request.EmailId} failed due to : {ex.Message}");
+                _logger.LogError($"Deleting email {request.EmailId} failed due to : {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
             return Unit.Value;

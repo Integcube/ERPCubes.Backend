@@ -15,16 +15,25 @@ namespace ERPCubes.Persistence.Repositories
 
         public async Task<List<GetUserListVm>> GetUserList(int TenantId, string Id)
         {
-            var users = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == TenantId)
-                               select new GetUserListVm
-                               {
-                                   Id = a.Id,
-                                   Name = a.FirstName + " " + a.LastName,
-                                   Email = a.Email,
-                                   UserName = a.UserName,
-                                   PhoneNumber = a.PhoneNumber,
-                               }).ToListAsync();
-            return users;
+            try
+            {
+                var users = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == TenantId)
+                                   select new GetUserListVm
+                                   {
+                                       Id = a.Id,
+                                       FirstName = a.FirstName,
+                                       LastName=a.LastName,
+                                       Email = a.Email,
+                                       UserName = a.UserName,
+                                       PhoneNumber = a.PhoneNumber,
+                                   }).ToListAsync();
+                return users;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+
         }
 
         public async Task UpdateUser(UpdateUserCommand updateUser)
