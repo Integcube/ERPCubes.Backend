@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.CustomLists.Commands.DeleteCustomList;
+using ERPCubes.Domain.Entities;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Crm.CustomLists.Commands.SaveCustomList
 {
-    public class SaveCustomListCommandHandler : IRequestHandler<SaveCustomListCommand>
+    public class SaveCustomListCommandHandler : IRequestHandler<SaveCustomListCommand, CrmCustomLists>
     {
         private readonly IAsyncCustomListRepository _customRepository;
         private readonly ILogger<SaveCustomListCommandHandler> _logger;
@@ -20,12 +21,12 @@ namespace ERPCubes.Application.Features.Crm.CustomLists.Commands.SaveCustomList
             _customRepository = customRepository;
             _logger = logger;
         }
-        public async Task<Unit> Handle(SaveCustomListCommand request, CancellationToken cancellationToken)
+        public async Task<CrmCustomLists> Handle(SaveCustomListCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await _customRepository.SaveCustomList(request);
-                return Unit.Value;
+                CrmCustomLists customList = await _customRepository.SaveCustomList(request);
+                return customList;
             }
             catch (Exception ex)
             {

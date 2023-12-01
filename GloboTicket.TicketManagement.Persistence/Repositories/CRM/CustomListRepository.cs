@@ -49,7 +49,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetCustomListVm> List = await (from a in _dbContext.CrmCustomLists.Where(a => (a.CreatedBy == Id || a.IsPublic == 1) && a.Type == Type && a.TenantId == TenantId)
+                List<GetCustomListVm> List = await (from a in _dbContext.CrmCustomLists.Where(a =>a.IsDeleted == 0 && (a.CreatedBy == Id || a.IsPublic == 1) && a.Type == Type && a.TenantId == TenantId)
                                                     select new GetCustomListVm
                                                     {
                                                         ListId = a.ListId,
@@ -65,7 +65,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
-        public async Task SaveCustomList(SaveCustomListCommand request)
+        public async Task<CrmCustomLists> SaveCustomList(SaveCustomListCommand request)
         {
             try
             {
@@ -75,7 +75,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     CrmCustomLists List = new CrmCustomLists();
                     List.ListTitle = request.ListTitle;
-                    List.Filter = request.Filter;
                     List.Type = request.Type;
                     List.TenantId = request.TenantId;
                     List.ListTitle = request.ListTitle;
@@ -85,7 +84,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     List.IsDeleted = 0;
                     await _dbContext.AddAsync(List);
                     await _dbContext.SaveChangesAsync();
-
+                    return List;
                 }
                 else
                 {
@@ -98,7 +97,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     else
                     {
                         List.ListTitle = request.ListTitle;
-                        List.Filter = request.Filter;
                         List.Type = request.Type;
                         List.TenantId = request.TenantId;
                         List.ListTitle = request.ListTitle;
@@ -107,7 +105,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         List.LastModifiedBy = request.Id;
                         await _dbContext.SaveChangesAsync();
                     }
-                }             
+                    return List;
+                }
             }
             catch (Exception ex)
             {

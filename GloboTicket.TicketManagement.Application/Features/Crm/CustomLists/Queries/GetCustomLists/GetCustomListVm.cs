@@ -10,6 +10,7 @@ namespace ERPCubes.Application.Features.Crm.CustomLists.Queries.GetCustomLists
     {
         public int ListId { get; set; }
         public string ListTitle { get; set; } = String.Empty;
+        public int IsPublic { get; set; }
         public string Filter { get; set; } = String.Empty;
     }
 }

@@ -12,8 +12,8 @@ namespace ERPCubes.Domain.Entities
     {
         [Key]
         public int ListId { get; set; }
-        public string ListTitle { get; set; }
-        public string Filter { get; set; } = String.Empty;
+        public string ListTitle { get; set; } = String.Empty;
+        public string? Filter { get; set; } = String.Empty;
         public string Type { get; set; } = String.Empty;
         public int IsPublic { get; set; }
         public int TenantId { get; set; }

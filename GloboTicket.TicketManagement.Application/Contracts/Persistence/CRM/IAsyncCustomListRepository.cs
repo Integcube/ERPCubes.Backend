@@ -2,6 +2,7 @@
 using ERPCubes.Application.Features.Crm.CustomLists.Commands.SaveCustomList;
 using ERPCubes.Application.Features.Crm.CustomLists.Commands.SaveCustomListFilters;
 using ERPCubes.Application.Features.Crm.CustomLists.Queries.GetCustomLists;
+using ERPCubes.Domain.Entities;
 
 namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
@@ -9,7 +10,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetCustomListVm>> GetAllCustomLists(int TenantId, string Id, string Type);
         Task DeleteCustomList(DeleteCustomListCommand request);
-        Task SaveCustomList(SaveCustomListCommand request);
+        Task<CrmCustomLists> SaveCustomList (SaveCustomListCommand request);
         Task UpdateCustomListFilter(SaveCustomListFilterCommand request);
 
     }

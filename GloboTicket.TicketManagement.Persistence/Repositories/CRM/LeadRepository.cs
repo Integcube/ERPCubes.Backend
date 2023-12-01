@@ -42,6 +42,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus)
         {
             try
+            
             {
                 List<int> StatusIds = new List<int>();
                 if (!string.IsNullOrEmpty(LeadStatus))
