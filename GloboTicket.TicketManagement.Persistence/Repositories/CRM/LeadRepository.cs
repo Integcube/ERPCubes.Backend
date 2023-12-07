@@ -199,6 +199,36 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.TenantId = TenantId;
                     await _dbContext.AddAsync(LeadObj);
                     await _dbContext.SaveChangesAsync();
+
+                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                    CalenderObj.UserId = LeadObj.LeadOwner;
+                    CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
+                    CalenderObj.Type = 6;
+                    CalenderObj.CreatedBy = LeadObj.CreatedBy;
+                    CalenderObj.CreatedDate = LeadObj.CreatedDate;
+                    CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
+                    CalenderObj.EndTime = localDateTime.ToUniversalTime().AddDays(3);
+                    CalenderObj.TenantId = TenantId;
+                    CalenderObj.Id = LeadObj.LeadId;
+                    CalenderObj.IsCompany = -1;
+                    CalenderObj.IsLead = 1;
+                    CalenderObj.AllDay = false;
+                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = LeadObj.LeadOwner;
+                    ActivityObj.Detail = "You are tasked to call" + LeadObj.FirstName + " " + LeadObj.LastName;
+                    ActivityObj.ActivityType = 1;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = LeadObj.TenantId;
+                    ActivityObj.Id = LeadObj.LeadId;
+                    ActivityObj.IsCompany = -1;
+                    ActivityObj.IsLead = 1;
+                    ActivityObj.CreatedBy = LeadObj.CreatedBy;
+                    ActivityObj.CreatedDate = LeadObj.CreatedDate;
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                    await _dbContext.SaveChangesAsync();
                 }
             }
             catch (Exception e)

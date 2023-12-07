@@ -84,7 +84,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     addCall.EndTime = call.EndTime.ToUniversalTime();
                     addCall.CreatedBy = call.Id;
                     addCall.CreatedDate = localDateTime.ToUniversalTime();
-
+                    addCall.TenantId = call.TenantId;
                     if (call.CompanyId == -1)
                     {
                         addCall.IsCompany = -1;
@@ -107,8 +107,37 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     {
                         addCall.Id = -1;
                     }
-
                     await _dbContext.AddAsync(addCall);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                    CalenderObj.UserId = addCall.CreatedBy;
+                    CalenderObj.Description = "You have a " + addCall.Subject;
+                    CalenderObj.Type = 6;
+                    CalenderObj.CreatedBy = addCall.CreatedBy;
+                    CalenderObj.CreatedDate = addCall.CreatedDate;
+                    CalenderObj.StartTime = addCall.StartTime;
+                    CalenderObj.EndTime = addCall.EndTime;
+                    CalenderObj.TenantId = addCall.TenantId;
+                    CalenderObj.Id = addCall.CallId;
+                    CalenderObj.IsCompany = -1;
+                    CalenderObj.IsLead = 1;
+                    CalenderObj.AllDay = false;
+                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = addCall.CreatedBy;
+                    ActivityObj.Detail = addCall.Subject;
+                    ActivityObj.ActivityType = 4;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = addCall.TenantId;
+                    ActivityObj.Id = addCall.CallId;
+                    ActivityObj.IsCompany = -1;
+                    ActivityObj.IsLead = 1;
+                    ActivityObj.CreatedBy = addCall.CreatedBy;
+                    ActivityObj.CreatedDate = addCall.CreatedDate;
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
                     await _dbContext.SaveChangesAsync();
                 }
                 else

@@ -82,10 +82,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addMeeting.Note = meeting.Note;
                         addMeeting.StartTime = meeting.StartTime;
                         addMeeting.EndTime = meeting.EndTime;
-                        //addEmail.TenantId = email.TenantId;
-                        //addEmail.CreatedBy = email.Id;
+                        addMeeting.TenantId = meeting.TenantId;
+                        addMeeting.CreatedBy = meeting.Id;
                         addMeeting.CreatedDate = localDateTime.ToUniversalTime();
-
                         if (meeting.CompanyId == -1)
                         {
                             addMeeting.IsCompany = -1;
@@ -106,10 +105,40 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         }
                         if (meeting.LeadId == -1 && meeting.CompanyId == -1)
                         {
-                            meeting.CompanyId = -1;
+                            addMeeting.IsCompany = -1;
                         }
 
                         await _dbContext.AddAsync(addMeeting);
+                        await _dbContext.SaveChangesAsync();
+
+                        CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                        CalenderObj.UserId = addMeeting.CreatedBy;
+                        CalenderObj.Description = "You have a " + addMeeting.Subject;
+                        CalenderObj.Type = 1;
+                        CalenderObj.CreatedBy = addMeeting.CreatedBy;
+                        CalenderObj.CreatedDate = addMeeting.CreatedDate;
+                        CalenderObj.StartTime = addMeeting.StartTime;
+                        CalenderObj.EndTime = addMeeting.EndTime;
+                        CalenderObj.TenantId = addMeeting.TenantId;
+                        CalenderObj.Id = addMeeting.MeetingId;
+                        CalenderObj.IsCompany = -1;
+                        CalenderObj.IsLead = 1;
+                        CalenderObj.AllDay = false;
+                        await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                        await _dbContext.SaveChangesAsync();
+
+                        CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                        ActivityObj.UserId = addMeeting.CreatedBy;
+                        ActivityObj.Detail = addMeeting.Subject;
+                        ActivityObj.ActivityType = 3;
+                        ActivityObj.ActivityStatus = 1;
+                        ActivityObj.TenantId = addMeeting.TenantId;
+                        ActivityObj.Id = addMeeting.MeetingId;
+                        ActivityObj.IsCompany = -1;
+                        ActivityObj.IsLead = 1;
+                        ActivityObj.CreatedBy = addMeeting.CreatedBy;
+                        ActivityObj.CreatedDate = addMeeting.CreatedDate;
+                        await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
                         await _dbContext.SaveChangesAsync();
                     }
                     else
