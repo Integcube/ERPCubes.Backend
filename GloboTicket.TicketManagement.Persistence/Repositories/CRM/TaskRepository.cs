@@ -156,6 +156,36 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         await _dbContext.AddAsync(tags);
                         await _dbContext.SaveChangesAsync();
                     }
+
+                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                    CalenderObj.UserId = task.CreatedBy;
+                    CalenderObj.Description = "You have a task " + task.Title;
+                    CalenderObj.Type = 4;
+                    CalenderObj.CreatedBy = task.CreatedBy;
+                    CalenderObj.CreatedDate = task.CreatedDate;
+                    CalenderObj.StartTime = localDateTime.ToUniversalTime();
+                    CalenderObj.EndTime = localDateTime.ToUniversalTime();
+                    CalenderObj.TenantId = task.TenantId;
+                    CalenderObj.Id = task.TaskId;
+                    CalenderObj.IsCompany = -1;
+                    CalenderObj.IsLead = 1;
+                    CalenderObj.AllDay = false;
+                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = task.CreatedBy;
+                    ActivityObj.Detail = "Task" + task.Title;
+                    ActivityObj.ActivityType = 2;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = task.TenantId;
+                    ActivityObj.Id = task.TaskId;
+                    ActivityObj.IsCompany = -1;
+                    ActivityObj.IsLead = 1;
+                    ActivityObj.CreatedBy = task.CreatedBy;
+                    ActivityObj.CreatedDate = task.CreatedDate;
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                    await _dbContext.SaveChangesAsync();
                 }
                 else
                 {
