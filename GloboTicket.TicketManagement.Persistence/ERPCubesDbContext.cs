@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Contracts;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,11 @@ namespace ERPCubes.Persistence
         {
             _loggedInUserService = loggedInUserService;
         }
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<GetLeadReportVm>().HasNoKey().ToView("get_crmleads");
+            base.OnModelCreating(modelBuilder);
+        }
         public DbSet<AppMenus> AppMenus { get; set; }
         public DbSet<CrmLead> CrmLead { get; set; }
         public DbSet<CrmCompany> CrmCompany { get; set; }
@@ -40,6 +45,7 @@ namespace ERPCubes.Persistence
         public DbSet<CrmEmail> CrmEmail { get; set; }
         public DbSet<CrmCall> CrmCall { get; set; }
         public DbSet<CrmMeeting> CrmMeeting { get; set; }
+        public DbSet<GetLeadReportVm> GetCrmLeads { get; set; }
 
     }
 }

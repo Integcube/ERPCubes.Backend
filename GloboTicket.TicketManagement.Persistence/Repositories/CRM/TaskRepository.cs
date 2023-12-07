@@ -2,14 +2,13 @@
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.Design;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -66,8 +65,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                 CreatedBy = a.CreatedBy,
                                                 CreatedDate = a.CreatedDate,
                                                 TaskType = a.Type,
+                                                Order = a.Order,
                                                 StatusTitle = (a.DueDate < localDateTime.ToUniversalTime() && a.Status != 1) ? "Overdue" : (a.Status == null || a.Status == -1) ? "Pending" : ss.StatusTitle,
-                                            }).OrderByDescending(a => a.TaskId).ToListAsync();
+                                            }).OrderBy(a => a.Order).ToListAsync();
                 return obj;
             }
             catch (Exception ex)
@@ -75,7 +75,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-
         public async Task<List<GetTaskTagsListVm>> GetAllTaskTags(int TenantId, string Id, int TaskId)
         {
             try
@@ -97,14 +96,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-
         public async Task SaveTask(SaveTaskCommand request)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
 
-                if (request.Task.TaskId == -1)
+                if (request.Task.TaskId == -1 || request.Task.TaskId == -2)
                 {
                     CrmTask task = new CrmTask();
                     task.Title = request.Task.TaskTitle;
@@ -116,6 +114,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.CreatedDate = localDateTime.ToUniversalTime();
                     task.CreatedBy = request.Id;
                     task.TenantId = request.TenantId;
+                    task.Type = request.Type;
                     task.IsDeleted = 0;
                     if (request.CompanyId == -1)
                     {
@@ -227,7 +226,22 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
      }
-
+        public async Task UpdateTaskOrder(List<UpdateTaskOrderDto> request)
+        {
+            try
+            {
+                foreach (var items in request)
+                {
+                    var taskIdParam = items.TaskId;
+                    var orderParam = items.Order;
+                    await _dbContext.Database.ExecuteSqlRawAsync("UPDATE \"CrmTask\" SET \"Order\" = {0} WHERE \"TaskId\" = {1}", orderParam, taskIdParam);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
         public async Task UpdateTaskStatus(UpdateTaskStatusCommand request)
         {
             try

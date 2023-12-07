@@ -19,6 +19,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public string TaskType { get; set; } = string.Empty;
+        public int Order { get; set; }
 
     }
 }

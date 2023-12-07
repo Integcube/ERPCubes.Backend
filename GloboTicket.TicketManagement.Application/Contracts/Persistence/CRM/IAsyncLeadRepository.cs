@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
@@ -18,6 +19,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus);
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
+        Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id);
         Task DeleteLead(string Id, int TenantId, int LeadId, string Name);
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
     }

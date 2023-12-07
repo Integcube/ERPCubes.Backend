@@ -23,5 +23,6 @@ namespace ERPCubes.Domain.Entities
         public int IsLead { get; set; }
         public int TenantId { get; set; }
         public string Type { get; set; } = String.Empty;
+        public int Order { get; set; }
     }
 }

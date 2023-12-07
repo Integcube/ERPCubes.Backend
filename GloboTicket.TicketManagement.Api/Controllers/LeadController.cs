@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using MediatR;
@@ -59,6 +60,13 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> SaveLead(SaveLeadCommand leadCommand)
         {
             var dtos = await _mediator.Send(leadCommand);
+            return Ok(dtos);
+        }
+        [HttpPost("leadReport", Name = "GetLeadReport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadReport(GetLeadReportQuery leadReport)
+        {
+            var dtos = await _mediator.Send(leadReport);
             return Ok(dtos);
         }
     }

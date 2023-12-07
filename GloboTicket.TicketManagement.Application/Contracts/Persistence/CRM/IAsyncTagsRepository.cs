@@ -1,4 +1,5 @@
 ﻿
+using ERPCubes.Application.Features.Crm.Tags.Commands.SaveTags;
 using ERPCubes.Application.Features.Tags.Commands.DeleteTags;
 using ERPCubes.Application.Features.Tags.Commands.SaveTags;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
@@ -17,6 +18,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetTagsVm>> GetAllTags(int TenantId);
         Task DeleteTags(DeleteTagsCommand TagsId);
 
-        Task SaveTags(SaveTagsCommand Tags);
+        Task<SaveTagVm> SaveTags(SaveTagsCommand Tags);
     }
 }

@@ -2,6 +2,7 @@
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Domain.Entities;
@@ -136,6 +137,29 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
+        public async Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id)
+        {
+            try
+            {
+                var tenantIdParameter = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+
+                var results = await _dbContext.GetCrmLeads.FromSqlRaw(
+                    "SELECT * FROM public.get_crmleads({0})", tenantIdParameter)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+
 
         public async Task SaveLead(string Id, int TenantId, SaveLeadDto Lead)
         {

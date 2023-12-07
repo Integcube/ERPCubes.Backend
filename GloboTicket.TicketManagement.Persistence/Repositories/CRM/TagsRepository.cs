@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Tags.Commands.SaveTags;
 using ERPCubes.Application.Features.Tags.Commands.DeleteTags;
 using ERPCubes.Application.Features.Tags.Commands.SaveTags;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
@@ -53,7 +54,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
-        public async Task SaveTags(SaveTagsCommand Tags)
+        public async Task<SaveTagVm> SaveTags(SaveTagsCommand Tags)
         {
             try
             {
@@ -68,6 +69,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     addTags.CreatedDate = localDateTime.ToUniversalTime();
                     await _dbContext.AddAsync(addTags);
                     await _dbContext.SaveChangesAsync();
+                    Tags.TagId = addTags.TagId;
                 }
                 else
                 {
@@ -78,6 +80,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     existingTags.LastModifiedDate = localDateTime.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
+                return new SaveTagVm { TagId = Tags.TagId, TagTitle = Tags.TagTitle, IsSelected = true };
             }
             catch (Exception e)
             {

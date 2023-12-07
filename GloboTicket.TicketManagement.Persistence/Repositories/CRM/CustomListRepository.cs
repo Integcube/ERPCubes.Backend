@@ -7,12 +7,6 @@ using ERPCubes.Application.Features.Crm.CustomLists.Queries.GetCustomLists;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {

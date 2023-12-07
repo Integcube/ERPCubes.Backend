@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
@@ -20,5 +21,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task DeletTask(DeleteTaskCommand request);
         Task SaveTask(SaveTaskCommand request);
         Task UpdateTaskStatus(UpdateTaskStatusCommand request);
+        Task UpdateTaskOrder(List<UpdateTaskOrderDto> request);
     }
 }
