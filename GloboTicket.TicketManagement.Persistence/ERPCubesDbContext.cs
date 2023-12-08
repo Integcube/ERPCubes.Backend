@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Contracts;
+using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
@@ -18,6 +19,7 @@ namespace ERPCubes.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GetLeadReportVm>().HasNoKey().ToView("get_crmleads");
+            modelBuilder.Entity<GetUserActivityReportVm>().HasNoKey().ToView("calculateleadevent");
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<AppMenus> AppMenus { get; set; }
@@ -46,6 +48,6 @@ namespace ERPCubes.Persistence
         public DbSet<CrmCall> CrmCall { get; set; }
         public DbSet<CrmMeeting> CrmMeeting { get; set; }
         public DbSet<GetLeadReportVm> GetCrmLeads { get; set; }
-
+        public DbSet<GetUserActivityReportVm> GetCrmUserActivity {  get; set; }
     }
 }
