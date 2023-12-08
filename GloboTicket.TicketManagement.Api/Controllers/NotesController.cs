@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
+using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTasks;
 using MediatR;
@@ -20,6 +21,13 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult<List<GetNoteListVm>>> GetAllNotes(GetNoteListQuery getLeadList)
         {
             var dtos = await _mediator.Send(getLeadList);
+            return Ok(dtos);
+        }
+        [HttpPost("NoteTask", Name = "GetAllNotesWithTasks")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetNoteListVm>>> GetAllNotesWithTasks(GetNotesWithTaskCommand getNoteTask)
+        {
+            var dtos = await _mediator.Send(getNoteTask);
             return Ok(dtos);
         }
         [HttpPost("tasks", Name = "GetSelectedTasks")]

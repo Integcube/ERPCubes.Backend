@@ -38,7 +38,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-
         public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int CompanyId, int LeadId)
         {
             try
@@ -262,9 +261,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 foreach (var items in request)
                 {
-                    var taskIdParam = items.TaskId;
-                    var orderParam = items.Order;
-                    await _dbContext.Database.ExecuteSqlRawAsync("UPDATE \"CrmTask\" SET \"Order\" = {0} WHERE \"TaskId\" = {1}", orderParam, taskIdParam);
+                    await _dbContext.Database.ExecuteSqlRawAsync("UPDATE \"CrmTask\" SET \"Order\" = {0} WHERE \"TaskId\" = {1}", items.TaskId, items.Order);
                 }
             }
             catch (Exception ex)

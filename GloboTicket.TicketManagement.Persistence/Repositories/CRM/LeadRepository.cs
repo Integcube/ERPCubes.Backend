@@ -21,12 +21,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                CrmLead? Lead = await(from a in _dbContext.CrmLead.Where(a => a.LeadId == LeadId)
-                                                             select a
+                CrmLead? Lead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == LeadId)
+                                       select a
                                            ).FirstOrDefaultAsync();
                 if (Lead == null)
                 {
-                    throw new NotFoundException(Name,LeadId);
+                    throw new NotFoundException(Name, LeadId);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus)
         {
             try
-            
+
             {
                 List<int> StatusIds = new List<int>();
                 if (!string.IsNullOrEmpty(LeadStatus))
@@ -55,7 +55,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                         .Select(owner => owner.Trim())
                                         .ToList();
                 }
-                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && (CreatedDate == null || a.CreatedDate>=CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status)))
+                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status)))
                                                join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
                                                join i in _dbContext.CrmIndustry.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
                                                from ii in all.DefaultIfEmpty()
@@ -103,11 +103,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetLeadSourceListVm> LeadStatus = await (from a in _dbContext.CrmLeadSource.Where(a => a.TenantId == -1 || a.TenantId == TenantId && a.IsDeleted == 0)
-                                                             select new GetLeadSourceListVm
-                                                             {
-                                                                 SourceId = a.SourceId,
-                                                                 SourceTitle = a.SourceTitle
-                                                             }
+                                                              select new GetLeadSourceListVm
+                                                              {
+                                                                  SourceId = a.SourceId,
+                                                                  SourceTitle = a.SourceTitle
+                                                              }
                                            ).ToListAsync();
                 return LeadStatus;
             }
@@ -169,10 +169,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 if (Lead.LeadId != -1)
                 {
                     CrmLead? LeadObj = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == Lead.LeadId)
-                                             select a).FirstAsync();
+                                              select a).FirstAsync();
                     if (LeadObj == null)
                     {
-                        throw new NotFoundException(Lead.FirstName+" "+Lead.LastName, Lead.LeadId);
+                        throw new NotFoundException(Lead.FirstName + " " + Lead.LastName, Lead.LeadId);
                     }
                     else
                     {
