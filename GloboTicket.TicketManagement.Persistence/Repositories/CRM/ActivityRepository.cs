@@ -1,4 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
 using ERPCubes.Application.Features.Crm.UserActivity.Queries.GetUserActivity;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
@@ -39,6 +41,25 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
           
             
+        }
+        public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId) {
+            try
+            {
+                var tenantIdParameter = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+
+                var results = await _dbContext.GetCrmUserActivity.FromSqlRaw(
+                    "SELECT * FROM public.calculateleadevent({0})", tenantIdParameter)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
     }
 }
