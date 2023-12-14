@@ -16,7 +16,9 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncLeadRepository:IAsyncRepository<CrmLead>
     {
-        Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus);
+        Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id
+            //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
+            );
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
         Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id);

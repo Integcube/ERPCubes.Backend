@@ -11,9 +11,9 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
     {
         public string Id { get; set; } = string.Empty;
         public int TenantId { get; set; }
-        public string? LeadOwner { get; set; } = String.Empty;
-        public DateTime? CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
-        public string? LeadStatus { get; set; } = String.Empty;
+        //public string? LeadOwner { get; set; } = String.Empty;
+        //public DateTime? CreatedDate { get; set; }
+        //public DateTime? ModifiedDate { get; set; }
+        //public string? LeadStatus { get; set; } = String.Empty;
     }
 }

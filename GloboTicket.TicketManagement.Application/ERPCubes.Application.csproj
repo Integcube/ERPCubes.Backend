@@ -24,7 +24,6 @@
 	<ItemGroup>
 	  <Folder Include="Features\Crm\DocumentLog\" />
 	  <Folder Include="Features\Crm\Projects\" />
-	  <Folder Include="Features\Notes\Commands\" />
 	</ItemGroup>
 
 </Project>

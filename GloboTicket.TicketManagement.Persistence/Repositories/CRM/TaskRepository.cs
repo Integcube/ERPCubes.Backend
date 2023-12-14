@@ -3,6 +3,7 @@ using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
@@ -282,6 +283,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     task.Status = request.Status;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+        public async Task UpdateTaskPriority(UpdateTaskPriorityCommand request)
+        {
+            try
+            {
+                var task = await (from a in _dbContext.CrmTask.Where(a => a.TaskId == request.TaskId)
+                                  select a).FirstOrDefaultAsync();
+                if (task == null)
+                {
+                    throw new NotFoundException(request.TaskTitle, request.TaskId);
+                }
+                else
+                {
+                    task.Priority = request.Priority;
                     await _dbContext.SaveChangesAsync();
                 }
             }

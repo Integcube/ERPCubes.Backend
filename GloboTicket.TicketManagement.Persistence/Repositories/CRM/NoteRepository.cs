@@ -1,5 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Notes.Commands.DeleteNote;
+using ERPCubes.Application.Features.Notes.Commands.SaveNote;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
 using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
@@ -136,5 +138,187 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
+        public async Task SaveNote(SaveNoteCommand request)
+        {
+            try
+            {
+                DateTime localDateTime = DateTime.Now;
+                if (request.Note.NoteId == -1)
+                {
+                    CrmNote note = new CrmNote();
+                    note.NoteTitle = request.Note.NoteTitle;
+                    note.Content = request.Note.Content;
+                    note.CreatedDate = localDateTime.ToUniversalTime();
+                    note.CreatedBy = request.Id;
+                    note.TenantId = request.TenantId;
+                    note.IsDeleted = 0;
+                    if (request.CompanyId == -1)
+                    {
+                        note.IsCompany = -1;
+                    }
+                    else
+                    {
+                        note.IsCompany = 1;
+                        note.Id = request.CompanyId;
+                    }
+                    if (request.LeadId == -1)
+                    {
+                        note.IsLead = -1;
+                    }
+                    else
+                    {
+                        note.IsLead = 1;
+                        note.Id = request.LeadId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1)
+                    {
+                        note.Id = -1;
+                    }
+                    await _dbContext.AddAsync(note);
+                    await _dbContext.SaveChangesAsync();
+
+                    List<int> TagIds = new List<int>();
+                    if (!string.IsNullOrEmpty(request.Note.Tags))
+                        TagIds = (request.Note.Tags.Split(',').Select(Int32.Parse).ToList());
+                    foreach (var item in TagIds)
+                    {
+                        CrmNoteTags tags = new CrmNoteTags();
+                        tags.NoteId = note.NoteId;
+                        tags.TagId = item;
+                        tags.CreatedBy = request.Id;
+                        tags.CreatedDate = localDateTime.ToUniversalTime();
+                        tags.TenantId = request.TenantId;
+                        await _dbContext.AddAsync(tags);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    foreach (var taskDto in request.Note?.Tasks ?? new List<SaveNoteTaskDto>())
+                    {
+
+                        var taskEntity = new CrmNoteTasks
+                        {
+                            NoteId = note.NoteId,
+                            CreatedDate = localDateTime.ToUniversalTime(),
+                            CreatedBy = request.Id,
+                            TenantId = request.TenantId,
+                            IsDeleted = 0,
+                            Task = taskDto.Task,
+                            IsCompleted = taskDto.IsCompleted == true ? 1 : 0
+                        };
+                        await _dbContext.AddAsync(taskEntity);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                }
+                else
+                {
+                    var note = await (from a in _dbContext.CrmNote.Where(a => a.NoteId == request.Note.NoteId)
+                                      select a).FirstOrDefaultAsync();
+                    if (note == null)
+                    {
+                        throw new NotFoundException(request.Note.NoteTitle, request.Note.NoteId);
+                    }
+                    else
+                    {
+                        note.NoteTitle = request.Note.NoteTitle;
+                        note.Content = request.Note.Content;
+                        note.LastModifiedDate = localDateTime.ToUniversalTime();
+                        note.LastModifiedBy = request.Id;
+                        note.TenantId = request.TenantId;
+                        if (request.CompanyId == -1)
+                        {
+                            note.IsCompany = -1;
+                        }
+                        else
+                        {
+                            note.IsCompany = 1;
+                            note.Id = request.CompanyId;
+                        }
+                        if (request.LeadId == -1)
+                        {
+                            note.IsLead = -1;
+                        }
+                        else
+                        {
+                            note.IsLead = 1;
+                            note.Id = request.LeadId;
+                        }
+                        await _dbContext.SaveChangesAsync();
+
+                        CrmNoteTags? noteTags = await (from a in _dbContext.CrmNoteTags.Where(a => a.NoteId == request.Note.NoteId)
+                                                       select a).FirstOrDefaultAsync();
+                        if (noteTags != null)
+                        {
+                            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"CrmNoteTags\" WHERE \"NoteId\" = {0}", noteTags.NoteId);
+
+                        }
+
+                        List<int> TagIds = new List<int>();
+                        if (!string.IsNullOrEmpty(request.Note.Tags))
+                            TagIds = (request.Note.Tags.Split(',').Select(Int32.Parse).ToList());
+                        foreach (var item in TagIds)
+                        {
+                            CrmNoteTags tags = new CrmNoteTags();
+                            tags.NoteId = note.NoteId;
+                            tags.TagId = item;
+                            tags.CreatedBy = request.Id;
+                            tags.CreatedDate = localDateTime.ToUniversalTime();
+                            tags.TenantId = request.TenantId;
+                            await _dbContext.AddAsync(tags);
+                            await _dbContext.SaveChangesAsync();
+                        }
+                        CrmNoteTasks? noteTasks = await (from a in _dbContext.CrmNoteTasks.Where(a => a.NoteId == request.Note.NoteId)
+                                                         select a).FirstOrDefaultAsync();
+                        if (noteTasks != null)
+                        {
+                            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"CrmNoteTasks\" WHERE \"NoteId\" = {0}", noteTasks.NoteId);
+
+                        }
+                        foreach (var taskDto in request.Note?.Tasks ?? new List<SaveNoteTaskDto>())
+                        {
+
+                            var taskEntity = new CrmNoteTasks
+                            {
+                                NoteId = note.NoteId,
+                                CreatedDate = localDateTime.ToUniversalTime(),
+                                CreatedBy = request.Id,
+                                TenantId = request.TenantId,
+                                IsDeleted = 0,
+                                Task = taskDto.Task,
+                                IsCompleted = taskDto.IsCompleted == true ? 1 : 0
+                            };
+                            await _dbContext.AddAsync(taskEntity);
+                            await _dbContext.SaveChangesAsync();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task DeletNote(DeleteNoteCommand request)
+        {
+            try
+            {
+                var note = await (from a in _dbContext.CrmNote.Where(a => a.NoteId == request.NoteId)
+                                  select a).FirstOrDefaultAsync();
+                if (note == null)
+                {
+                    throw new NotFoundException("noteId", request.NoteId);
+                }
+                else
+                {
+                    note.IsDeleted = 1;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
     }
 }

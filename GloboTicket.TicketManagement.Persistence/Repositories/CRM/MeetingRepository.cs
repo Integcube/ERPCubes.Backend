@@ -80,8 +80,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         CrmMeeting addMeeting = new CrmMeeting();
                         addMeeting.Subject = meeting.Subject;
                         addMeeting.Note = meeting.Note;
-                        addMeeting.StartTime = meeting.StartTime;
-                        addMeeting.EndTime = meeting.EndTime;
+                        addMeeting.StartTime = meeting.StartTime.ToUniversalTime();
+                        addMeeting.EndTime = meeting.EndTime.ToUniversalTime();
                         addMeeting.TenantId = meeting.TenantId;
                         addMeeting.CreatedBy = meeting.Id;
                         addMeeting.CreatedDate = localDateTime.ToUniversalTime();
@@ -105,46 +105,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         }
                         if (meeting.LeadId == -1 && meeting.CompanyId == -1)
                         {
-                            addMeeting.IsCompany = -1;
+                            addMeeting.Id = -1;
                         }
 
                         await _dbContext.AddAsync(addMeeting);
                         await _dbContext.SaveChangesAsync();
-
-                        CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
-                        CalenderObj.UserId = addMeeting.CreatedBy;
-                        CalenderObj.Description = "You have a " + addMeeting.Subject;
-                        CalenderObj.Type = 1;
-                        CalenderObj.CreatedBy = addMeeting.CreatedBy;
-                        CalenderObj.CreatedDate = addMeeting.CreatedDate;
-                        CalenderObj.StartTime = addMeeting.StartTime;
-                        CalenderObj.EndTime = addMeeting.EndTime;
-                        CalenderObj.TenantId = addMeeting.TenantId;
-                        CalenderObj.Id = addMeeting.MeetingId;
-                        CalenderObj.IsCompany = -1;
-                        CalenderObj.IsLead = 1;
-                        CalenderObj.AllDay = false;
-                        await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
-                        await _dbContext.SaveChangesAsync();
-
-                        CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                        ActivityObj.UserId = addMeeting.CreatedBy;
-                        ActivityObj.Detail = addMeeting.Subject;
-                        ActivityObj.ActivityType = 3;
-                        ActivityObj.ActivityStatus = 1;
-                        ActivityObj.TenantId = addMeeting.TenantId;
-                        ActivityObj.Id = addMeeting.MeetingId;
-                        ActivityObj.IsCompany = -1;
-                        ActivityObj.IsLead = 1;
-                        ActivityObj.CreatedBy = addMeeting.CreatedBy;
-                        ActivityObj.CreatedDate = addMeeting.CreatedDate;
-                        await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
-                        await _dbContext.SaveChangesAsync();
                     }
                     else
                     {
-                        var existingMeeting = await(from a in _dbContext.CrmMeeting.Where(a => a.MeetingId == meeting.MeetingId)
-                                                    select a).FirstAsync();
+                        var existingMeeting = await (from a in _dbContext.CrmMeeting.Where(a => a.MeetingId == meeting.MeetingId)
+                                                     select a).FirstAsync();
                         if (existingMeeting == null)
                         {
                             throw new NotFoundException(meeting.Subject, meeting.MeetingId);
@@ -153,12 +123,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         {
                             existingMeeting.Subject = meeting.Subject;
                             existingMeeting.Note = meeting.Note;
-                            existingMeeting.StartTime = meeting.StartTime;
+                            existingMeeting.StartTime = meeting.StartTime.ToUniversalTime();
                             //existingEmail.TenantId = email.TenantId;
-                            //existingMeeting.CreatedBy = meeting.Id;
-                            existingMeeting.EndTime = meeting.EndTime;
-                            existingMeeting.CreatedDate = localDateTime.ToUniversalTime();
-
+                            existingMeeting.LastModifiedBy = meeting.Id;
+                            existingMeeting.EndTime = meeting.EndTime.ToUniversalTime();
+                            existingMeeting.LastModifiedDate = localDateTime.ToUniversalTime();
                             if (meeting.CompanyId == -1)
                             {
                                 existingMeeting.IsCompany = -1;
@@ -179,7 +148,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             }
                             if (meeting.LeadId == -1 && meeting.CompanyId == -1)
                             {
-                                meeting.CompanyId = -1;
+                                existingMeeting.Id = -1;
                             }
                             await _dbContext.SaveChangesAsync();
                         }

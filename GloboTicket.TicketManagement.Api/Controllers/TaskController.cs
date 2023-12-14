@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
@@ -64,6 +65,14 @@ namespace ERPCubesApi.Controllers
         public async Task SaveTask(SaveTaskCommand saveTask)
         {
             var dtos = await _mediator.Send(saveTask);
+        }
+        [HttpPost("updatePriority", Name = "UpdateTaskPriority")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task UpdateTaskPriority(UpdateTaskPriorityCommand updateTaskPriority)
+        {
+            var dtos = await _mediator.Send(updateTaskPriority);
         }
     }
 }

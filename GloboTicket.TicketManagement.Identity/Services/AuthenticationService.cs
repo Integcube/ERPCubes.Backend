@@ -2,6 +2,7 @@
 using ERPCubes.Application.Models.Authentication;
 using ERPCubes.Identity.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,7 +28,7 @@ namespace ERPCubes.Identity.Services
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email == request.Email);
 
             if (user == null)
             {

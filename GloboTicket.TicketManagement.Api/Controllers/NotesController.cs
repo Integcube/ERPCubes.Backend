@@ -1,4 +1,6 @@
-﻿using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
+﻿using ERPCubes.Application.Features.Notes.Commands.DeleteNote;
+using ERPCubes.Application.Features.Notes.Commands.SaveNote;
+using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
 using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTasks;
@@ -45,6 +47,20 @@ namespace ERPCubesApi.Controllers
 
             var dtos = await _mediator.Send(getNoteTags);
             return Ok(dtos);
+        }
+        [HttpPost("save", Name = "SaveNote")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task SaveNote(SaveNoteCommand saveNote)
+        {
+            var dtos = await _mediator.Send(saveNote);
+        }
+        [HttpPost("delete", Name = "DeleteNote")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task DeleteNote(DeleteNoteCommand deleteNote)
+        {
+            var dtos = await _mediator.Send(deleteNote);
         }
     }
 }
