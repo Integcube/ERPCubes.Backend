@@ -26,7 +26,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport
             try
             {
                 List<GetLeadReportVm> LeadReport = new List<GetLeadReportVm>();
-                LeadReport = await _leadRepository.GetLeadReport(request.TenantId, request.Id);
+                LeadReport = await _leadRepository.GetLeadReport(request.TenantId, request.Id, request.startDate, request.endDate, request.prodId);
                 return LeadReport;
             }
             catch (Exception ex)

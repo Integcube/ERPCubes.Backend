@@ -16,33 +16,34 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-            var Activitylist = await (
-              from a in _dbContext.CrmUserActivityLog.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && (request.LeadId != -1 || request.CompanyId != -1 || a.UserId == request.Id || a.CreatedBy == request.Id) && (request.CompanyId == -1 || a.Id == request.CompanyId) && (request.LeadId == -1 || a.Id == request.LeadId))
-              join b in _dbContext.CrmUserActivityType on a.ActivityType equals b.ActivityTypeId into all
-              from c in all.DefaultIfEmpty()
-              orderby a.CreatedDate descending
-              select new GetUserActivityVm
-              {
-                  ActivityId = a.ActivityId,
-                  UserId = a.UserId,
-                  ActivityStatus = a.ActivityStatus,
-                  Detail = a.Detail,
-                  CreatedDate = a.CreatedDate,
-                  CreatedBy = a.CreatedBy,
-                  ActivityType = c.ActivityTypeTitle,
-                  Icon = c.Icon,
-                  ActivityTypeId = c.ActivityTypeId
-              }).Take(request.Count * 10).ToListAsync();
+                var Activitylist = await (
+                  from a in _dbContext.CrmUserActivityLog.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && (request.LeadId != -1 || request.CompanyId != -1 || a.UserId == request.Id || a.CreatedBy == request.Id) && (request.CompanyId == -1 || a.Id == request.CompanyId) && (request.LeadId == -1 || a.Id == request.LeadId))
+                  join b in _dbContext.CrmUserActivityType on a.ActivityType equals b.ActivityTypeId into all
+                  from c in all.DefaultIfEmpty()
+                  orderby a.CreatedDate descending
+                  select new GetUserActivityVm
+                  {
+                      ActivityId = a.ActivityId,
+                      UserId = a.UserId,
+                      ActivityStatus = a.ActivityStatus,
+                      Detail = a.Detail,
+                      CreatedDate = a.CreatedDate,
+                      CreatedBy = a.CreatedBy,
+                      ActivityType = c.ActivityTypeTitle,
+                      Icon = c.Icon,
+                      ActivityTypeId = c.ActivityTypeId
+                  }).Take(request.Count * 10).ToListAsync();
                 return Activitylist;
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-          
-            
+
+
         }
-        public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId) {
+        public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId)
+        {
             try
             {
                 var tenantIdParameter = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)

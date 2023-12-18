@@ -24,7 +24,7 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(request);
             return Ok(dtos);
         }
-        
+
         [HttpPost("activityReport", Name = "GetUserActivityReport")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetUserActivityReport(GetUserActivityReportQuery leadReport)

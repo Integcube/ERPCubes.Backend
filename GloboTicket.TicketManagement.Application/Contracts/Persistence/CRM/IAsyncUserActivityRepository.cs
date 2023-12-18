@@ -13,6 +13,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     public interface IAsyncUserActivityRepository : IAsyncRepository<CrmUserActivityLog>
     {
         Task<List<GetUserActivityVm>> GetUserActivityListAsync(GetUserActivityQuery request);
-        Task<List<GetUserActivityReportVm>> GetUserActivityReport( string Id, int TenantId);
+        Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId);
     }
 }

@@ -142,17 +142,28 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id)
+        public async Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId)
         {
             try
             {
-                var tenantIdParameter = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
                 {
                     Value = TenantId
                 };
-
+                var startDatePrm = new Npgsql.NpgsqlParameter("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = startDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = endDate
+                };
+                var prodIdPrm = new Npgsql.NpgsqlParameter("@p_productid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = prodId
+                };
                 var results = await _dbContext.GetCrmLeads.FromSqlRaw(
-                    "SELECT * FROM public.leadstatusfn({0})", tenantIdParameter)
+                    "SELECT * FROM public.leadstatusfn({0},{1},{2},{3})", tenantIdPrm, startDatePrm, endDatePrm, prodIdPrm)
                     .ToListAsync();
 
                 return results;

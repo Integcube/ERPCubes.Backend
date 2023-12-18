@@ -18,7 +18,7 @@ namespace ERPCubes.Persistence
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<GetLeadReportVm>().HasNoKey().ToView("get_crmleads");
+            modelBuilder.Entity<GetLeadReportVm>().HasNoKey().ToView("leadstatusfn");
             modelBuilder.Entity<GetUserActivityReportVm>().HasNoKey().ToView("calculateleadevent");
             base.OnModelCreating(modelBuilder);
         }
@@ -33,6 +33,8 @@ namespace ERPCubes.Persistence
         public DbSet<CrmNote> CrmNote { get; set; }
         public DbSet<CrmNoteTags> CrmNoteTags { get; set; }
         public DbSet<CrmNoteTasks> CrmNoteTasks { get; set; }
+        public DbSet<CrmOpportunity> CrmOpportunity { get; set; }
+        public DbSet<CrmOpportunitySource> CrmOpportunitySource { get; set; }
         public DbSet<CrmTask> CrmTask { get; set; }
         public DbSet<CrmTaskTags> CrmTaskTags { get; set; }
         public DbSet<CrmTaskPriority> CrmTaskPriority { get; set; }

@@ -21,7 +21,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
             );
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
-        Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id);
+        Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId);
         Task DeleteLead(string Id, int TenantId, int LeadId, string Name);
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
     }

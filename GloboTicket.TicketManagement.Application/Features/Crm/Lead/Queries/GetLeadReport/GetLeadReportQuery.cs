@@ -11,5 +11,8 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport
     {
         public int TenantId { get; set; }
         public string Id { get; set; } = string.Empty;
+        public DateTime startDate {  get; set; }
+        public DateTime endDate { get; set; }
+        public int prodId {  get; set; }
     }
 }
