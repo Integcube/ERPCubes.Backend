@@ -52,6 +52,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                               Name = a.Name,
                                                               Website = a.Website,
                                                               CompanyOwner = a.CompanyOwner,
+                                                              Email = a.Email,
                                                               Mobile = a.Mobile,
                                                               Work = a.Work,
                                                               BillingAddress = a.BillingAddress,

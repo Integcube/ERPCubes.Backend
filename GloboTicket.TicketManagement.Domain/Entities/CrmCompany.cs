@@ -26,5 +26,7 @@ namespace ERPCubes.Domain.Entities
         public string? DeliveryCountry { get; set; } = string.Empty;
         public int? IndustryId { get; set; }
         public int TenantId { get; set; }
+        public string Email { get; set; } = string.Empty;
+
     }
 }

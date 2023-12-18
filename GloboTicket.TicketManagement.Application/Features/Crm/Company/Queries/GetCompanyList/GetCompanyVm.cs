@@ -29,5 +29,7 @@ namespace ERPCubes.Application.Features.Crm.Company.Queries.GetCompanyList
         public int? IndustryId { get; set; }
         public string? IndustryTitle { get; set; } = string.Empty;
         public DateTime? CreatedDate { get; set; }
+        public string Email { get; set; } = string.Empty;
+
     }
 }
