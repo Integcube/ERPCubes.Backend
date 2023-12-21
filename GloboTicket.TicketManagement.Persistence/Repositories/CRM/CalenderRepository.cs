@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.Crm.Calender.Commands.DeleteCalendarEvent;
 using ERPCubes.Application.Features.Crm.Calender.Commands.SaveCalendarEvent;
 using ERPCubes.Application.Features.Crm.Calender.Queries.GetCalendarTypeList;
 using ERPCubes.Application.Features.Crm.Calender.Queries.GetCalenderList;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -123,11 +124,19 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         events.IsLead = 1;
                         events.Id = request.LeadId;
                     }
-                    if (request.LeadId == -1 && request.CompanyId == -1)
+                    if (request.OpportunityId == -1)
+                    {
+                        events.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        events.IsOpportunity = 1;
+                        events.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
                     {
                         events.Id = -1;
                     }
-
                     await _dbContext.AddAsync(events);
                     await _dbContext.SaveChangesAsync();
 
@@ -167,7 +176,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             events.IsLead = 1;
                             events.Id = request.LeadId;
                         }
-                        if (request.LeadId == -1 && request.CompanyId == -1)
+                        if (request.OpportunityId == -1)
+                        {
+                            events.IsOpportunity = -1;
+                        }
+                        else
+                        {
+                            events.IsOpportunity = 1;
+                            events.Id = request.OpportunityId;
+                        }
+                        if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
                         {
                             events.Id = -1;
                         }

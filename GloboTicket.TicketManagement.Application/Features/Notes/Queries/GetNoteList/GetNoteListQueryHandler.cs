@@ -24,7 +24,7 @@ namespace ERPCubes.Application.Features.Notes.Queries.GetNoteList
             List<GetNoteListVm> NoteList = new List<GetNoteListVm>();
             try
             {
-                NoteList = await _noteRepository.GetNoteList(request.TenantId, request.Id, request.LeadId, request.CompanyId);
+                NoteList = await _noteRepository.GetNoteList(request.TenantId, request.Id, request.LeadId, request.CompanyId, request.OpportunityId);
             }
             catch (Exception ex)
             {

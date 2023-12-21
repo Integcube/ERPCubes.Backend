@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    public class CrmOpportunitySource : AuditableEntity
+    public class CrmOpportunityStatus : AuditableEntity
     {
         [Key]
-        public int SourceId { get; set; }
-        public string SourceTitle { get; set; } = string.Empty;
+        public int StatusId { get; set; }
+        public string StatusTitle { get; set; } = string.Empty;
+        public int IsDeletable { get; set; }
+        public int Order { get; set; }
         public int TenantId { get; set; }
-
     }
 }

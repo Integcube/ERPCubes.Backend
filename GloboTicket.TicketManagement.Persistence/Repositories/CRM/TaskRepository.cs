@@ -7,6 +7,7 @@ using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,7 +40,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int CompanyId, int LeadId)
+        public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int CompanyId, int LeadId, int OpportunityId)
         {
             try
             {
@@ -47,7 +48,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                 List<GetCrmTaskListVm> obj = await (
                                             from a in _dbContext.CrmTask
-                                                .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
+                                                .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
+                                                (Id == "-1" || a.CreatedBy == Id) &&
+                                                (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
+                                                (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
+                                                (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
                                             join s in _dbContext.CrmTaskStatus on a.Status equals s.StatusId into all
                                             from ss in all.DefaultIfEmpty()
                                             //let tagId = bb != null ? bb.TagId : (int?)null 
@@ -134,7 +139,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         task.IsLead = 1;
                         task.Id = request.LeadId;
                     }
-                    if(request.LeadId == -1 && request.CompanyId == -1)
+                    if (request.OpportunityId == -1)
+                    {
+                        task.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        task.IsOpportunity = 1;
+                        task.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
                     {
                         task.Id = -1;
                     }
@@ -160,28 +174,84 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                     CalenderObj.UserId = task.CreatedBy;
                     CalenderObj.Description = "You have a task " + task.Title;
-                    CalenderObj.Type = 4;
+                    CalenderObj.Type = 5;
                     CalenderObj.CreatedBy = task.CreatedBy;
                     CalenderObj.CreatedDate = task.CreatedDate;
                     CalenderObj.StartTime = localDateTime.ToUniversalTime();
                     CalenderObj.EndTime = localDateTime.ToUniversalTime();
                     CalenderObj.TenantId = task.TenantId;
-                    CalenderObj.Id = task.TaskId;
-                    CalenderObj.IsCompany = -1;
-                    CalenderObj.IsLead = 1;
+                    if (request.CompanyId == -1)
+                    {
+                        CalenderObj.IsCompany = -1;
+                    }
+                    else
+                    {
+                        CalenderObj.IsCompany = 1;
+                        CalenderObj.Id = request.CompanyId;
+                    }
+                    if (request.LeadId == -1)
+                    {
+                        CalenderObj.IsLead = -1;
+                    }
+                    else
+                    {
+                        CalenderObj.IsLead = 1;
+                        CalenderObj.Id = request.LeadId;
+                    }
+                    if (request.OpportunityId == -1)
+                    {
+                        CalenderObj.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        CalenderObj.IsOpportunity = 1;
+                        CalenderObj.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
+                    {
+                        CalenderObj.Id = -1;
+                    }
                     CalenderObj.AllDay = false;
                     await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
                     await _dbContext.SaveChangesAsync();
 
                     CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                    ActivityObj.UserId = task.CreatedBy;
-                    ActivityObj.Detail = "Task" + task.Title;
-                    ActivityObj.ActivityType = 2;
+                    ActivityObj.UserId = task.TaskOwner;
+                    ActivityObj.Detail = "Task: " + task.Title;
+                    ActivityObj.ActivityType = 5;
                     ActivityObj.ActivityStatus = 1;
                     ActivityObj.TenantId = task.TenantId;
-                    ActivityObj.Id = task.TaskId;
-                    ActivityObj.IsCompany = -1;
-                    ActivityObj.IsLead = 1;
+                    if (request.CompanyId == -1)
+                    {
+                        ActivityObj.IsCompany = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsCompany = 1;
+                        ActivityObj.Id = request.CompanyId;
+                    }
+                    if (request.LeadId == -1)
+                    {
+                        ActivityObj.IsLead = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsLead = 1;
+                        ActivityObj.Id = request.LeadId;
+                    }
+                    if (request.OpportunityId == -1)
+                    {
+                        ActivityObj.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsOpportunity = 1;
+                        ActivityObj.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
+                    {
+                        ActivityObj.Id = -1;
+                    }
                     ActivityObj.CreatedBy = task.CreatedBy;
                     ActivityObj.CreatedDate = task.CreatedDate;
                     await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
@@ -206,24 +276,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         task.LastModifiedDate = localDateTime.ToUniversalTime();
                         task.LastModifiedBy = request.Id;
                         task.TenantId = request.TenantId;
-                        if (request.CompanyId == -1)
-                        {
-                            task.IsCompany = -1;
-                        }
-                        else
-                        {
-                            task.IsCompany = 1;
-                            task.Id = request.CompanyId;
-                        }
-                        if (request.LeadId == -1)
-                        {
-                            task.IsLead = -1;
-                        }
-                        else
-                        {
-                            task.IsLead = 1;
-                            task.Id = request.LeadId;
-                        }
                         await _dbContext.SaveChangesAsync();
 
                         CrmTaskTags? taskTags = await (from a in _dbContext.CrmTaskTags.Where(a => a.TaskId == request.Task.TaskId)

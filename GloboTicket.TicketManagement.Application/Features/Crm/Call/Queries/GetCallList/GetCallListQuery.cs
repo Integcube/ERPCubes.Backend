@@ -14,6 +14,7 @@ namespace ERPCubes.Application.Features.Crm.Call.Queries.GetCallList
         public int TenantId { get; set; }
         public int LeadId { get; set; }
         public int CompanyId { get; set; }
+        public int OpportunityId { get; set; }
 
     }
 }

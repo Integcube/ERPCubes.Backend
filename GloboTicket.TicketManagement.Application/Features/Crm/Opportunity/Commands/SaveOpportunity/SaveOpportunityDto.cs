@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunity
+namespace ERPCubes.Application.Features.Crm.Opportunity.Commands.SaveOpportunity
 {
-    public class GetOpportunityVm
+    public class SaveOpportunityDto
     {
         public int OpportunityId { get; set; }
         public string FirstName { get; set; } = string.Empty;
@@ -30,6 +30,5 @@ namespace ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunity
         public int ProductId { get; set; }
         public string ProductTitle { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
-        public DateTime? ModifiedDate { get; set; }
     }
 }

@@ -13,6 +13,7 @@ namespace ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList
         public int TenantId { get; set; }
         public int LeadId { get; set; }
         public int CompanyId { get; set; }
+        public int OpportunityId { get; set; }
 
     }
 }

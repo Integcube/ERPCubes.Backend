@@ -12,6 +12,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList
         public int TenantId { get; set; }
         public int CompanyId { get; set; }
         public int LeadId { get; set; }
+        public int OpportunityId { get; set; }
         public string Id { get; set; }=String.Empty;
     }
 }

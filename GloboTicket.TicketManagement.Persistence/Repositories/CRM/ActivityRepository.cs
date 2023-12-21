@@ -5,6 +5,7 @@ using ERPCubes.Application.Features.Crm.UserActivity.Queries.GetUserActivity;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -17,7 +18,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 var Activitylist = await (
-                  from a in _dbContext.CrmUserActivityLog.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && (request.LeadId != -1 || request.CompanyId != -1 || a.UserId == request.Id || a.CreatedBy == request.Id) && (request.CompanyId == -1 || a.Id == request.CompanyId) && (request.LeadId == -1 || a.Id == request.LeadId))
+                  from a in _dbContext.CrmUserActivityLog.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && 
+                  //(request.LeadId != -1 || request.CompanyId != -1 || a.UserId == request.Id || a.CreatedBy == request.Id) &&
+                  (a.UserId == request.Id || a.CreatedBy == request.Id) &&
+                  (request.LeadId == -1 || (a.Id == request.LeadId && a.IsLead == 1)) &&
+                  (request.CompanyId == -1 || (a.Id == request.CompanyId && a.IsCompany == 1)) &&
+                  (request.OpportunityId == -1 || (a.Id == request.OpportunityId && a.IsOpportunity == 1)))
                   join b in _dbContext.CrmUserActivityType on a.ActivityType equals b.ActivityTypeId into all
                   from c in all.DefaultIfEmpty()
                   orderby a.CreatedDate descending

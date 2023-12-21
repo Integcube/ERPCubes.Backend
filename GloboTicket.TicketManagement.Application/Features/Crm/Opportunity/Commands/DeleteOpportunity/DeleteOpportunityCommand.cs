@@ -10,7 +10,7 @@ namespace ERPCubes.Application.Features.Crm.Opportunity.Commands.DeleteOpportuni
     public class DeleteOpportunityCommand : IRequest
     {
         public string Id { get; set; } = string.Empty;
-        public int OpportunityId { get; set; }
         public int TenantId { get; set; }
+        public int OpportunityId { get; set; }
     }
 }

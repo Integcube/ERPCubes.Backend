@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.Opportunity.Commands.DeleteOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Commands.SaveOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunity;
+using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunityStatus;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportuntiySource;
 using ERPCubes.Domain.Entities;
 using System;
@@ -15,6 +16,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetOpportunityVm>> GetOpportunity(GetOpportunityQuery query);
         Task<List<GetOpportunitySourceVm>> GetOpportunitySource(GetOpportunitySourceQuery query);
+        Task<List<GetOpportunityStatusVm>> GetOpportunityStatus(GetOpportunityStatusQuery query);
         Task SaveOpportunity(SaveOpportunityCommand command);
         Task DeleteOpportunity(DeleteOpportunityCommand query);
     }

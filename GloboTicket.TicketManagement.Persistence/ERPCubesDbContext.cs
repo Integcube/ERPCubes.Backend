@@ -35,6 +35,7 @@ namespace ERPCubes.Persistence
         public DbSet<CrmNoteTasks> CrmNoteTasks { get; set; }
         public DbSet<CrmOpportunity> CrmOpportunity { get; set; }
         public DbSet<CrmOpportunitySource> CrmOpportunitySource { get; set; }
+        public DbSet<CrmOpportunityStatus> CrmOpportunityStatus { get; set; }
         public DbSet<CrmTask> CrmTask { get; set; }
         public DbSet<CrmTaskTags> CrmTaskTags { get; set; }
         public DbSet<CrmTaskPriority> CrmTaskPriority { get; set; }

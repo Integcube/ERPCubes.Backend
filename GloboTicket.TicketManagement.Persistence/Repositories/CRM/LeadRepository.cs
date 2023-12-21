@@ -242,7 +242,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                     CalenderObj.UserId = LeadObj.LeadOwner;
                     CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
-                    CalenderObj.Type = 6;
+                    CalenderObj.Type = 1;
                     CalenderObj.CreatedBy = LeadObj.CreatedBy;
                     CalenderObj.CreatedDate = LeadObj.CreatedDate;
                     CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
@@ -250,6 +250,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CalenderObj.TenantId = TenantId;
                     CalenderObj.Id = LeadObj.LeadId;
                     CalenderObj.IsCompany = -1;
+                    CalenderObj.IsOpportunity = -1;
                     CalenderObj.IsLead = 1;
                     CalenderObj.AllDay = false;
                     await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
@@ -263,6 +264,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     ActivityObj.TenantId = LeadObj.TenantId;
                     ActivityObj.Id = LeadObj.LeadId;
                     ActivityObj.IsCompany = -1;
+                    ActivityObj.IsOpportunity = -1;
                     ActivityObj.IsLead = 1;
                     ActivityObj.CreatedBy = LeadObj.CreatedBy;
                     ActivityObj.CreatedDate = LeadObj.CreatedDate;

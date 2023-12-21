@@ -21,6 +21,7 @@ namespace ERPCubes.Domain.Entities
         public int Id { get; set; } 
         public int IsCompany { get; set; }
         public int IsLead { get; set; }
+        public int IsOpportunity {  get; set; }
         public bool AllDay { get; set; }
     }
 }

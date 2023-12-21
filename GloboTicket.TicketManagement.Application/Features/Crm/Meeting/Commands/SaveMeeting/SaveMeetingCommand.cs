@@ -15,6 +15,7 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Commands.SaveMeeting
         public string Id { get; set; } = String.Empty;
         public int CompanyId { get; set; }
         public int LeadId { get; set; }
+        public int OpportunityId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int TenantId { get; set; }
