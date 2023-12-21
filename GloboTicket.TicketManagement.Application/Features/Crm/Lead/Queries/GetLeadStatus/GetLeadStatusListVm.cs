@@ -12,5 +12,6 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus
         public string StatusTitle { get; set; } = string.Empty;
         public int IsDeletable { get; set; }
         public int Order { get; set; }
+        public int Count { get; set; }
     }
 }
