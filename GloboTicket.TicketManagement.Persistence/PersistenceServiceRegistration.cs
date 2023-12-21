@@ -31,6 +31,7 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncEmailRepository, EmailRepository>();
             services.AddScoped<IAsyncCallRepository, CallRepository>();
             services.AddScoped<IAsyncMeetingRepository, MeetingRepository>();
+            services.AddScoped<IAsyncAdAccountRepository, AdAccountRepository>();
             return services;    
         }
     }
