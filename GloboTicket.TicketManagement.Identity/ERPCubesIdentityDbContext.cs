@@ -6,14 +6,14 @@ namespace ERPCubes.Identity
 {
     public class ERPCubesIdentityDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ERPCubesIdentityDbContext()
-        {
 
-        }
 
         public ERPCubesIdentityDbContext(DbContextOptions<ERPCubesIdentityDbContext> options) : base(options)
         {
         }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<SocialUsers> SocialUsers { get; set; }
+        public DbSet<SocialUserTokens> SocialUserTokens { get; set; }
+
     }
 }

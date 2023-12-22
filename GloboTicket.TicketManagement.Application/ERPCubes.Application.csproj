@@ -24,6 +24,8 @@
 	<ItemGroup>
 	  <Folder Include="Features\Crm\DocumentLog\" />
 	  <Folder Include="Features\Crm\Projects\" />
+	  <Folder Include="Features\Facebook\Commands\SaveFacebookLead\" />
+	  <Folder Include="Features\Facebook\Commands\SaveFacebookCampaign\" />
 	</ItemGroup>
 
 </Project>

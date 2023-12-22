@@ -1,4 +1,6 @@
-﻿using ERPCubes.Application.Contracts.Identity;
+﻿using ERPCubes.Application.Contracts.Facebook;
+using ERPCubes.Application.Contracts.Identity;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Models.Authentication;
 using ERPCubes.Identity.Models;
 using ERPCubes.Identity.Services;

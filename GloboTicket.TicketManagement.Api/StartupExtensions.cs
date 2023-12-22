@@ -6,8 +6,6 @@ using ERPCubes.Application.Contracts;
 using ERPCubes.Identity;
 using ERPCubes.Infrastructure;
 using ERPCubes.Persistence;
-using ERPCubesApi.Middleware;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 //using Serilog;
@@ -31,13 +29,21 @@ namespace ERPCubes.Api
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers().AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; // This will configure camelCase to PascalCase conversion
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; 
     });
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("Open", builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+                options.AddPolicy("Open", builder => builder.WithOrigins("http://localhost:4200")
+.AllowAnyHeader().AllowAnyMethod());
             });
 
+            builder.Services.AddAuthentication().AddFacebook(options =>
+            {
+                options.AppId = "746255643565380"; 
+                options.AppSecret = "d7f47f73d8d8722bd5e2ac82aa670d59"; 
+                options.CallbackPath = "/api/FacebookLogin/signin-facebook";
+                options.SaveTokens = true;
+            });
             return builder.Build();
 
         }
@@ -56,13 +62,12 @@ namespace ERPCubes.Api
 
             app.UseHttpsRedirection();
 
-            //app.UseRouting();
-            
+            app.UseCors("Open");
             app.UseAuthentication();
 
             app.UseCustomExceptionHandler();
 
-            app.UseCors("Open");
+
 
             app.UseAuthorization();
 

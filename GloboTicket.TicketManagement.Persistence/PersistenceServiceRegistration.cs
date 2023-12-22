@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Contracts.Persistence;
+﻿using ERPCubes.Application.Contracts.Facebook;
+using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Persistence.Repositories;
 using ERPCubes.Persistence.Repositories.CRM;
@@ -18,7 +19,8 @@ namespace ERPCubes.Persistence
             services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IAsyncCompanyRepository, CompanyRepository>();
             services.AddScoped<IAsyncIndustryRepository, IndustryRepository>();
-            services.AddScoped<Application.Contracts.Persistence.IAsyncUserRepository, UsersRepository>();
+            services.AddScoped<IAsyncUserRepository, UsersRepository>();
+            services.AddScoped<IAsyncSocialRepository, SocialRepository>();
             services.AddScoped<IAsyncTagsRepository, TagsRepository>();
             services.AddScoped<IAsyncLeadRepository, LeadRepository>();
             services.AddScoped<IAsyncProductRepository, ProductRepository>();
