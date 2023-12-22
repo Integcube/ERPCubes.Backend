@@ -53,5 +53,6 @@ namespace ERPCubes.Persistence
         public DbSet<GetLeadReportVm> GetCrmLeads { get; set; }
         public DbSet<CrmAdAccount> CrmAdAccount { get; set; }
         public DbSet<GetUserActivityReportVm> GetCrmUserActivity {  get; set; }
+        public DbSet<CrmCampaign> CrmCampaign { get; set; }
     }
 }

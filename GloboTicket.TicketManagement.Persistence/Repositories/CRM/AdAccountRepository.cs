@@ -18,51 +18,55 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public async Task SaveAdAccount(SaveAdAccountCommand ad)
+        public async Task SaveAdAccount(List<SaveAdAccountCommand> ad)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
 
-                if (ad.AccountId == -1)
+                foreach (var ads in ad)
                 {
-                    CrmAdAccount addAccount = new CrmAdAccount();
-                    addAccount.Title = ad.Title;
-                    addAccount.SocialId = ad.SocialId;
-                    addAccount.IsSelected = ad.IsSelected;
-                    addAccount.CreatedDate = localDateTime.ToUniversalTime();
-                    addAccount.TenantId = ad.TenantId;
-                    addAccount.IsDeleted = 0;
-                    addAccount.CreatedBy = ad.Id;
-                    await _dbContext.AddAsync(addAccount);
-                    await _dbContext.SaveChangesAsync();
-
-                }
-                else
-                {
-                    var existingAccount = await (from a in _dbContext.CrmAdAccount.Where(a => a.AccountId == ad.AccountId)
-                                                 select a).FirstAsync();
-                    if (existingAccount == null)
+                    if (ads.AccountId == "-1")
                     {
-                        throw new NotFoundException(ad.Title, ad.AccountId);
+                        CrmAdAccount addAccount = new CrmAdAccount();
+                        addAccount.Title = ads.Title;
+                        addAccount.SocialId = ads.SocialId;
+                        addAccount.IsSelected = ads.IsSelected;
+                        addAccount.CreatedDate = localDateTime.ToUniversalTime();
+                        addAccount.TenantId = ads.TenantId;
+                        addAccount.IsDeleted = 0;
+                        addAccount.CreatedBy = ads.Id;
+                        await _dbContext.AddAsync(addAccount);
+                        await _dbContext.SaveChangesAsync();
+
                     }
                     else
                     {
-                        existingAccount.Title = ad.Title;
-                        existingAccount.SocialId = ad.SocialId;
+                        var existingAccount = await (from a in _dbContext.CrmAdAccount.Where(a => a.AccountId == ads.AccountId)
+                                                     select a).FirstAsync();
+                        if (existingAccount == null)
+                        {
+                            throw new NotFoundException(ads.Title, ads.AccountId);
+                        }
+                        else
+                        {
+                            existingAccount.Title = ads.Title;
+                            existingAccount.SocialId = ads.SocialId;
 
-                        existingAccount.IsSelected = ad.IsSelected;
+                            existingAccount.IsSelected = ads.IsSelected;
 
-                        //addAccount.CreatedBy = ad.Id;
-                        existingAccount.CreatedDate = localDateTime.ToUniversalTime();
-                        existingAccount.TenantId = ad.TenantId;
-                        existingAccount.IsDeleted = 0;
-                        existingAccount.LastModifiedBy = ad.Id;
-                        existingAccount.LastModifiedDate= localDateTime.ToUniversalTime();
-                        await _dbContext.SaveChangesAsync();
+                            //addAccount.CreatedBy = ad.Id;
+                            //existingAccount.CreatedDate = localDateTime.ToUniversalTime();
+                            existingAccount.TenantId = ads.TenantId;
+                            existingAccount.IsDeleted = 0;
+                            existingAccount.LastModifiedBy = ads.Id;
+                            existingAccount.LastModifiedDate = localDateTime.ToUniversalTime();
+                            await _dbContext.SaveChangesAsync();
+                        }
+
                     }
-
                 }
+                    
             }
             catch (Exception ex)
             {

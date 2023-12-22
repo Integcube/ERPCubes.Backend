@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,7 +26,7 @@ namespace ERPCubes.Application.Features.Crm.AdAccount.SaveAdAccount
         {
             try
             {
-                await _adRepository.SaveAdAccount(request);
+                await _adRepository.SaveAdAccount(new List<SaveAdAccountCommand> { request });
             }
             catch (Exception ex)
             {

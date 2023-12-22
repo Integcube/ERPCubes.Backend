@@ -11,7 +11,7 @@ namespace ERPCubes.Domain.Entities
     public class CrmAdAccount : AuditableEntity
     {
         [Key]
-        public int AccountId { get; set; }
+        public string AccountId { get; set; } = String.Empty;
         public string Title { get; set; } = String.Empty;
         public int IsSelected { get; set; }
         public string SocialId { get; set; } = String.Empty;

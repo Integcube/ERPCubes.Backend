@@ -17,7 +17,7 @@ namespace ERPCubesApi.Controllers
         [HttpPost("save", Name = "SaveAccount")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> SaveCall(SaveAdAccountCommand saveAccount)
+        public async Task<ActionResult> SaveAdAccount(SaveAdAccountCommand saveAccount)
         {
             var dtos = await _mediator.Send(saveAccount);
             return Ok(dtos);
