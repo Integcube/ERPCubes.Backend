@@ -44,22 +44,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
+        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
         {
             try
             {
-                List<GetCallVm> Call = await (from a in _dbContext.CrmCall.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
-                                               select new GetCallVm
-                                               {
-                                                   CallId = a.CallId,
-                                                   Subject = a.Subject,
-                                                   Response = a.Response,
-                                                   StartTime= a.StartTime,
-                                                   EndTime= a.EndTime,
-                                                   CreatedBy = a.CreatedBy,
-                                                   CreatedDate=a.CreatedDate
+                List<GetCallVm> Call = await (
+                    from a in _dbContext.CrmCall.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && 
+                    (Id == "-1" || a.CreatedBy == Id) && 
+                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1))  && 
+                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) && 
+                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    select new GetCallVm
+                    {
+                        CallId = a.CallId,
+                        Subject = a.Subject,
+                        Response = a.Response,
+                        StartTime= a.StartTime,
+                        EndTime= a.EndTime,
+                        CreatedBy = a.CreatedBy,
+                        CreatedDate=a.CreatedDate
 
-                                               }).OrderByDescending(a => a.CreatedDate).ToListAsync();
+                    }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Call;
             }
@@ -103,7 +108,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addCall.IsLead = 1;
                         addCall.Id = call.LeadId;
                     }
-                    if (call.LeadId == -1 && call.CompanyId == -1)
+                    if (call.OpportunityId == -1)
+                    {
+                        addCall.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        addCall.IsOpportunity = 1;
+                        addCall.Id = call.OpportunityId;
+                    }
+                    if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
                     {
                         addCall.Id = -1;
                     }
@@ -113,15 +127,43 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                     CalenderObj.UserId = addCall.CreatedBy;
                     CalenderObj.Description = "You have a " + addCall.Subject;
-                    CalenderObj.Type = 6;
+                    CalenderObj.Type = 1;
                     CalenderObj.CreatedBy = addCall.CreatedBy;
                     CalenderObj.CreatedDate = addCall.CreatedDate;
                     CalenderObj.StartTime = addCall.StartTime;
                     CalenderObj.EndTime = addCall.EndTime;
                     CalenderObj.TenantId = addCall.TenantId;
-                    CalenderObj.Id = addCall.CallId;
-                    CalenderObj.IsCompany = -1;
-                    CalenderObj.IsLead = 1;
+                    if (call.CompanyId == -1)
+                    {
+                        addCall.IsCompany = -1;
+                    }
+                    else
+                    {
+                        addCall.IsCompany = 1;
+                        addCall.Id = call.CompanyId;
+                    }
+                    if (call.LeadId == -1)
+                    {
+                        addCall.IsLead = -1;
+                    }
+                    else
+                    {
+                        addCall.IsLead = 1;
+                        addCall.Id = call.LeadId;
+                    }
+                    if (call.OpportunityId == -1)
+                    {
+                        addCall.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        addCall.IsOpportunity = 1;
+                        addCall.Id = call.OpportunityId;
+                    }
+                    if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
+                    {
+                        addCall.Id = -1;
+                    }
                     CalenderObj.AllDay = false;
                     await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
                     await _dbContext.SaveChangesAsync();
@@ -129,12 +171,40 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
                     ActivityObj.UserId = addCall.CreatedBy;
                     ActivityObj.Detail = addCall.Subject;
-                    ActivityObj.ActivityType = 4;
+                    ActivityObj.ActivityType = 1;
                     ActivityObj.ActivityStatus = 1;
                     ActivityObj.TenantId = addCall.TenantId;
-                    ActivityObj.Id = addCall.CallId;
-                    ActivityObj.IsCompany = -1;
-                    ActivityObj.IsLead = 1;
+                    if (call.CompanyId == -1)
+                    {
+                        ActivityObj.IsCompany = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsCompany = 1;
+                        ActivityObj.Id = call.CompanyId;
+                    }
+                    if (call.LeadId == -1)
+                    {
+                        ActivityObj.IsLead = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsLead = 1;
+                        ActivityObj.Id = call.LeadId;
+                    }
+                    if (call.OpportunityId == -1)
+                    {
+                        ActivityObj.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsOpportunity = 1;
+                        ActivityObj.Id = call.OpportunityId;
+                    }
+                    if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
+                    {
+                        ActivityObj.Id = -1;
+                    }
                     ActivityObj.CreatedBy = addCall.CreatedBy;
                     ActivityObj.CreatedDate = addCall.CreatedDate;
                     await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
@@ -156,29 +226,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         existingCall.EndTime = call.EndTime.ToUniversalTime();
                         existingCall.CreatedBy = call.Id;
                         existingCall.CreatedDate = localDateTime.ToUniversalTime();
-
-                        if (call.CompanyId == -1)
-                        {
-                            existingCall.IsCompany = -1;
-                        }
-                        else
-                        {
-                            existingCall.IsCompany = 1;
-                            existingCall.Id = call.CompanyId;
-                        }
-                        if (call.LeadId == -1)
-                        {
-                            existingCall.IsLead = -1;
-                        }
-                        else
-                        {
-                            existingCall.IsLead = 1;
-                            existingCall.Id = call.LeadId;
-                        }
-                        if (call.LeadId == -1 && call.CompanyId == -1)
-                        {
-                            existingCall.Id = -1;
-                        }
                         await _dbContext.SaveChangesAsync();
                     }
 

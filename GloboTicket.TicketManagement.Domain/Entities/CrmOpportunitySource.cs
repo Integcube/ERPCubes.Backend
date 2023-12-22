@@ -12,8 +12,8 @@ namespace ERPCubes.Domain.Entities
     {
         [Key]
         public int SourceId { get; set; }
-        public int TenantId { get; set; }
         public string SourceTitle { get; set; } = string.Empty;
+        public int TenantId { get; set; }
 
     }
 }

@@ -6,6 +6,7 @@ using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
 using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTask;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -18,20 +19,25 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public async Task<List<GetNoteListVm>> GetNoteList(int TenantId, string Id, int LeadId, int CompanyId)
+        public async Task<List<GetNoteListVm>> GetNoteList(int TenantId, string Id, int LeadId, int CompanyId, int OpportunityId)
         {
             try
             {
-                List<GetNoteListVm> Notes = await (from a in _dbContext.CrmNote.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
-                                                   select new GetNoteListVm
-                                                   {
-                                                       NoteId = a.NoteId,
-                                                       NoteTitle = a.NoteTitle,
-                                                       Content = a.Content,
-                                                       CreatedBy = a.CreatedBy,
-                                                       CreatedDate = a.CreatedDate,
-                                                   }
-                                                   ).OrderByDescending(a => a.CreatedDate).ToListAsync();
+                List<GetNoteListVm> Notes = await (
+                    from a in _dbContext.CrmNote.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
+                    (Id == "-1" || a.CreatedBy == Id) &&
+                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
+                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
+                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    select new GetNoteListVm
+                    {
+                        NoteId = a.NoteId,
+                        NoteTitle = a.NoteTitle,
+                        Content = a.Content,
+                        CreatedBy = a.CreatedBy,
+                        CreatedDate = a.CreatedDate,
+                    }
+                    ).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Notes;
             }
@@ -45,7 +51,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var notes = await (from a in _dbContext.CrmNote.Where(a => a.TenantId == TenantId && a.CreatedBy == Id && a.IsLead == -1 && a.IsCompany == -1)
+                var notes = await (from a in _dbContext.CrmNote.Where(a => a.TenantId == TenantId && a.CreatedBy == Id && a.IsLead == -1 && a.IsCompany == -1 && a.IsOpportunity == -1)
                                    join b in _dbContext.CrmNoteTags on a.NoteId equals b.NoteId into all1
                                    from bb in all1.DefaultIfEmpty()
                                    join d in _dbContext.CrmTags on bb.TagId equals d.TagId into all3
@@ -171,7 +177,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         note.IsLead = 1;
                         note.Id = request.LeadId;
                     }
-                    if (request.LeadId == -1 && request.CompanyId == -1)
+                    if (request.OpportunityId == -1)
+                    {
+                        note.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        note.IsOpportunity = 1;
+                        note.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
                     {
                         note.Id = -1;
                     }
@@ -208,6 +223,48 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         await _dbContext.AddAsync(taskEntity);
                         await _dbContext.SaveChangesAsync();
                     }
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = note.CreatedBy;
+                    ActivityObj.Detail = note.Content;
+                    ActivityObj.ActivityType = 4;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = note.TenantId;
+                    if (request.CompanyId == -1)
+                    {
+                        ActivityObj.IsCompany = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsCompany = 1;
+                        ActivityObj.Id = request.CompanyId;
+                    }
+                    if (request.LeadId == -1)
+                    {
+                        ActivityObj.IsLead = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsLead = 1;
+                        ActivityObj.Id = request.LeadId;
+                    }
+                    if (request.OpportunityId == -1)
+                    {
+                        ActivityObj.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsOpportunity = 1;
+                        ActivityObj.Id = request.OpportunityId;
+                    }
+                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
+                    {
+                        ActivityObj.Id = -1;
+                    }
+                    ActivityObj.CreatedBy = ActivityObj.CreatedBy;
+                    ActivityObj.CreatedDate = localDateTime.ToUniversalTime();
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                    await _dbContext.SaveChangesAsync();
                 }
                 else
                 {
@@ -224,24 +281,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         note.LastModifiedDate = localDateTime.ToUniversalTime();
                         note.LastModifiedBy = request.Id;
                         note.TenantId = request.TenantId;
-                        if (request.CompanyId == -1)
-                        {
-                            note.IsCompany = -1;
-                        }
-                        else
-                        {
-                            note.IsCompany = 1;
-                            note.Id = request.CompanyId;
-                        }
-                        if (request.LeadId == -1)
-                        {
-                            note.IsLead = -1;
-                        }
-                        else
-                        {
-                            note.IsLead = 1;
-                            note.Id = request.LeadId;
-                        }
                         await _dbContext.SaveChangesAsync();
 
                         CrmNoteTags? noteTags = await (from a in _dbContext.CrmNoteTags.Where(a => a.NoteId == request.Note.NoteId)

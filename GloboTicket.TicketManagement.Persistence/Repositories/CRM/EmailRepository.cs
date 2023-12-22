@@ -22,21 +22,26 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public async Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
+        public async Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
         {
             try
             {
-                List<GetEmailVm> Email = await (from a in _dbContext.CrmEmail.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
-                                                select new GetEmailVm
-                                                {
-                                                    EmailId = a.EmailId,
-                                                    Subject = a.Subject,
-                                                    Description = a.Description,
-                                                    Reply = a.Reply,
-                                                    CreatedBy = a.CreatedBy,
-                                                    CreatedDate=a.CreatedDate
+                List<GetEmailVm> Email = await (
+                    from a in _dbContext.CrmEmail.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
+                    (Id == "-1" || a.CreatedBy == Id) &&
+                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
+                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
+                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    select new GetEmailVm
+                    {
+                        EmailId = a.EmailId,
+                        Subject = a.Subject,
+                        Description = a.Description,
+                        Reply = a.Reply,
+                        CreatedBy = a.CreatedBy,
+                        CreatedDate=a.CreatedDate
 
-                                                }).OrderByDescending(a=>a.CreatedDate).ToListAsync();
+                    }).OrderByDescending(a=>a.CreatedDate).ToListAsync();
 
                 return Email;
             }
@@ -99,11 +104,62 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addEmail.IsLead = 1;
                         addEmail.Id = email.LeadId;
                     }
-                    if(email.LeadId==-1 && email.CompanyId==-1)
+                    if (email.OpportunityId == -1)
                     {
-                        addEmail.Id = -1;
+                        addEmail.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        addEmail.IsOpportunity = 1;
+                        addEmail.Id = email.OpportunityId;
+                    }
+                    if (email.LeadId==-1 && email.CompanyId==-1 && email.OpportunityId==-1)
+                    {
+                        addEmail.Id = email.EmailId;
                     }
                     await _dbContext.AddAsync(addEmail);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = addEmail.CreatedBy;
+                    ActivityObj.Detail = addEmail.Subject;
+                    ActivityObj.ActivityType = 2;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = addEmail.TenantId;
+                    if (email.CompanyId == -1)
+                    {
+                        ActivityObj.IsCompany = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsCompany = 1;
+                        ActivityObj.Id = email.CompanyId;
+                    }
+                    if (email.LeadId == -1)
+                    {
+                        ActivityObj.IsLead = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsLead = 1;
+                        ActivityObj.Id = email.LeadId;
+                    }
+                    if (email.OpportunityId == -1)
+                    {
+                        ActivityObj.IsOpportunity = -1;
+                    }
+                    else
+                    {
+                        ActivityObj.IsOpportunity = 1;
+                        ActivityObj.Id = email.OpportunityId;
+                    }
+                    if (email.LeadId == -1 && email.CompanyId == -1 && email.OpportunityId == -1)
+                    {
+                        ActivityObj.Id = -1;
+                    }
+                    ActivityObj.CreatedBy = addEmail.CreatedBy;
+                    ActivityObj.CreatedDate = addEmail.CreatedDate;
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
                     await _dbContext.SaveChangesAsync();
                 }
                 else
@@ -121,29 +177,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         existingEmail.LastModifiedDate = localDateTime.ToUniversalTime();
                         existingEmail.LastModifiedBy = email.Id;
                         existingEmail.TenantId = email.TenantId;
-
-                        if (email.CompanyId == -1)
-                        {
-                            existingEmail.IsCompany = -1;
-                        }
-                        else
-                        {
-                            existingEmail.IsCompany = 1;
-                            existingEmail.Id = email.CompanyId;
-                        }
-                        if (email.LeadId == -1)
-                        {
-                            existingEmail.IsLead = -1;
-                        }
-                        else
-                        {
-                            existingEmail.IsLead = 1;
-                            existingEmail.Id = email.LeadId;
-                        }
-                        if (email.LeadId == -1 && email.CompanyId == -1)
-                        {
-                            existingEmail.Id = -1;
-                        }
                         await _dbContext.SaveChangesAsync();
                     }
                 }

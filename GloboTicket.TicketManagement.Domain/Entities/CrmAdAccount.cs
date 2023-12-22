@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    public class CrmAdAccount: AuditableEntity
+    public class CrmAdAccount : AuditableEntity
     {
         [Key]
-        public string Id { get; set; } = string.Empty;
-        public string AccountId { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public int IsSelected { get; set; }  
-        public string SocialId { get; set; } = string.Empty;
+        public string AccountId { get; set; } = String.Empty;
+        public string Title { get; set; } = String.Empty;
+        public int IsSelected { get; set; }
+        public string SocialId { get; set; } = String.Empty;
+        public int TenantId { get; set; }
+
     }
 }

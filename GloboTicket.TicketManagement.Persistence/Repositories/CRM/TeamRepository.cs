@@ -66,6 +66,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
+                DateTime localDateTime = DateTime.Now;
                 if (request.TeamId == -1)
                 {
                     CrmTeam obj = new CrmTeam();
@@ -74,7 +75,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     obj.Name = request.TeamName;
                     obj.TeamLeader = request.TeamLeader;
                     obj.CreatedBy = request.UserId;
-                    obj.CreatedDate = DateTime.UtcNow;
+                    obj.CreatedDate = localDateTime.ToUniversalTime();
                     _dbContext.Add(obj);
                     _dbContext.SaveChanges();
 
@@ -106,7 +107,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     obj.Name = request.TeamName;
                     obj.TeamLeader = request.TeamLeader;
                     obj.LastModifiedBy = request.UserId;
-                    obj.LastModifiedDate = DateTime.UtcNow;
+                    obj.LastModifiedDate = localDateTime.ToUniversalTime();
 
                     var UpdatedTeamMembers = request.TeamMembersId.Split(',').ToList();
 

@@ -24,7 +24,7 @@ namespace ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList
             try
             {
                 List<GetEmailVm> Emails = new List<GetEmailVm>();
-                Emails = await _emailRepository.GetAllList(request.Id, request.TenantId, request.LeadId, request.CompanyId);
+                Emails = await _emailRepository.GetAllList(request.Id, request.TenantId, request.LeadId, request.CompanyId, request.OpportunityId);
                 return Emails;
             }
             catch (Exception ex)

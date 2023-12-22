@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
@@ -67,6 +68,13 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> GetLeadReport(GetLeadReportQuery leadReport)
         {
             var dtos = await _mediator.Send(leadReport);
+            return Ok(dtos);
+        }
+        [HttpPost("leadByMonth", Name = "GetLeadByMonth")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadByMonth(GetLeadByMonthListQuery leadByMonth)
+        {
+            var dtos = await _mediator.Send(leadByMonth);
             return Ok(dtos);
         }
     }

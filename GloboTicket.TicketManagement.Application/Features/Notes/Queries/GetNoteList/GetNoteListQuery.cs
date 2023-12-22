@@ -13,5 +13,6 @@ namespace ERPCubes.Application.Features.Notes.Queries.GetNoteList
         public int TenantId { get; set; }
         public int LeadId { get; set; } = -1;
         public int CompanyId { get; set; } = -1;
+        public int OpportunityId { get; set; } = -1;
     }
 }

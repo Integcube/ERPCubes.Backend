@@ -2,9 +2,11 @@
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Application.Features.Crm.Opportunity.Commands.DeleteOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Commands.SaveOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunity;
+using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunityStatus;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportuntiySource;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +27,7 @@ namespace ERPCubesApi.Controllers
         //[Authorize]
         [HttpPost("all", Name = "GetAllOpportunity")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetLeadVm>>> GetAllOpportunity(GetOpportunityQuery getOpportunity)
+        public async Task<ActionResult<List<GetOpportunityVm>>> GetAllOpportunity(GetOpportunityQuery getOpportunity)
         {
             var dtos = await _mediator.Send(getOpportunity);
             return Ok(dtos);
@@ -33,9 +35,17 @@ namespace ERPCubesApi.Controllers
         //[Authorize]
         [HttpPost("allSource", Name = "GetAllOpportunitySource")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetLeadVm>>> GetAllOpportunitySource(GetOpportunitySourceQuery getOpportunitySource)
+        public async Task<ActionResult<List<GetOpportunitySourceVm>>> GetAllOpportunitySource(GetOpportunitySourceQuery getOpportunitySource)
         {
             var dtos = await _mediator.Send(getOpportunitySource);
+            return Ok(dtos);
+        }
+        //[Authorize]
+        [HttpPost("allStatus", Name = "GetAllOpportunityStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetOpportunityStatusVm>>> GetAllOpportunityStatus(GetLeadStatusListQuery getOpportunityStatus)
+        {
+            var dtos = await _mediator.Send(getOpportunityStatus);
             return Ok(dtos);
         }
         //[Authorize]

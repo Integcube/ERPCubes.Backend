@@ -18,6 +18,7 @@ namespace ERPCubes.Domain.Entities
         public int Id { get; set; }
         public int IsCompany { get; set; }
         public int IsLead { get; set; }
+        public int IsOpportunity { get; set; }
         public DateTime? SendDate { get; set; }
         public int TenantId { get; set; }
         public int IsSuccessful { get; set; }

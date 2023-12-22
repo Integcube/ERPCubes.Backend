@@ -13,7 +13,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncEmailRepository : IAsyncRepository<CrmEmail>
     {
-        Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId);
+        Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int Opportunity);
         Task DeleteEmail(DeleteEmailCommand emailId);
         Task SaveEmail(SaveEmailCommand email);
     }

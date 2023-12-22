@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
@@ -142,6 +143,48 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id)
+        {
+            try
+            {
+                var groupedLeads = await (
+                    from a in _dbContext.CrmLead
+                    where (a.TenantId == -1 || a.TenantId == TenantId) && a.IsDeleted == 0
+                    group a by new { a.CreatedDate.Year, a.CreatedDate.Month } into g
+                    select new GetLeadByMonthListVm
+                    {
+                        Year = g.Key.Year,
+                        Month = g.Key.Month,
+                        TotalLeads = g.Count(),
+                        LeadStatusList = new List<GetLeadStatusListVm>() // Initialize an empty list
+                    }
+                ).ToListAsync();
+
+                foreach (var leadByMonth in groupedLeads)
+                {
+                    leadByMonth.LeadStatusList = await (
+                        from l in _dbContext.CrmLeadStatus
+                        where l.TenantId == -1 || l.TenantId == TenantId && l.IsDeleted == 0
+                        select new GetLeadStatusListVm
+                        {
+                            StatusId = l.StatusId,
+                            StatusTitle = l.StatusTitle,
+                            IsDeletable = l.IsDeletable,
+                            Order = l.Order,
+                            Count = _dbContext.CrmLead.Count(lead => lead.Status == l.StatusId && lead.CreatedDate.Year == leadByMonth.Year && lead.CreatedDate.Month == leadByMonth.Month)
+                        }
+                    ).ToListAsync();
+                }
+
+                return groupedLeads;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+
+        }
+
         public async Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId)
         {
             try
@@ -242,7 +285,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                     CalenderObj.UserId = LeadObj.LeadOwner;
                     CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
-                    CalenderObj.Type = 6;
+                    CalenderObj.Type = 1;
                     CalenderObj.CreatedBy = LeadObj.CreatedBy;
                     CalenderObj.CreatedDate = LeadObj.CreatedDate;
                     CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
@@ -250,6 +293,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CalenderObj.TenantId = TenantId;
                     CalenderObj.Id = LeadObj.LeadId;
                     CalenderObj.IsCompany = -1;
+                    CalenderObj.IsOpportunity = -1;
                     CalenderObj.IsLead = 1;
                     CalenderObj.AllDay = false;
                     await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
@@ -263,6 +307,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     ActivityObj.TenantId = LeadObj.TenantId;
                     ActivityObj.Id = LeadObj.LeadId;
                     ActivityObj.IsCompany = -1;
+                    ActivityObj.IsOpportunity = -1;
                     ActivityObj.IsLead = 1;
                     ActivityObj.CreatedBy = LeadObj.CreatedBy;
                     ActivityObj.CreatedDate = LeadObj.CreatedDate;

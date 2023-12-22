@@ -25,7 +25,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList
             try
             {
                 List<GetCrmTaskListVm> Tasks = new List<GetCrmTaskListVm>();
-                Tasks = await _taskRepository.GetAllTasks(request.TenantId, request.Id, request.CompanyId,request.LeadId);
+                Tasks = await _taskRepository.GetAllTasks(request.TenantId, request.Id, request.CompanyId,request.LeadId,request.OpportunityId);
                 return Tasks;
             }
             catch (Exception ex)

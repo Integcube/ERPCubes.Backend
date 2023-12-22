@@ -13,6 +13,7 @@ namespace ERPCubes.Application.Features.Notes.Commands.SaveNote
         public int TenantId { get; set; }
         public int CompanyId { get; set; }
         public int LeadId { get; set; }
+        public int OpportunityId { get; set; }
         public SaveNoteDto? Note { get; set; }
     }
 }

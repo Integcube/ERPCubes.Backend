@@ -22,22 +22,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public MeetingRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
         }
-        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId)
+        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
         {
             try
             {
-                List<GetMeetingVm> Meeting = await (from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && (Id == "-1" || a.CreatedBy == Id) && (LeadId == -1 || a.Id == LeadId) && (CompanyId == -1 || a.Id == CompanyId))
-                                                    select new GetMeetingVm
-                                                    {
-                                                        MeetingId = a.MeetingId,
-                                                        Subject = a.Subject,
-                                                        Note = a.Note,
-                                                        StartTime = a.StartTime,
-                                                        EndTime = a.EndTime,
-                                                        CreatedBy = a.CreatedBy,
-                                                        CreatedDate = a.CreatedDate
+                List<GetMeetingVm> Meeting = await (
+                    from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
+                    (Id == "-1" || a.CreatedBy == Id) &&
+                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
+                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
+                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    select new GetMeetingVm
+                    {
+                        MeetingId = a.MeetingId,
+                        Subject = a.Subject,
+                        Note = a.Note,
+                        StartTime = a.StartTime,
+                        EndTime = a.EndTime,
+                        CreatedBy = a.CreatedBy,
+                        CreatedDate = a.CreatedDate
 
-                                                    }).OrderByDescending(a => a.CreatedDate).ToListAsync();
+                    }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Meeting;
             }
@@ -103,12 +108,62 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             addMeeting.IsLead = 1;
                             addMeeting.Id = meeting.LeadId;
                         }
-                        if (meeting.LeadId == -1 && meeting.CompanyId == -1)
+                        if (meeting.OpportunityId == -1)
+                        {
+                            addMeeting.IsOpportunity = -1;
+                        }
+                        else
+                        {
+                            addMeeting.IsOpportunity = 1;
+                            addMeeting.Id = meeting.OpportunityId;
+                        }
+                        if (meeting.LeadId == -1 && meeting.CompanyId == -1 && meeting.OpportunityId == -1)
                         {
                             addMeeting.Id = -1;
                         }
-
                         await _dbContext.AddAsync(addMeeting);
+                        await _dbContext.SaveChangesAsync();
+
+                        CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                        ActivityObj.UserId = addMeeting.CreatedBy;
+                        ActivityObj.Detail = addMeeting.Subject;
+                        ActivityObj.ActivityType = 3;
+                        ActivityObj.ActivityStatus = 1;
+                        ActivityObj.TenantId = addMeeting.TenantId;
+                        if (meeting.CompanyId == -1)
+                        {
+                            ActivityObj.IsCompany = -1;
+                        }
+                        else
+                        {
+                            ActivityObj.IsCompany = 1;
+                            ActivityObj.Id = meeting.CompanyId;
+                        }
+                        if (meeting.LeadId == -1)
+                        {
+                            ActivityObj.IsLead = -1;
+                        }
+                        else
+                        {
+                            ActivityObj.IsLead = 1;
+                            ActivityObj.Id = meeting.LeadId;
+                        }
+                        if (meeting.OpportunityId == -1)
+                        {
+                            ActivityObj.IsOpportunity = -1;
+                        }
+                        else
+                        {
+                            ActivityObj.IsOpportunity = 1;
+                            ActivityObj.Id = meeting.OpportunityId;
+                        }
+                        if (meeting.LeadId == -1 && meeting.CompanyId == -1 && meeting.OpportunityId == -1)
+                        {
+                            ActivityObj.Id = -1;
+                        }
+                        ActivityObj.CreatedBy = meeting.Id;
+                        ActivityObj.CreatedDate = localDateTime.ToUniversalTime();
+                        await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
                         await _dbContext.SaveChangesAsync();
                     }
                     else
@@ -124,32 +179,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             existingMeeting.Subject = meeting.Subject;
                             existingMeeting.Note = meeting.Note;
                             existingMeeting.StartTime = meeting.StartTime.ToUniversalTime();
-                            //existingEmail.TenantId = email.TenantId;
                             existingMeeting.LastModifiedBy = meeting.Id;
                             existingMeeting.EndTime = meeting.EndTime.ToUniversalTime();
                             existingMeeting.LastModifiedDate = localDateTime.ToUniversalTime();
-                            if (meeting.CompanyId == -1)
-                            {
-                                existingMeeting.IsCompany = -1;
-                            }
-                            else
-                            {
-                                existingMeeting.IsCompany = 1;
-                                existingMeeting.Id = meeting.CompanyId;
-                            }
-                            if (meeting.LeadId == -1)
-                            {
-                                existingMeeting.IsLead = -1;
-                            }
-                            else
-                            {
-                                existingMeeting.IsLead = 1;
-                                existingMeeting.Id = meeting.LeadId;
-                            }
-                            if (meeting.LeadId == -1 && meeting.CompanyId == -1)
-                            {
-                                existingMeeting.Id = -1;
-                            }
                             await _dbContext.SaveChangesAsync();
                         }
 
