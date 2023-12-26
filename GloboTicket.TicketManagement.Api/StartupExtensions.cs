@@ -33,7 +33,7 @@ namespace ERPCubes.Api
     });
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("Open", builder => builder.WithOrigins("http://localhost:4200")
+                options.AddPolicy("Open", builder => builder.AllowAnyOrigin()
 .AllowAnyHeader().AllowAnyMethod());
             });
 

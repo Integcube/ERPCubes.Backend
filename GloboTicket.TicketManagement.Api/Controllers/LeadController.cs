@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
+﻿using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -50,6 +51,14 @@ namespace ERPCubesApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteLead(DeleteLeadCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
+            return Ok(dtos);
+        }
+        [HttpPost("bulkSave", Name = "BulkSave")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> BulkSave(SaveBulkLeadCommand leadCommand)
         {
             var dtos = await _mediator.Send(leadCommand);
             return Ok(dtos);

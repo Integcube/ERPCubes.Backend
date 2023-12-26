@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -26,5 +27,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task DeleteLead(string Id, int TenantId, int LeadId, string Name);
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
         Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id);
+        Task SaveLeadBulk(SaveBulkLeadCommand request);
     }
 }

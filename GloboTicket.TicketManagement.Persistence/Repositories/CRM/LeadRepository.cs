@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -320,5 +321,67 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(e.Message);
             }
         }
+
+        public async Task SaveLeadBulk(SaveBulkLeadCommand request)
+        {
+            try { 
+            DateTime localDateTime = DateTime.Now;
+                foreach (var Lead in request.Lead)
+                {
+                    CrmLead LeadObj = new CrmLead();
+                    LeadObj.FirstName = Lead.FirstName;
+                    LeadObj.LastName = Lead.LastName;
+                    LeadObj.Email = Lead.Email;
+                    LeadObj.Status = 1;
+                    LeadObj.LeadOwner = request.Id;
+                    LeadObj.City = Lead.City;
+                    LeadObj.ProductId = Lead.ProductId;
+                    LeadObj.CreatedBy = request.Id;
+                    LeadObj.CreatedDate = localDateTime.ToUniversalTime();
+                    LeadObj.IsDeleted = 0;
+                    LeadObj.TenantId = request.TenantId;
+                    await _dbContext.AddAsync(LeadObj);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                    CalenderObj.UserId = LeadObj.LeadOwner;
+                    CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
+                    CalenderObj.Type = 1;
+                    CalenderObj.CreatedBy = LeadObj.CreatedBy;
+                    CalenderObj.CreatedDate = LeadObj.CreatedDate;
+                    CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
+                    CalenderObj.EndTime = localDateTime.ToUniversalTime().AddDays(3);
+                    CalenderObj.TenantId = request.TenantId;
+                    CalenderObj.Id = LeadObj.LeadId;
+                    CalenderObj.IsCompany = -1;
+                    CalenderObj.IsOpportunity = -1;
+                    CalenderObj.IsLead = 1;
+                    CalenderObj.AllDay = false;
+                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                    await _dbContext.SaveChangesAsync();
+
+                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
+                    ActivityObj.UserId = LeadObj.LeadOwner;
+                    ActivityObj.Detail = "You are tasked to call" + LeadObj.FirstName + " " + LeadObj.LastName;
+                    ActivityObj.ActivityType = 1;
+                    ActivityObj.ActivityStatus = 1;
+                    ActivityObj.TenantId = LeadObj.TenantId;
+                    ActivityObj.Id = LeadObj.LeadId;
+                    ActivityObj.IsCompany = -1;
+                    ActivityObj.IsOpportunity = -1;
+                    ActivityObj.IsLead = 1;
+                    ActivityObj.CreatedBy = LeadObj.CreatedBy;
+                    ActivityObj.CreatedDate = LeadObj.CreatedDate;
+                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+            
+        }
+            catch (Exception e)
+            {
+                throw new BadRequestException(e.Message);
+    }
+}
     }
 }
