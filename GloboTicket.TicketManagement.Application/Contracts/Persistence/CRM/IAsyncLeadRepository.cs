@@ -3,6 +3,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
@@ -28,5 +29,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
         Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id);
         Task SaveLeadBulk(SaveBulkLeadCommand request);
+        Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Contracts;
 using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
@@ -19,6 +20,7 @@ namespace ERPCubes.Persistence
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<GetLeadReportVm>().HasNoKey().ToView("leadstatusfn");
+            modelBuilder.Entity<GetleadPiplineReportVm>().HasNoKey().ToView("crmleadstagewiserpt");
             modelBuilder.Entity<GetUserActivityReportVm>().HasNoKey().ToView("calculateleadevent");
             base.OnModelCreating(modelBuilder);
         }
@@ -54,5 +56,7 @@ namespace ERPCubes.Persistence
         public DbSet<CrmAdAccount> CrmAdAccount { get; set; }
         public DbSet<GetUserActivityReportVm> GetCrmUserActivity {  get; set; }
         public DbSet<CrmCampaign> CrmCampaign { get; set; }
+        public DbSet<GetleadPiplineReportVm> GetleadPiplineReportVm { get; set; }
+        
     }
 }

@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
@@ -59,7 +60,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 //                        .Select(owner => owner.Trim())
                 //                        .ToList();
                 //}
-                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 
+                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0
                                                //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
                                                )
                                                join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
@@ -324,8 +325,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         public async Task SaveLeadBulk(SaveBulkLeadCommand request)
         {
-            try { 
-            DateTime localDateTime = DateTime.Now;
+            try
+            {
+                DateTime localDateTime = DateTime.Now;
                 foreach (var Lead in request.Lead)
                 {
                     CrmLead LeadObj = new CrmLead();
@@ -376,12 +378,56 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     await _dbContext.SaveChangesAsync();
                 }
 
-            
-        }
+
+            }
             catch (Exception e)
             {
                 throw new BadRequestException(e.Message);
-    }
-}
+            }
+        }
+
+
+        public async Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@TenantId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.TenantId
+                };
+                var SourceIdPrm = new Npgsql.NpgsqlParameter("@p_SourceId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.SourceId
+                };
+                var Status = new Npgsql.NpgsqlParameter("@Status", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.Status
+                };
+
+                var startDatePrm = new Npgsql.NpgsqlParameter("@SourceId", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = obj.StartDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@EndDate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = obj.EndDate
+                };
+                var ProductId = new Npgsql.NpgsqlParameter("@ProductId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.ProductId
+                };
+                
+                var results = await _dbContext.GetleadPiplineReportVm.FromSqlRaw(
+                    "SELECT * FROM public.crmleadstagewiserpt({0},{1},{2},{3},{4},{5})", tenantIdPrm, SourceIdPrm, Status, startDatePrm,endDatePrm, ProductId)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
     }
 }
