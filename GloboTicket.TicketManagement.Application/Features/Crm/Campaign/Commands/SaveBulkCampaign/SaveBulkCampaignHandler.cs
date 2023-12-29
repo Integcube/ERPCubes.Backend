@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign
 {
-    public class SaveCampaignHandler : IRequestHandler<SaveCampaignCommand>
+    public class SaveBulkCampaignHandler : IRequestHandler<SaveBulkCampaignCommand>
     {
         private readonly IAsyncCampaignRepository _campaignRepository;
-        private readonly ILogger<SaveCampaignHandler> _logger;
+        private readonly ILogger<SaveBulkCampaignHandler> _logger;
 
-        public SaveCampaignHandler(IAsyncCampaignRepository campaignRepository, ILogger<SaveCampaignHandler> logger)
+        public SaveBulkCampaignHandler(IAsyncCampaignRepository campaignRepository, ILogger<SaveBulkCampaignHandler> logger)
         {
             _campaignRepository = campaignRepository;
             _logger = logger;
         }
 
-        public async Task<Unit> Handle(SaveCampaignCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SaveBulkCampaignCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await _campaignRepository.SaveCampaigns(new List<SaveCampaignCommand> { request });
+                await _campaignRepository.SaveBulkCampaigns(new List<SaveBulkCampaignCommand> { request });
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Crm.AdAccount.SaveAdAccount;
+﻿using ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount;
+using ERPCubes.Application.Features.Crm.AdAccount.Commands.SaveAdAccount;
 using ERPCubes.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncAdAccountRepository : IAsyncRepository<CrmAdAccount>
     {
-        Task SaveAdAccount(List<SaveAdAccountCommand> ad);
+        Task SaveAdAccount(SaveAdAccountCommand ad);
+        Task SaveAdAccountBulk(List<SaveBulkAdAccountCommand> ad);
     }
 }

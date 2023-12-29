@@ -1,7 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
-using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
-using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign;
+using ERPCubes.Application.Features.Crm.AdAccount.Commands.SaveAdAccount;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,23 +9,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.AdAccount.SaveAdAccount
+namespace ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount
 {
-    public class SaveAdAccountHandler : IRequestHandler<SaveAdAccountCommand>
+    public class SaveBulkAdAccountHandler : IRequestHandler<SaveBulkAdAccountCommand>
     {
         private readonly IAsyncAdAccountRepository _adRepository;
-        private readonly ILogger<SaveAdAccountHandler> _logger;
+        private readonly ILogger<SaveBulkAdAccountHandler> _logger;
 
-        public SaveAdAccountHandler(IAsyncAdAccountRepository adRepository, ILogger<SaveAdAccountHandler> logger)
+        public SaveBulkAdAccountHandler(IAsyncAdAccountRepository adRepository, ILogger<SaveBulkAdAccountHandler> logger)
         {
             _adRepository = adRepository;
             _logger = logger;
         }
-        public async Task<Unit> Handle(SaveAdAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(SaveBulkAdAccountCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                await _adRepository.SaveAdAccount(new List<SaveAdAccountCommand> { request });
+                await _adRepository.SaveAdAccountBulk(new List<SaveBulkAdAccountCommand> { request });
             }
             catch (Exception ex)
             {
