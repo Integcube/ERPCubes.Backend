@@ -56,11 +56,8 @@ namespace ERPCubes.Persistence
         public DbSet<CrmAdAccount> CrmAdAccount { get; set; }
         public DbSet<GetUserActivityReportVm> GetCrmUserActivity {  get; set; }
         public DbSet<CrmCampaign> CrmCampaign { get; set; }
-<<<<<<< Updated upstream
         public DbSet<GetleadPiplineReportVm> GetleadPiplineReportVm { get; set; }
-        
-=======
         public DbSet<CrmCampaignSource> CrmCampaignSource { get; set; }
->>>>>>> Stashed changes
+
     }
 }
