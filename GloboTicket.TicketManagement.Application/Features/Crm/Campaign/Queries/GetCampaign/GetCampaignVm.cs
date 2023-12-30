@@ -13,8 +13,8 @@ namespace ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaign
         public string Title { get; set; } = string.Empty;
         public int ProductId { get; set; }
         //public string ProductName { get; set; } = string.Empty;
-        public int SourceId {  get; set; }
+        public int SourceId { get; set; }
         //public string SourceTitle { get; set; } = string.Empty;
-        public string Budget { get; set; } = string.Empty;
+        public decimal Budget { get; set; }
     }
 }

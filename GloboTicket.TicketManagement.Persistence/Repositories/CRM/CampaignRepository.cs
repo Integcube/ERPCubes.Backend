@@ -35,9 +35,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     if (campaign.CampaignId == "-1")
                     {
                         CrmCampaign addCampaign = new CrmCampaign();
+                        addCampaign.CampaignId = $"{new Random().Next(1_000_000_000):000000000}{new Random().Next(1_000_000_000):000000000}";
                         addCampaign.AdAccountId = campaign.AdAccountId;
                         addCampaign.Title = campaign.Title;
                         addCampaign.ProductId = campaign.ProductId;
+                        addCampaign.SourceId = campaign.SourceId;
+                        addCampaign.Budget = campaign.Budget;
+                        addCampaign.CreatedBy = campaign.Id;
                         addCampaign.CreatedDate = localDateTime.ToUniversalTime();
                         addCampaign.TenantId = campaign.TenantId;
                         addCampaign.IsDeleted = 0;
@@ -56,8 +60,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         else
                         {
                             existingCampaign.Title = campaign.Title;
+                            existingCampaign.SourceId = campaign.SourceId;
+                            existingCampaign.Budget = campaign.Budget;
                             existingCampaign.TenantId = campaign.TenantId;
                             existingCampaign.IsDeleted = 0;
+                            existingCampaign.LastModifiedBy = campaign.Id;
                             existingCampaign.LastModifiedDate = localDateTime.ToUniversalTime();
                         }
                     }
@@ -177,7 +184,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             List<GetCampaignSourceVm> sources = new List<GetCampaignSourceVm>();
             try
             {
-                sources = await(from a in _dbContext.CrmCampaignSource.Where(a => a.IsDeleted == 0)
+                sources = await(from a in _dbContext.CrmLeadSource.Where(a => a.IsDeleted == 0)
                                 select new GetCampaignSourceVm
                                 {
                                     SourceId = a.SourceId,
