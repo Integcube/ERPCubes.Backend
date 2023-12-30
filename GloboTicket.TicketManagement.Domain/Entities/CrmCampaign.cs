@@ -16,7 +16,7 @@ namespace ERPCubes.Domain.Entities
         public string Title {  get; set; }= string.Empty;
         public int ProductId { get; set; }
         public int SourceId { get; set; }
-        public string Budget { get; set; } = string.Empty;
+        public decimal Budget { get; set; }
         public int TenantId { get; set; }
     }
 }
