@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
+using ERPCubes.Application.Features.Crm.Reports.Queries.GetCampaigWiseReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,8 @@ namespace ERPCubes.Persistence
             modelBuilder.Entity<GetLeadSourceWiseVm>().HasNoKey().ToView("crmleadsourcewiserpt");
             modelBuilder.Entity<GetUserActivityReportVm>().HasNoKey().ToView("calculateleadevent");
             modelBuilder.Entity<GetLeadOwnerWiseVm>().HasNoKey().ToView("crmleadownerwiserpt");
+            modelBuilder.Entity<GetCampaigWiseReportQueryVm>().HasNoKey().ToView("crmcampaignwiserpt");
+            
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<AppMenus> AppMenus { get; set; }
@@ -61,9 +64,10 @@ namespace ERPCubes.Persistence
         public DbSet<GetUserActivityReportVm> GetCrmUserActivity {  get; set; }
         public DbSet<CrmCampaign> CrmCampaign { get; set; }
         public DbSet<GetleadPiplineReportVm> GetleadPiplineReportVm { get; set; }
-        public DbSet<CrmCampaignSource> CrmCampaignSource { get; set; }
         public DbSet<GetLeadSourceWiseVm> GetCrmLeadSourceWise { get; set; }
         public DbSet<GetLeadOwnerWiseVm> GetCrmLeadOwnerWise { get; set; }
+
+        public DbSet<GetCampaigWiseReportQueryVm> GetCampaigWiseReportQueryVm { get; set; }
         
 
     }
