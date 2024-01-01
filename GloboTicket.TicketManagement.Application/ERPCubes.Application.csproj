@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Features\Crm\Projects\**" />
+	  <EmbeddedResource Remove="Features\Crm\Projects\**" />
+	  <None Remove="Features\Crm\Projects\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="FluentValidation" Version="11.2.2" />
@@ -23,7 +29,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Features\Crm\DocumentLog\" />
-	  <Folder Include="Features\Crm\Projects\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookLead\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookCampaign\" />
 	</ItemGroup>

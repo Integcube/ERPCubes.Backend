@@ -15,6 +15,7 @@ namespace ERPCubes.Domain.Entities
         public string ProductName { get; set; }=String.Empty;
         public string Description { get; set; } = String.Empty;
         public decimal Price { get; set; }
+        public int ProjectId {  get; set; }
         public int TenantId { get; set; }
     }
 }

@@ -37,6 +37,7 @@ namespace ERPCubes.Persistence
 
             services.AddScoped<IAsyncAdAccountRepository, AdAccountRepository>();
             services.AddScoped<IAsyncCampaignRepository, CampaignRepository>();
+            services.AddScoped<IAsyncProjectRepository, ProjectRepository>();
             return services;    
         }
     }

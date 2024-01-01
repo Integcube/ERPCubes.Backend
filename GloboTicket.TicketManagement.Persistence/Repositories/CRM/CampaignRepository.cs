@@ -135,7 +135,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetCampaignVm> getCampaigns = await (
-                    from a in _dbContext.CrmCampaign.Where(a => a.TenantId == campaign.TenantId && a.IsDeleted == 0)
+                    from a in _dbContext.CrmCampaign.Where(a => a.TenantId == campaign.TenantId && a.IsDeleted == 0) orderby a.CreatedDate
                     //join b in _dbContext.CrmCampaignSource on a.SourceId equals b.SourceId
                     //join c in _dbContext.CrmProduct on a.ProductId equals c.ProductId
                     select new GetCampaignVm

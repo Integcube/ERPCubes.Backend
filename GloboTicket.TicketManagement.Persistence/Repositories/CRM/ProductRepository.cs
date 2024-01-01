@@ -24,7 +24,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                               ProductId = a.ProductId,
                                                               ProductName = a.ProductName,
                                                               Description = a.Description,
-                                                              Price = a.Price
+                                                              Price = a.Price,
+                                                              ProjectId = a.ProjectId,
                                                           }).OrderBy(a => a.ProductName).ToListAsync();
                 return productDetail;
             }
@@ -38,6 +39,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
+                DateTime localDateTime = DateTime.Now;
                 if (product.ProductId == -1)
                 {
                     CrmProduct addProduct = new CrmProduct();
@@ -45,7 +47,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     addProduct.ProductName = product.ProductName;
                     addProduct.Price = product.Price;
                     addProduct.Description = product.Description;
+                    addProduct.ProjectId = product.ProjectId;
                     addProduct.CreatedBy = product.Id;
+                    addProduct.CreatedDate = localDateTime.ToUniversalTime();
                     await _dbContext.AddAsync(addProduct);
                     await _dbContext.SaveChangesAsync();
                 }
@@ -62,6 +66,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         existingProduct.ProductName = product.ProductName;
                         existingProduct.Price = product.Price;
                         existingProduct.Description = product.Description;
+                        existingProduct.ProjectId = product.ProjectId;
+                        existingProduct.LastModifiedBy = product.Id;
+                        existingProduct.LastModifiedDate = localDateTime.ToUniversalTime();
                         await _dbContext.SaveChangesAsync();
                     }
 
