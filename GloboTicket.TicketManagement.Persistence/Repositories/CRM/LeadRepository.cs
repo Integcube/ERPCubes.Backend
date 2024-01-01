@@ -5,8 +5,10 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
@@ -187,6 +189,46 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
+        public async Task<List<GetLeadOwnerWiseVm>> GetLeadOwnerWise(int TenantId, string Id, DateTime startDate, DateTime endDate, string leadOwner, int sourceId, int status)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var startDatePrm = new Npgsql.NpgsqlParameter("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = startDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = endDate
+                };
+                var leadOwnerPrm = new Npgsql.NpgsqlParameter("@p_leadowner", NpgsqlTypes.NpgsqlDbType.Varchar)
+                {
+                    Value = leadOwner
+                };
+                var sourceIdPrm = new Npgsql.NpgsqlParameter("@p_sourceid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = sourceId
+                };
+                var statusPrm = new Npgsql.NpgsqlParameter("@p_status", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = status
+                };
+                var results = await _dbContext.GetCrmLeadOwnerWise.FromSqlRaw(
+                    "SELECT * FROM public.crmleadownerwiserpt({0},{1},{2},{3},{4},{5})", tenantIdPrm, sourceIdPrm, leadOwnerPrm, statusPrm, startDatePrm, endDatePrm)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
         public async Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId)
         {
             try
@@ -217,6 +259,39 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
+        }
+
+        public async Task<List<GetLeadSourceWiseVm>> GetLeadSourceWise(int TenantId, string Id, DateTime startDate, DateTime endDate, int sourceId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var startDatePrm = new Npgsql.NpgsqlParameter("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = startDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = endDate
+                };
+                var sourceIdPrm = new Npgsql.NpgsqlParameter("@p_sourceid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = sourceId
+                };
+                var results = await _dbContext.GetCrmLeadSourceWise.FromSqlRaw(
+                    "SELECT * FROM public.crmleadsourcewiserpt({0},{1},{2},{3})", tenantIdPrm, sourceIdPrm, startDatePrm, endDatePrm)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+
         }
 
 

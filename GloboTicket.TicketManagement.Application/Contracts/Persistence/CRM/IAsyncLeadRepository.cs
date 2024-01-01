@@ -3,12 +3,15 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
 using ERPCubes.Domain.Entities;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +22,8 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncLeadRepository:IAsyncRepository<CrmLead>
     {
-        Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id
-            //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
-            );
+        Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id);
+        //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
         Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId);
@@ -30,5 +32,10 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id);
         Task SaveLeadBulk(SaveBulkLeadCommand request);
         Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj);
+        Task<List<GetLeadSourceWiseVm>> GetLeadSourceWise(int TenantId, string Id, DateTime startDate, DateTime endDate, int sourceId);
+        Task<List<GetLeadOwnerWiseVm>> GetLeadOwnerWise(int TenantId, string Id, DateTime startDate, DateTime endDate, string leadOwner, int sourceId, int status);
+
+
+
     }
 }

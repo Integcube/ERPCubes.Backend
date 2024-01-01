@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount;
 using ERPCubes.Application.Features.Crm.AdAccount.Commands.SaveAdAccount;
 using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
