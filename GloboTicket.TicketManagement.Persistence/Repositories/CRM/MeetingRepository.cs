@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
 using ERPCubes.Application.Features.Crm.Meeting.Commands.DeleteMeeting;
@@ -26,6 +26,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
+                var users = await _dbContextIdentity.Users.Where(u => u.TenantId == TenantId).ToDictionaryAsync(user => user.Id);
                 List<GetMeetingVm> Meeting = await (
                     from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
                     (Id == "-1" || a.CreatedBy == Id) &&
@@ -40,8 +41,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         StartTime = a.StartTime,
                         EndTime = a.EndTime,
                         CreatedBy = a.CreatedBy,
-                        CreatedDate = a.CreatedDate
-
+                        CreatedDate = a.CreatedDate,
+                       CreatedByName = users.ContainsKey(a.CreatedBy) ? users[a.CreatedBy].FirstName + " " + users[a.CreatedBy].LastName : null,
                     }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Meeting;

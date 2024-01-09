@@ -1,4 +1,4 @@
-﻿using ERPCubes.Domain.Common;
+using ERPCubes.Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,8 +12,8 @@ namespace ERPCubes.Domain.Entities
     {
         [Key]
         public int CallId { get; set; }
-        public string Subject { get; set; }= String.Empty;
-        public string Response { get; set; }= String.Empty;
+        public string Subject { get; set; } = String.Empty;
+        public string Response { get; set; }
         public int Id { get; set; }
         public int IsCompany { get; set; }
         public int IsLead { get; set; }
@@ -21,8 +21,7 @@ namespace ERPCubes.Domain.Entities
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public int TenantId { get; set; }
-
-
-
+        public int ReasonId { get; set; }
+        public int TaskId { get; set; }
     }
 }

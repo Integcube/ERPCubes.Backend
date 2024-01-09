@@ -1,5 +1,6 @@
-﻿using ERPCubes.Application.Contracts;
+using ERPCubes.Application.Contracts;
 using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
+using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
@@ -13,7 +14,7 @@ namespace ERPCubes.Persistence
 {
     public class ERPCubesDbContext: DbContext
     {
-        private readonly ILoggedInUserService? _loggedInUserService;
+        private readonly ILoggedInUserService _loggedInUserService;
 
         public ERPCubesDbContext(DbContextOptions<ERPCubesDbContext> options, ILoggedInUserService loggedInUserService)
             : base(options)
@@ -58,6 +59,7 @@ namespace ERPCubes.Persistence
         public DbSet<CrmUserActivityType> CrmUserActivityType { get; set; }
         public DbSet<CrmEmail> CrmEmail { get; set; }
         public DbSet<CrmCall> CrmCall { get; set; }
+        public DbSet<GetCallScenariosVm> GetCallScenariosVm { get; set; }
         public DbSet<CrmMeeting> CrmMeeting { get; set; }
         public DbSet<GetLeadReportVm> GetCrmLeads { get; set; }
         public DbSet<CrmAdAccount> CrmAdAccount { get; set; }

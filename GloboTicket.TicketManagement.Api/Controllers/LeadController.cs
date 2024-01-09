@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
@@ -112,5 +113,14 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(leadOwnerReport);
             return Ok(dtos);
         }
+        [HttpPost("ChangeLeadStatus", Name = "ChangeLeadStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> ChangeLeadStatus(ChangeLeadStatusCommand obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
+        
     }
 }

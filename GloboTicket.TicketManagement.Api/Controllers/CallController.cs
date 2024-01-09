@@ -1,6 +1,7 @@
-﻿using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
+using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
 using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallList;
+using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
 using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -44,5 +45,13 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(saveCall);
             return Ok(dtos);
         }
+
+        [HttpGet("allscenarios", Name = "GetCrmIcallscenarios")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetCallScenariosVm>>> GetCrmIcallscenarios()
+        {
+            var dtos = await _mediator.Send(new GetCallScenariosListListQuery());
+            return Ok(dtos);
+        } 
     }
 }

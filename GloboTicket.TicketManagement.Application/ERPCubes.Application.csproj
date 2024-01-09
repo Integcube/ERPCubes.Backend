@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
 
 	<ItemGroup>
 	  <Compile Remove="Features\Crm\Projects\**" />

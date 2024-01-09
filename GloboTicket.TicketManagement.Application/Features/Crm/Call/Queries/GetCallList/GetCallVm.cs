@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,5 +15,10 @@ namespace ERPCubes.Application.Features.Crm.Call.Queries.GetCallList
         public DateTime? EndTime { get; set; }
         public string CreatedBy {  get; set; }=String.Empty;
         public DateTime? CreatedDate { get; set; }
+        public string CreatedByName { get; set; } = String.Empty;
+        public int ReasonId { get; set; }
+        public DateTime? DueDate { get; set; }
+        public int TaskId { get; set; }
+        public int IsTask { get; set; }
     }
 }

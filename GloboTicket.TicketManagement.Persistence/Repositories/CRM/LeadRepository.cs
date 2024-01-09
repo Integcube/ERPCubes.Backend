@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
@@ -13,6 +13,9 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
+using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
+using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -44,7 +47,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-
         public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id
             //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
             )
@@ -503,6 +505,37 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
+        public async Task ChangeLeadStatus(ChangeLeadStatusCommand obj)
+        {
+            try
+            {
+                CrmLead? Lead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == obj.LeadId) select a).FirstOrDefaultAsync();
+                if (Lead == null)
+                {
+                    throw new NotFoundException("", obj.LeadId);
+                }
+                else
+                {
+                    Lead.Status= obj.statusId;
+                    Lead.LastModifiedBy = obj.userId;
+                    Lead.LastModifiedDate = DateTime.Now.ToUniversalTime();
+                    await _dbContext.SaveChangesAsync();
+                }
+                int typeId = (int)CrmEnum.ContactEnum.Lead;
+                string statusTitle = "Status Changed to " + obj.StausTitle;
+                string details = "Lead Status Changed to " + obj.StausTitle;
+                var result = _dbContext.Database.ExecuteSqlRaw(
+                    "CALL public.insertstatuslog({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                     details, typeId, statusTitle, obj.userId, obj.LeadId, obj.TenantId, obj.statusId);
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+        
+
 
     }
 }

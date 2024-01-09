@@ -1,5 +1,6 @@
-﻿using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -34,8 +35,8 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj);
         Task<List<GetLeadSourceWiseVm>> GetLeadSourceWise(int TenantId, string Id, DateTime startDate, DateTime endDate, int sourceId);
         Task<List<GetLeadOwnerWiseVm>> GetLeadOwnerWise(int TenantId, string Id, DateTime startDate, DateTime endDate, string leadOwner, int sourceId, int status);
-
-
+        Task ChangeLeadStatus(ChangeLeadStatusCommand oj);
+        
 
     }
 }

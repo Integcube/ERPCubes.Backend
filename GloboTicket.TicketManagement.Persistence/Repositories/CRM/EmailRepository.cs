@@ -1,8 +1,9 @@
-﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Email.Commands.DeleteEmail;
 using ERPCubes.Application.Features.Crm.Email.Commands.SaveEmail;
 using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using MediatR;
@@ -26,24 +27,28 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetEmailVm> Email = await (
-                    from a in _dbContext.CrmEmail.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
-                    (Id == "-1" || a.CreatedBy == Id) &&
-                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
-                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
-                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
-                    select new GetEmailVm
+
+                var users = await _dbContextIdentity.Users.Where(a => a.TenantId == TenantId).ToDictionaryAsync(user => user.Id);
+
+                var emails = await _dbContext.CrmEmail
+                    .Where(a => a.IsDeleted == 0 &&
+                                a.TenantId == TenantId &&
+                                (Id == "-1" || a.CreatedBy == Id) &&
+                                (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
+                                (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
+                                (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    .OrderByDescending(a => a.CreatedDate).Select(email => new GetEmailVm
                     {
-                        EmailId = a.EmailId,
-                        Subject = a.Subject,
-                        Description = a.Description,
-                        Reply = a.Reply,
-                        CreatedBy = a.CreatedBy,
-                        CreatedDate=a.CreatedDate
+                        EmailId = email.EmailId,
+                        Subject = email.Subject,
+                        Description = email.Description,
+                        Reply = email.Reply,
+                        CreatedBy = email.CreatedBy,
+                        CreatedDate = email.CreatedDate,
+                        CreatedbyName = users[email.CreatedBy].FirstName + " " + users[email.CreatedBy].LastName
+                    }).ToListAsync();
 
-                    }).OrderByDescending(a=>a.CreatedDate).ToListAsync();
-
-                return Email;
+                return emails;
             }
             catch (Exception ex)
             {
@@ -55,8 +60,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var deleteEmail = await(from a in _dbContext.CrmEmail.Where(a => a.EmailId == emailId.EmailId)
-                                       select a).FirstOrDefaultAsync();
+                var deleteEmail = await (from a in _dbContext.CrmEmail.Where(a => a.EmailId == emailId.EmailId)
+                                         select a).FirstOrDefaultAsync();
                 if (deleteEmail == null)
                 {
                     throw new NotFoundException("emailId", emailId);
@@ -113,7 +118,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addEmail.IsOpportunity = 1;
                         addEmail.Id = email.OpportunityId;
                     }
-                    if (email.LeadId==-1 && email.CompanyId==-1 && email.OpportunityId==-1)
+                    if (email.LeadId == -1 && email.CompanyId == -1 && email.OpportunityId == -1)
                     {
                         addEmail.Id = email.EmailId;
                     }
@@ -165,7 +170,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     var existingEmail = await (from a in _dbContext.CrmEmail.Where(a => a.EmailId == email.EmailId)
-                                         select a).FirstOrDefaultAsync();
+                                               select a).FirstOrDefaultAsync();
                     if (existingEmail == null)
                     {
                         throw new NotFoundException(email.Subject, email.EmailId);

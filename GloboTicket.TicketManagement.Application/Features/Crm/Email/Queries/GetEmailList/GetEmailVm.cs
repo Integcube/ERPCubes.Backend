@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +14,8 @@ namespace ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList
         public string Reply { get; set; } = String.Empty;
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+        public string CreatedbyName { get; set; } = String.Empty;
+
+        
     }
 }
