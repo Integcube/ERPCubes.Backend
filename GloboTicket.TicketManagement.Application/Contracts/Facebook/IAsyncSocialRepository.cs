@@ -1,4 +1,6 @@
 ﻿using ERPCubes.Application.Features.Facebook.Commands.SaveFacebookUser;
+using ERPCubes.Application.Features.Google.Commands.SaveAuth;
+using ERPCubes.Application.Features.Google.Queries.GetAuthCode;
 using ERPCubes.Application.Models.Authentication;
 using System;
 using System.Collections.Generic;
@@ -11,5 +13,7 @@ namespace ERPCubes.Application.Contracts.Facebook
     public interface IAsyncSocialRepository
     {
         Task RegisterUser(SaveFacebookUserCommand request);
+        Task RegisterGoogleUser(SaveGoogleAuthUserCommand request);
+        Task<string> GetAuthCode(GetAuthCodeQuery request);
     }
 }

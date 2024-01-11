@@ -37,13 +37,7 @@ namespace ERPCubes.Api
 .AllowAnyHeader().AllowAnyMethod());
             });
 
-            builder.Services.AddAuthentication().AddFacebook(options =>
-            {
-                options.AppId = "746255643565380"; 
-                options.AppSecret = "d7f47f73d8d8722bd5e2ac82aa670d59"; 
-                options.CallbackPath = "/api/FacebookLogin/signin-facebook";
-                options.SaveTokens = true;
-            });
+
             return builder.Build();
 
         }
