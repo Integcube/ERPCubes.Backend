@@ -414,6 +414,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.Status = 1;
                     LeadObj.LeadOwner = request.Id;
                     LeadObj.City = Lead.City;
+                    LeadObj.Address = Lead.Address;
+                    LeadObj.Country = Lead.Country;
+                    LeadObj.Street = Lead.Street;
+                    LeadObj.Zip = Lead.Zip;
                     LeadObj.ProductId = Lead.ProductId;
                     LeadObj.CreatedBy = request.Id;
                     LeadObj.CreatedDate = localDateTime.ToUniversalTime();
