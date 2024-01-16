@@ -73,6 +73,7 @@ namespace ERPCubes.Persistence
         public DbSet<GetLeadOwnerWiseVm> GetCrmLeadOwnerWise { get; set; }
 
         public DbSet<GetCampaigWiseReportQueryVm> GetCampaigWiseReportQueryVm { get; set; }
+        public DbSet<Notification> Notification { get; set; }
         
 
     }

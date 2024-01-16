@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Contracts.Facebook;
+using ERPCubes.Application.Contracts.Notifications;
 using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Persistence.Repositories;
@@ -39,6 +40,7 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncCampaignRepository, CampaignRepository>();
             services.AddScoped<IAsyncProjectRepository, ProjectRepository>();
             services.AddScoped<IAsyncReportsRepository, ReportsRepository>();
+            services.AddScoped<IAsyncNotificationRepository, NotificationRepository>();
 
             return services;    
         }

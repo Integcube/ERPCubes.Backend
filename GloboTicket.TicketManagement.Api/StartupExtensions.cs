@@ -6,6 +6,7 @@ using ERPCubes.Application.Contracts;
 using ERPCubes.Identity;
 using ERPCubes.Infrastructure;
 using ERPCubes.Persistence;
+using ERPCubesApi.Hubs;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 //using Serilog;
@@ -29,13 +30,14 @@ namespace ERPCubes.Api
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers().AddJsonOptions(options =>
     {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase; 
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("Open", builder => builder.AllowAnyOrigin()
-.AllowAnyHeader().AllowAnyMethod());
+                options.AddPolicy("Open", builder => builder.WithOrigins("http://localhost:44300")
+.AllowAnyHeader().AllowAnyMethod().AllowCredentials());
             });
+            builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
 
 
             return builder.Build();
@@ -50,7 +52,7 @@ namespace ERPCubes.Api
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GloboTicket Ticket Management API");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ERPCubes API");
                 });
             }
 
@@ -66,6 +68,8 @@ namespace ERPCubes.Api
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.MapHub<TicketHub>("/ticketHub").RequireCors("Open");
 
             return app;
 
