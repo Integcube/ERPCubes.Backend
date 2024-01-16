@@ -11,9 +11,8 @@ namespace ERPCubes.Application.Features.Crm.UserActivity.Queries.GetUserActivity
     {
         public int TenantId { get; set; }
         public string Id { get; set; } = string.Empty;
-        public int LeadId { get; set; } 
-        public int CompanyId { get; set; }
-        public int OpportunityId { get; set; }
+        public int ContactTypeId { get; set; }
+        public int ContactId { get; set; }
         public int Count { get; set; } 
     }
 }

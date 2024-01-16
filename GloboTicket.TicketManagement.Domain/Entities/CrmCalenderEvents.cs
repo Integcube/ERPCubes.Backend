@@ -19,9 +19,8 @@ namespace ERPCubes.Domain.Entities
         public DateTime? EndTime { get; set;}
         public int TenantId { get; set;}
         public int Id { get; set; } 
-        public int IsCompany { get; set; }
-        public int IsLead { get; set; }
-        public int IsOpportunity {  get; set; }
         public bool AllDay { get; set; }
+        public int ActivityId { get; set; }
+        public int ContactTypeId { get; set; }  
     }
 }

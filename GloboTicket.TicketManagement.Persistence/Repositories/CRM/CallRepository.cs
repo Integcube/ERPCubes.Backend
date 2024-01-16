@@ -15,6 +15,7 @@ using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ERPCubes.Persistence.Repositories.CRM.CrmEnum;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -61,37 +62,35 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
+        public async Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int ContactTypeId, int ContactId)
         {
             try
             {
-                var users = await _dbContextIdentity.Users.Where(u => u.TenantId == TenantId).ToDictionaryAsync(user => user.Id);
 
-                List<GetCallVm> calls = await (
-                    from a in _dbContext.CrmCall
-                    where a.IsDeleted == 0 &&
-                          a.TenantId == TenantId &&
-                          (Id == "-1" || a.CreatedBy == Id) &&
-                          (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
-                          (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
-                          (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1))
-                    join task in _dbContext.CrmTask on a.TaskId equals task.TaskId into all
-                    from tasks in all.DefaultIfEmpty()
-                    select new GetCallVm
-                    {
-                        CallId = a.CallId,
-                        Subject = a.Subject,
-                        Response = a.Response == null ? "" : a.Response,
-                        StartTime = a.StartTime,
-                        EndTime = a.EndTime,
-                        CreatedBy = a.CreatedBy,
-                        CreatedDate = a.CreatedDate,
-                        CreatedByName = users.ContainsKey(a.CreatedBy) ? users[a.CreatedBy].FirstName + " " + users[a.CreatedBy].LastName : null,
-                        ReasonId = a.ReasonId,
-                        TaskId = a.TaskId,
-                        DueDate = tasks.DueDate,
-                        IsTask = -1
-                    }).OrderByDescending(a => a.CreatedDate).ToListAsync();
+                List<GetCallVm> calls = await (from a in _dbContext.CrmCall.Where(a => a.IsDeleted == 0
+                                                && a.TenantId == TenantId
+                                                && (Id == "-1" || a.CreatedBy == Id)
+                                                && (a.Id == ContactId)
+                                                && (a.ContactTypeId == ContactTypeId))
+                                               join task in _dbContext.CrmTask on a.TaskId equals task.TaskId into all
+                                               from tasks in all.DefaultIfEmpty()
+                                               join user in _dbContext.AppUser on a.CreatedBy equals user.Id into allUsers
+                                               from user in allUsers.DefaultIfEmpty()
+                                               select new GetCallVm
+                                               {
+                                                   CallId = a.CallId,
+                                                   Subject = a.Subject,
+                                                   Response = a.Response == null ? "" : a.Response,
+                                                   StartTime = a.StartTime,
+                                                   EndTime = a.EndTime,
+                                                   CreatedBy = a.CreatedBy,
+                                                   CreatedDate = a.CreatedDate,
+                                                   CreatedByName = user == null ? "User Not Found" : user.FirstName + " " + user.LastName,
+                                                   ReasonId = a.ReasonId,
+                                                   TaskId = a.TaskId,
+                                                   DueDate = tasks.DueDate,
+                                                   IsTask = -1
+                                               }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return calls;
 
@@ -124,33 +123,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         task.TenantId = call.TenantId;
                         task.Type = "task";
                         task.IsDeleted = 0;
-                        if (call.CompanyId == -1){task.IsCompany = -1;} else { task.IsCompany = 1;task.Id = call.CompanyId;}
-                        if (call.LeadId is -1)
-                        {
-                            task.IsLead = -1;
-                        }
-                        else
-                        {
-                            task.IsLead = 1;
-                            task.Id = call.LeadId;
-                        }
-                        if (call.OpportunityId == -1)
-                        {
-                            task.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            task.IsOpportunity = 1;
-                            task.Id = call.OpportunityId;
-                        }
-                        if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
-                        {
-                            task.Id = -1;
-                        }
+                        task.Id = call.ContactId;
+                        task.ContactTypeId = call.ContactTypeId; //For Contact Type exp. lead,company
                         await _dbContext.AddAsync(task);
                         await _dbContext.SaveChangesAsync();
-                        TaskId = task.TaskId;
 
+                        var result = _dbContext.Database.ExecuteSqlRaw(
+                               "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                  call.Id, (int)CrmEnum.UserActivityEnum.Task, 1, call.Subject, call.Id, call.TenantId, call.ContactTypeId, call.TaskId, "Insertion", call.ContactId);
+                        TaskId = task.TaskId;
                     }
                     else if (call.TaskId != -1 && call.IsTask == 1)
                     {
@@ -180,134 +161,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addCall.TenantId = call.TenantId;
                         addCall.ReasonId = call.ReasonId;
                         addCall.TaskId = TaskId;
-                        if (call.CompanyId == -1)
-                        {
-                            addCall.IsCompany = -1;
-                        }
-                        else
-                        {
-                            addCall.IsCompany = 1;
-                            addCall.Id = call.CompanyId;
-                        }
-                        if (call.LeadId == -1)
-                        {
-                            addCall.IsLead = -1;
-                        }
-                        else
-                        {
-                            addCall.IsLead = 1;
-                            addCall.Id = call.LeadId;
-                        }
-                        if (call.OpportunityId == -1)
-                        {
-                            addCall.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            addCall.IsOpportunity = 1;
-                            addCall.Id = call.OpportunityId;
-                        }
-                        if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
-                        {
-                            addCall.Id = -1;
-                        }
+                        addCall.Id = call.ContactId;
+                        addCall.ContactTypeId = call.ContactTypeId;//For Contact Type exp. lead,company
                         await _dbContext.AddAsync(addCall);
                         await _dbContext.SaveChangesAsync();
 
-                        CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
-                        CalenderObj.UserId = addCall.CreatedBy;
-                        CalenderObj.Description = "You have a " + addCall.Subject;
-                        CalenderObj.Type = 1;
-                        CalenderObj.CreatedBy = addCall.CreatedBy;
-                        CalenderObj.CreatedDate = addCall.CreatedDate;
-                        CalenderObj.StartTime = addCall.StartTime;
-                        CalenderObj.EndTime = addCall.EndTime;
-                        CalenderObj.TenantId = addCall.TenantId;
-
-                        if (call.CompanyId == -1)
-                        {
-                            addCall.IsCompany = -1;
-                        }
-                        else
-                        {
-                            addCall.IsCompany = 1;
-                            addCall.Id = call.CompanyId;
-                        }
-                        if (call.LeadId == -1)
-                        {
-                            addCall.IsLead = -1;
-                        }
-                        else
-                        {
-                            addCall.IsLead = 1;
-                            addCall.Id = call.LeadId;
-                        }
-                        if (call.OpportunityId == -1)
-                        {
-                            addCall.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            addCall.IsOpportunity = 1;
-                            addCall.Id = call.OpportunityId;
-                        }
-                        if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
-                        {
-                            addCall.Id = -1;
-                        }
-                        CalenderObj.AllDay = false;
-                        await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                        var result = _dbContext.Database.ExecuteSqlRaw(
+                               "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                  addCall.CreatedBy, (int)CrmEnum.UserActivityEnum.Call, 1, call.Subject, addCall.CreatedBy, addCall.TenantId, addCall.ContactTypeId, addCall.CallId, "Insertion", call.ContactId);
                         await _dbContext.SaveChangesAsync();
-
-                        CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                        ActivityObj.UserId = addCall.CreatedBy;
-                        ActivityObj.Detail = addCall.Subject;
-                        ActivityObj.ActivityType = 1;
-                        ActivityObj.ActivityStatus = 1;
-                        ActivityObj.TenantId = addCall.TenantId;
-                        if (call.CompanyId == -1)
-                        {
-                            ActivityObj.IsCompany = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsCompany = 1;
-                            ActivityObj.Id = call.CompanyId;
-                        }
-                        if (call.LeadId == -1)
-                        {
-                            ActivityObj.IsLead = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsLead = 1;
-                            ActivityObj.Id = call.LeadId;
-                        }
-                        if (call.OpportunityId == -1)
-                        {
-                            ActivityObj.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsOpportunity = 1;
-                            ActivityObj.Id = call.OpportunityId;
-                        }
-                        if (call.LeadId == -1 && call.CompanyId == -1 && call.OpportunityId == -1)
-                        {
-                            ActivityObj.Id = -1;
-                        }
-                        ActivityObj.CreatedBy = addCall.CreatedBy;
-                        ActivityObj.CreatedDate = addCall.CreatedDate;
-                        await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
-                        await _dbContext.SaveChangesAsync();
-
-
                         await transaction.CommitAsync();
                     }
                     else
                     {
-                        var existingCall = await (from a in _dbContext.CrmCall.Where(a => a.CallId == call.CallId)
-                                                  select a).FirstAsync();
+
+                        var existingCall = await (from a in _dbContext.CrmCall.Where(a => a.CallId == call.CallId) select a).FirstAsync();
                         if (existingCall == null)
                         {
                             throw new NotFoundException(call.Subject, call.CallId);
@@ -323,7 +191,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             existingCall.ReasonId = call.ReasonId;
                             existingCall.TaskId = TaskId;
                             await _dbContext.SaveChangesAsync();
+
+                            var result = _dbContext.Database.ExecuteSqlRaw(
+                                   "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                      call.Id, 1, 1, call.Subject, call.Id, call.TenantId, call.ContactTypeId, call.CallId, "Update", call.ContactId);
+                            await _dbContext.SaveChangesAsync();
                             await transaction.CommitAsync();
+
                         }
                     }
                 }

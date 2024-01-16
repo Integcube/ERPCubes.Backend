@@ -33,6 +33,7 @@ namespace ERPCubes.Persistence
             base.OnModelCreating(modelBuilder);
         }
         public DbSet<AppMenus> AppMenus { get; set; }
+        public DbSet<AppUser> AppUser { get; set; }
         public DbSet<CrmLead> CrmLead { get; set; }
         public DbSet<CrmCompany> CrmCompany { get; set; }
         public DbSet<CrmIndustry> CrmIndustry { get; set; }

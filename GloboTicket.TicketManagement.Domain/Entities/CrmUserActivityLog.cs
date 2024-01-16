@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,8 +19,7 @@ namespace ERPCubes.Domain.Entities
         public string Detail { get; set; } = string.Empty;
         public int TenantId { get; set; }
         public int Id { get; set; }
-        public int IsLead { get; set; }
-        public int IsCompany { get; set; }
-        public int IsOpportunity { get; set; }
+        public int ContactTypeId { get; set; }
+        public int ContactActivityId { get; set; }
     }
 }

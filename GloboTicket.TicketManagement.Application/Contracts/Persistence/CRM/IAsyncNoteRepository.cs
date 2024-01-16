@@ -13,7 +13,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncNoteRepository:IAsyncRepository<CrmNote>
     {
-        Task<List<GetNoteListVm>> GetNoteList(int TenantId, string Id, int LeadId, int CompanyId, int OpportunityId);
+        Task<List<GetNoteListVm>> GetNoteList(int TenantId, string Id, int ContactTypeId, int ContactId);
         Task<List<NoteTaskListVm>> GetNoteTaskList(int TenantId, string Id, int NoteId);
         Task<List<NoteTagListVm>> GetNoteTagList(int TenantId, string Id, int NoteId);
         Task<List<GetNotesWithTasksVm>> GetNoteListWithTasks(int TenantId, string Id);

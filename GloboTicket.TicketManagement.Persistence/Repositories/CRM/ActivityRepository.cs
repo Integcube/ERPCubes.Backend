@@ -7,6 +7,7 @@ using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
 namespace ERPCubes.Persistence.Repositories.CRM
@@ -19,241 +20,101 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-          var activities = (
-                _dbContext.CrmCall.Where(a =>
-                 a.TenantId == request.TenantId &&
-                 a.IsDeleted == 0 &&
-                 (request.LeadId == -1 || (a.Id == request.LeadId && a.IsLead == 1)) &&
-                 (request.CompanyId == -1 || (a.Id == request.CompanyId && a.IsCompany == 1)) &&
-                 (request.OpportunityId == -1 || (a.Id == request.OpportunityId && a.IsOpportunity == 1))
-                ).Select(a => new GetUserActivityVm
-                {
-                 ActivityId = a.CallId,
-                 UserId = a.CreatedBy,
-                 CreatedDate = a.CreatedDate,
-                 Detail = a.Subject,
-                 ActivityStatus = 1,
-                 ActivityType = "Call",
-                 Icon = "heroicons_outline:phone",
-                 ActivityTypeId = 1,
-                })
-                .Union(
-                 _dbContext.CrmEmail.Where(b =>
-                     b.TenantId == request.TenantId &&
-                     b.IsDeleted == 0 &&
-                     (request.LeadId == -1 || (b.Id == request.LeadId && b.IsLead == 1)) &&
-                     (request.CompanyId == -1 || (b.Id == request.CompanyId && b.IsCompany == 1)) &&
-                     (request.OpportunityId == -1 || (b.Id == request.OpportunityId && b.IsOpportunity == 1))
-                 ).Select(b => new GetUserActivityVm
-                 {
-                     ActivityId = b.EmailId,
-                     UserId = b.CreatedBy,
-                     CreatedDate = b.CreatedDate,
-                     Detail = b.Subject,
-                     ActivityStatus = 1,
-                     ActivityType = "Email",
-                     Icon = "heroicons_outline:envelope",
-                     ActivityTypeId = 2,
-                 })
-                )
-                .Union(
-                 _dbContext.CrmMeeting.Where(c =>
-                     c.TenantId == request.TenantId &&
-                     c.IsDeleted == 0 &&
-                     (request.LeadId == -1 || (c.Id == request.LeadId && c.IsLead == 1)) &&
-                     (request.CompanyId == -1 || (c.Id == request.CompanyId && c.IsCompany == 1)) &&
-                     (request.OpportunityId == -1 || (c.Id == request.OpportunityId && c.IsOpportunity == 1))
-                 ).Select(c => new GetUserActivityVm
-                 {
-                     ActivityId = c.MeetingId,
-                     UserId = c.CreatedBy,
-                     CreatedDate = c.CreatedDate,
-                     Detail = c.Subject,
-                     ActivityStatus = 1,
-                     ActivityType = "Meeting",
-                     Icon = "heroicons_outline:user-group",
-                     ActivityTypeId = 3,
-                 })
-                )
-                .Union(
-                 _dbContext.CrmTask.Where(d =>
-                     d.TenantId == request.TenantId &&
-                     d.IsDeleted == 0 &&
-                     (request.LeadId == -1 || (d.Id == request.LeadId && d.IsLead == 1)) &&
-                     (request.CompanyId == -1 || (d.Id == request.CompanyId && d.IsCompany == 1)) &&
-                     (request.OpportunityId == -1 || (d.Id == request.OpportunityId && d.IsOpportunity == 1))
-                 ).Select(d => new GetUserActivityVm
-                 {
-                     ActivityId = d.TaskId,
-                     UserId = d.CreatedBy,
-                     CreatedDate = d.CreatedDate,
-                     Detail = d.Title,
-                     ActivityStatus = 1,
-                     ActivityType = "Task",
-                     Icon = "heroicons_outline:pencil",
-                     ActivityTypeId = 4,
-                 })
-                )
-                .Union(
-                 _dbContext.CrmNote.Where(e =>
-                     e.TenantId == request.TenantId &&
-                     e.IsDeleted == 0 &&
-                     (request.LeadId == -1 || (e.Id == request.LeadId && e.IsLead == 1)) &&
-                     (request.CompanyId == -1 || (e.Id == request.CompanyId && e.IsCompany == 1)) &&
-                     (request.OpportunityId == -1 || (e.Id == request.OpportunityId && e.IsOpportunity == 1))
-                 ).Select(e => new GetUserActivityVm
-                 {
-                     ActivityId = e.NoteId,
-                     UserId = e.CreatedBy,
-                     CreatedDate = e.CreatedDate,
-                     Detail = e.NoteTitle,
-                     ActivityStatus = 1,
-                     ActivityType = "Note",
-                     Icon = "heroicons_outline:briefcase",
-                     ActivityTypeId = 5, // Adjust this ActivityTypeId as needed
-                 })
-                )
-                )
-                .OrderByDescending(activity => activity.CreatedDate)
-                .Take(request.Count * 10)
-                .ToList();
-                
-
-
-
-                //var callActivitiesTask = (
-                //    from a in _dbContext.CrmCall
-                //    where a.TenantId == request.TenantId
-                //        && a.IsDeleted == 0
-                //        && (request.LeadId == -1 || (a.Id == request.LeadId && a.IsLead == 1))
-                //        && (request.CompanyId == -1 || (a.Id == request.CompanyId && a.IsCompany == 1))
-                //        && (request.OpportunityId == -1 || (a.Id == request.OpportunityId && a.IsOpportunity == 1))
-                //    select new GetUserActivityVm
-                //    {
-                //        ActivityId = a.CallId,
-                //        UserId = a.CreatedBy,
-                //        CreatedDate = a.CreatedDate,
-                //        Detail = a.Subject,
-                //        ActivityStatus = 1,
-                //        ActivityType = "Call",
-                //        Icon = "heroicons_outline:phone",
-                //        ActivityTypeId = 1,
-
-                //    }
-                //).ToListAsync();
-
-                //var emailActivities = (
-                //    from b in _dbContext.CrmEmail
-                //    where b.TenantId == request.TenantId
-                //        && b.IsDeleted == 0
-                //        && (request.LeadId == -1 || (b.Id == request.LeadId && b.IsLead == 1))
-                //        && (request.CompanyId == -1 || (b.Id == request.CompanyId && b.IsCompany == 1))
-                //        && (request.OpportunityId == -1 || (b.Id == request.OpportunityId && b.IsOpportunity == 1))
-                //    select new GetUserActivityVm
-                //    {
-                //        ActivityId = b.EmailId,
-                //        UserId = b.CreatedBy,
-                //        CreatedDate = b.CreatedDate,
-                //        Detail = b.Subject,
-                //        ActivityStatus = 1,
-                //        ActivityType = "Email",
-                //        Icon = "heroicons_outline:envelope",
-                //        ActivityTypeId = 2,
-
-                //    }
-                //).ToListAsync();
-
-                //var meetingActivities = (
-                //     from b in _dbContext.CrmMeeting
-                //     where b.TenantId == request.TenantId
-                //         && b.IsDeleted == 0
-                //         && (request.LeadId == -1 || (b.Id == request.LeadId && b.IsLead == 1))
-                //         && (request.CompanyId == -1 || (b.Id == request.CompanyId && b.IsCompany == 1))
-                //         && (request.OpportunityId == -1 || (b.Id == request.OpportunityId && b.IsOpportunity == 1))
-                //     select new GetUserActivityVm
-                //     {
-                //         ActivityId = b.MeetingId,
-                //         UserId = b.CreatedBy,
-                //         CreatedDate = b.CreatedDate,
-                //         Detail = b.Subject,
-                //         ActivityStatus = 1,
-                //         ActivityType = "Meeting",
-                //         Icon = "heroicons_outline:user-group",
-                //         ActivityTypeId = 3,
-                //     }
-                // ).ToListAsync();
-
-                //var taskActivities = (
-                //      from b in _dbContext.CrmTask
-                //      where b.TenantId == request.TenantId
-                //          && b.IsDeleted == 0
-                //          && (request.LeadId == -1 || (b.Id == request.LeadId && b.IsLead == 1))
-                //          && (request.CompanyId == -1 || (b.Id == request.CompanyId && b.IsCompany == 1))
-                //          && (request.OpportunityId == -1 || (b.Id == request.OpportunityId && b.IsOpportunity == 1))
-                //      select new GetUserActivityVm
-                //      {
-                //          ActivityId = b.TaskId,
-                //          UserId = b.CreatedBy,
-                //          CreatedDate = b.CreatedDate,
-                //          Detail = b.Title,
-                //          ActivityStatus = 1,
-                //          ActivityType = "Task",
-                //          Icon = "heroicons_outline:pencil",
-                //          ActivityTypeId = 4,
-                //      }
-                //  ).ToListAsync();
-
-                //var noteActivities = (
-                //    from b in _dbContext.CrmNote
-                //    where b.TenantId == request.TenantId
-                //        && b.IsDeleted == 0
-                //        && (request.LeadId == -1 || (b.Id == request.LeadId && b.IsLead == 1))
-                //        && (request.CompanyId == -1 || (b.Id == request.CompanyId && b.IsCompany == 1))
-                //        && (request.OpportunityId == -1 || (b.Id == request.OpportunityId && b.IsOpportunity == 1))
-                //    select new GetUserActivityVm
-                //    {
-                //        ActivityId = b.NoteId,
-                //        UserId = b.CreatedBy,
-                //        CreatedDate = b.CreatedDate,
-                //        Detail = b.NoteTitle,
-                //        ActivityStatus = 1,
-                //        ActivityType = "Note",
-                //        Icon = "heroicons_outline:briefcase",
-                //        ActivityTypeId = 4,
-                //    }
-                //    ).ToListAsync();
-
-                //await Task.WhenAll(callActivitiesTask, emailActivities, meetingActivities, taskActivities, noteActivities);
-
-                //var combinedActivities = callActivitiesTask.Result
-                //    .Union(emailActivities.Result)
-                //    .Union(meetingActivities.Result)
-                //    .Union(taskActivities.Result)
-                //    .Union(noteActivities.Result)
-                //    .OrderByDescending(activity => activity.CreatedDate) // Order by CreatedDate descending
-                //    .Take(request.Count * 10).ToList();
-
-                //var Activitylist = await (
-                //  from a in _dbContext.CrmUserActivityLog.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 &&
-                //  (a.UserId == request.Id || a.CreatedBy == request.Id) &&
-                //  (request.LeadId == -1 || (a.Id == request.LeadId && a.IsLead == 1)) &&
-                //  (request.CompanyId == -1 || (a.Id == request.CompanyId && a.IsCompany == 1)) &&
-                //  (request.OpportunityId == -1 || (a.Id == request.OpportunityId && a.IsOpportunity == 1)))
-                //  join b in _dbContext.CrmUserActivityType on a.ActivityType equals b.ActivityTypeId into all
-                //  from c in all.DefaultIfEmpty()
-                //  orderby a.CreatedDate descending
-                //  select new GetUserActivityVm
-                //  {
-                //      ActivityId = a.ActivityId,
-                //      UserId = a.UserId,
-                //      ActivityStatus = a.ActivityStatus,
-                //      Detail = a.Detail,
-                //      CreatedDate = a.CreatedDate,
-                //      CreatedBy = a.CreatedBy,
-                //      ActivityType = c.ActivityTypeTitle,
-                //      Icon = c.Icon,
-                //      ActivityTypeId = c.ActivityTypeId
-                //  }).Take(request.Count * 10).ToListAsync();
+                var activities = await (
+                    from call in _dbContext.CrmCall.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0
+                    && (request.ContactTypeId == -1 || a.ContactTypeId == request.ContactTypeId)
+                    && (request.ContactId == -1 || a.Id == request.ContactId)
+                    && (request.Id == "-1" || a.CreatedBy == request.Id))
+                    join callUser in _dbContext.AppUser on call.CreatedBy equals callUser.Id into callUsers
+                    from userCall in callUsers.DefaultIfEmpty()
+                    select new GetUserActivityVm
+                    {
+                        ActivityId = call.CallId,
+                        UserId = call.CreatedBy,
+                        CreatedDate = call.CreatedDate,
+                        Detail = call.Subject,
+                        ActivityStatus = 1,
+                        ActivityType = "Call",
+                        Icon = "heroicons_outline:phone",
+                        ActivityTypeId = 1,
+                        UserName = userCall == null ? "User not found" : userCall.FirstName + " " + userCall.LastName
+                    }).Union(
+                        from email in _dbContext.CrmEmail.Where(b => b.TenantId == request.TenantId && b.IsDeleted == 0
+                         && (request.ContactTypeId == -1 || b.ContactTypeId == request.ContactTypeId)
+                         && (request.ContactId == -1 || b.Id == request.ContactId)
+                         && (request.Id == "-1" || b.CreatedBy == request.Id))
+                        join emailUser in _dbContext.AppUser on email.CreatedBy equals emailUser.Id into emailUsers
+                        from userEmail in emailUsers.DefaultIfEmpty()
+                        select new GetUserActivityVm
+                        {
+                            ActivityId = email.EmailId,
+                            UserId = email.CreatedBy,
+                            CreatedDate = email.CreatedDate,
+                            Detail = email.Subject,
+                            ActivityStatus = 1,
+                            ActivityType = "Email",
+                            Icon = "heroicons_outline:envelope",
+                            ActivityTypeId = 2,
+                            UserName = userEmail == null ? "User not found" : userEmail.FirstName + " " + userEmail.LastName
+                        }
+                    ).Union(
+                        from meeting in _dbContext.CrmMeeting.Where(c => c.TenantId == request.TenantId && c.IsDeleted == 0
+                         && (request.ContactTypeId == -1 || c.ContactTypeId == request.ContactTypeId)
+                         && (request.ContactId == -1 || c.Id == request.ContactId)
+                         && (request.Id == "-1" || c.CreatedBy == request.Id))
+                        join meetingUser in _dbContext.AppUser on meeting.CreatedBy equals meetingUser.Id into meetingUsers
+                        from userMeeting in meetingUsers.DefaultIfEmpty()
+                        select new GetUserActivityVm
+                        {
+                            ActivityId = meeting.MeetingId,
+                            UserId = meeting.CreatedBy,
+                            CreatedDate = meeting.CreatedDate,
+                            Detail = meeting.Subject,
+                            ActivityStatus = 1,
+                            ActivityType = "Meeting",
+                            Icon = "heroicons_outline:user-group",
+                            ActivityTypeId = 3,
+                            UserName = userMeeting == null ? "User not found" : userMeeting.FirstName + " " + userMeeting.LastName
+                        }
+                    ).Union(
+                        from task in _dbContext.CrmTask.Where(d => d.TenantId == request.TenantId && d.IsDeleted == 0
+                        && (request.ContactTypeId == -1 || d.ContactTypeId == request.ContactTypeId)
+                        && (request.ContactId == -1 || d.Id == request.ContactId)
+                        && (request.Id == "-1" || d.CreatedBy == request.Id))
+                        join taskUser in _dbContext.AppUser on task.CreatedBy equals taskUser.Id into taskUsers
+                        from userTask in taskUsers.DefaultIfEmpty()
+                        select new GetUserActivityVm
+                        {
+                            ActivityId = task.TaskId,
+                            UserId = task.CreatedBy,
+                            CreatedDate = task.CreatedDate,
+                            Detail = task.Title,
+                            ActivityStatus = 1,
+                            ActivityType = "Task",
+                            Icon = "heroicons_outline:pencil",
+                            ActivityTypeId = 4,
+                            UserName = userTask == null ? "User not found" : userTask.FirstName + " " + userTask.LastName
+                        }
+                    ).Union(
+                        from note in _dbContext.CrmNote.Where(e => e.TenantId == request.TenantId && e.IsDeleted == 0
+                         && (request.ContactTypeId == -1 || e.ContactTypeId == request.ContactTypeId)
+                         && (request.ContactId == -1 || e.Id == request.ContactId)
+                         && (request.Id == "-1" || e.CreatedBy == request.Id))
+                        join noteUser in _dbContext.AppUser on note.CreatedBy equals noteUser.Id into noteUsers
+                        from userNote in noteUsers.DefaultIfEmpty()
+                        select new GetUserActivityVm
+                        {
+                            ActivityId = note.NoteId,
+                            UserId = note.CreatedBy,
+                            CreatedDate = note.CreatedDate,
+                            Detail = note.NoteTitle,
+                            ActivityStatus = 1,
+                            ActivityType = "Note",
+                            Icon = "heroicons_outline:briefcase",
+                            ActivityTypeId = 5,
+                            UserName = userNote == null ? "User not found" : userNote.FirstName + " " + userNote.LastName
+                        }
+                    ).OrderByDescending(activity => activity.CreatedDate).Take(request.Count * 10).ToListAsync();
 
 
                 return activities;
@@ -262,8 +123,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new Exception(ex.Message);
             }
-
-
         }
         public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId)
         {
@@ -275,9 +134,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 };
 
                 var results = await _dbContext.GetCrmUserActivity.FromSqlRaw(
-                    "SELECT * FROM public.calculateleadevent({0})", tenantIdParameter)
-                    .ToListAsync();
-
+                    "SELECT * FROM public.calculateleadevent({0})", tenantIdParameter).ToListAsync();
                 return results;
             }
             catch (Exception ex)

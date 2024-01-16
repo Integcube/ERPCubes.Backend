@@ -13,5 +13,7 @@ namespace ERPCubes.Application.Features.Notes.Queries.GetNoteList
         public string NoteTitle { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
+        public string CreatedByName { get; set; }
+        
     }
 }

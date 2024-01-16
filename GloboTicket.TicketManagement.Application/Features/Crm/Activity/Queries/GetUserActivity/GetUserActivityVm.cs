@@ -17,5 +17,7 @@ namespace ERPCubes.Application.Features.Crm.UserActivity.Queries.GetUserActivity
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;
+        public string UserName { get; set; }
+        
     }
 }
