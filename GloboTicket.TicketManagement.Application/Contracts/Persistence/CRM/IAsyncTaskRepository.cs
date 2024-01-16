@@ -17,7 +17,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncTaskRepository:IAsyncRepository<CrmTask>
     {
-        Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int CompanyId, int LeadId, int Opportunity);
+        Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int ContactTypeId, int ContactId);
         Task<List<GetTaskTagsListVm>> GetAllTaskTags(int TenantId, string Id, int TaskId);
         Task DeletTask(DeleteTaskCommand request);
         Task SaveTask(SaveTaskCommand request);

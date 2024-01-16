@@ -49,21 +49,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
         }
         public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id
             //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
-            )
+            ) 
         {
             try
 
             {
-                //List<int> StatusIds = new List<int>();
-                //if (!string.IsNullOrEmpty(LeadStatus))
-                //    StatusIds = (LeadStatus.Split(',').Select(Int32.Parse).ToList());
-                //List<string> OwnerIds = new List<string>();
-                //if (!string.IsNullOrEmpty(LeadOwner))
-                //{
-                //    OwnerIds = LeadOwner.Split(',')
-                //                        .Select(owner => owner.Trim())
-                //                        .ToList();
-                //}
+
                 List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0
                                                //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
                                                )
@@ -74,6 +65,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                from zz in all2.DefaultIfEmpty()
                                                join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
                                                from pp in all3.DefaultIfEmpty()
+                                               join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+                                              
                                                select new GetLeadVm
                                                {
                                                    LeadId = a.LeadId,
@@ -99,6 +92,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    ProductTitle = pp.ProductName,
                                                    CreatedDate = a.CreatedDate,
                                                    ModifiedDate = a.LastModifiedDate,
+                                                   LeadOwnerName= user.FirstName+" "+ user.LastName
                                                }
                                               ).OrderByDescending(a => a.LeadId).ToListAsync();
                 return Leads;
@@ -252,7 +246,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     Value = prodId
                 };
                 var results = await _dbContext.GetCrmLeads.FromSqlRaw(
-                    "SELECT * FROM public.leadstatusfn({0},{1},{2},{3})", tenantIdPrm, startDatePrm, endDatePrm, prodIdPrm)
+                    "SELECT * FROM public.leadownerstatuswise({0},{1},{2},{3})", tenantIdPrm, startDatePrm, endDatePrm, prodIdPrm)
                     .ToListAsync();
 
                 return results;
@@ -361,37 +355,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     await _dbContext.AddAsync(LeadObj);
                     await _dbContext.SaveChangesAsync();
 
-                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
-                    CalenderObj.UserId = LeadObj.LeadOwner;
-                    CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
-                    CalenderObj.Type = 1;
-                    CalenderObj.CreatedBy = LeadObj.CreatedBy;
-                    CalenderObj.CreatedDate = LeadObj.CreatedDate;
-                    CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
-                    CalenderObj.EndTime = localDateTime.ToUniversalTime().AddDays(3);
-                    CalenderObj.TenantId = TenantId;
-                    CalenderObj.Id = LeadObj.LeadId;
-                    CalenderObj.IsCompany = -1;
-                    CalenderObj.IsOpportunity = -1;
-                    CalenderObj.IsLead = 1;
-                    CalenderObj.AllDay = false;
-                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
-                    await _dbContext.SaveChangesAsync();
-
-                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                    ActivityObj.UserId = LeadObj.LeadOwner;
-                    ActivityObj.Detail = "You are tasked to call" + LeadObj.FirstName + " " + LeadObj.LastName;
-                    ActivityObj.ActivityType = 1;
-                    ActivityObj.ActivityStatus = 1;
-                    ActivityObj.TenantId = LeadObj.TenantId;
-                    ActivityObj.Id = LeadObj.LeadId;
-                    ActivityObj.IsCompany = -1;
-                    ActivityObj.IsOpportunity = -1;
-                    ActivityObj.IsLead = 1;
-                    ActivityObj.CreatedBy = LeadObj.CreatedBy;
-                    ActivityObj.CreatedDate = LeadObj.CreatedDate;
-                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
-                    await _dbContext.SaveChangesAsync();
                 }
             }
             catch (Exception e)
@@ -424,38 +387,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.IsDeleted = 0;
                     LeadObj.TenantId = request.TenantId;
                     await _dbContext.AddAsync(LeadObj);
-                    await _dbContext.SaveChangesAsync();
-
-                    CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
-                    CalenderObj.UserId = LeadObj.LeadOwner;
-                    CalenderObj.Description = "You are tasked to call " + LeadObj.FirstName + " " + LeadObj.LastName;
-                    CalenderObj.Type = 1;
-                    CalenderObj.CreatedBy = LeadObj.CreatedBy;
-                    CalenderObj.CreatedDate = LeadObj.CreatedDate;
-                    CalenderObj.StartTime = localDateTime.ToUniversalTime().AddDays(3);
-                    CalenderObj.EndTime = localDateTime.ToUniversalTime().AddDays(3);
-                    CalenderObj.TenantId = request.TenantId;
-                    CalenderObj.Id = LeadObj.LeadId;
-                    CalenderObj.IsCompany = -1;
-                    CalenderObj.IsOpportunity = -1;
-                    CalenderObj.IsLead = 1;
-                    CalenderObj.AllDay = false;
-                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
-                    await _dbContext.SaveChangesAsync();
-
-                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                    ActivityObj.UserId = LeadObj.LeadOwner;
-                    ActivityObj.Detail = "You are tasked to call" + LeadObj.FirstName + " " + LeadObj.LastName;
-                    ActivityObj.ActivityType = 1;
-                    ActivityObj.ActivityStatus = 1;
-                    ActivityObj.TenantId = LeadObj.TenantId;
-                    ActivityObj.Id = LeadObj.LeadId;
-                    ActivityObj.IsCompany = -1;
-                    ActivityObj.IsOpportunity = -1;
-                    ActivityObj.IsLead = 1;
-                    ActivityObj.CreatedBy = LeadObj.CreatedBy;
-                    ActivityObj.CreatedDate = LeadObj.CreatedDate;
-                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
                     await _dbContext.SaveChangesAsync();
                 }
 
@@ -532,6 +463,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 var result = _dbContext.Database.ExecuteSqlRaw(
                     "CALL public.insertstatuslog({0}, {1}, {2}, {3}, {4}, {5}, {6})",
                      details, typeId, statusTitle, obj.userId, obj.LeadId, obj.TenantId, obj.statusId);
+
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

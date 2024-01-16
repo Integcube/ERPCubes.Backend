@@ -15,13 +15,12 @@ namespace ERPCubes.Domain.Entities
         public string Subject { get; set; } = String.Empty;
         public string Response { get; set; }
         public int Id { get; set; }
-        public int IsCompany { get; set; }
-        public int IsLead { get; set; }
-        public int IsOpportunity { get; set; }
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
         public int TenantId { get; set; }
         public int ReasonId { get; set; }
         public int TaskId { get; set; }
+        public int ContactTypeId { get; set; }
+        
     }
 }

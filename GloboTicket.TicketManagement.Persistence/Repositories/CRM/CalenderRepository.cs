@@ -106,37 +106,37 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     events.TenantId = request.TenantId;
                     events.IsDeleted = 0;
                     events.UserId = request.Id;
-                    if (request.CompanyId == -1)
-                    {
-                        events.IsCompany = -1;
-                    }
-                    else
-                    {
-                        events.IsCompany = 1;
-                        events.Id = request.CompanyId;
-                    }
-                    if (request.LeadId == -1)
-                    {
-                        events.IsLead = -1;
-                    }
-                    else
-                    {
-                        events.IsLead = 1;
-                        events.Id = request.LeadId;
-                    }
-                    if (request.OpportunityId == -1)
-                    {
-                        events.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        events.IsOpportunity = 1;
-                        events.Id = request.OpportunityId;
-                    }
-                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
-                    {
-                        events.Id = -1;
-                    }
+                    //if (request.CompanyId == -1)
+                    //{
+                    //    events.IsCompany = -1;
+                    //}
+                    //else
+                    //{
+                    //    events.IsCompany = 1;
+                    //    events.Id = request.CompanyId;
+                    //}
+                    //if (request.LeadId == -1)
+                    //{
+                    //    events.IsLead = -1;
+                    //}
+                    //else
+                    //{
+                    //    events.IsLead = 1;
+                    //    events.Id = request.LeadId;
+                    //}
+                    //if (request.OpportunityId == -1)
+                    //{
+                    //    events.IsOpportunity = -1;
+                    //}
+                    //else
+                    //{
+                    //    events.IsOpportunity = 1;
+                    //    events.Id = request.OpportunityId;
+                    //}
+                    //if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
+                    //{
+                    //    events.Id = -1;
+                    //}
                     await _dbContext.AddAsync(events);
                     await _dbContext.SaveChangesAsync();
 
@@ -158,37 +158,37 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         events.Type = request.Event.Type;
                         events.LastModifiedBy = request.Id;
                         events.LastModifiedDate = localDateTime.ToUniversalTime();
-                        if (request.CompanyId == -1)
-                        {
-                            events.IsCompany = -1;
-                        }
-                        else
-                        {
-                            events.IsCompany = 1;
-                            events.Id = request.CompanyId;
-                        }
-                        if (request.LeadId == -1)
-                        {
-                            events.IsLead = -1;
-                        }
-                        else
-                        {
-                            events.IsLead = 1;
-                            events.Id = request.LeadId;
-                        }
-                        if (request.OpportunityId == -1)
-                        {
-                            events.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            events.IsOpportunity = 1;
-                            events.Id = request.OpportunityId;
-                        }
-                        if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
-                        {
-                            events.Id = -1;
-                        }
+                        //if (request.CompanyId == -1)
+                        //{
+                        //    events.IsCompany = -1;
+                        //}
+                        //else
+                        //{
+                        //    events.IsCompany = 1;
+                        //    events.Id = request.CompanyId;
+                        //}
+                        //if (request.LeadId == -1)
+                        //{
+                        //    events.IsLead = -1;
+                        //}
+                        //else
+                        //{
+                        //    events.IsLead = 1;
+                        //    events.Id = request.LeadId;
+                        //}
+                        //if (request.OpportunityId == -1)
+                        //{
+                        //    events.IsOpportunity = -1;
+                        //}
+                        //else
+                        //{
+                        //    events.IsOpportunity = 1;
+                        //    events.Id = request.OpportunityId;
+                        //}
+                        //if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
+                        //{
+                        //    events.Id = -1;
+                        //}
                         await _dbContext.SaveChangesAsync();
                     }
                 }

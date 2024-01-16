@@ -40,39 +40,36 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int CompanyId, int LeadId, int OpportunityId)
+        public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int ContactTypeId, int ContactId)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
 
-                List<GetCrmTaskListVm> obj = await (
-                                            from a in _dbContext.CrmTask
-                                                .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
-                                                (Id == "-1" || a.CreatedBy == Id) &&
-                                                (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
-                                                (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
-                                                (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
-                                            join s in _dbContext.CrmTaskStatus on a.Status equals s.StatusId into all
-                                            from ss in all.DefaultIfEmpty()
-                                            //let tagId = bb != null ? bb.TagId : (int?)null 
-                                            //join c in _dbContext.CrmTags on tagId equals c.TagId into taskGroup
-                                            //from cc in taskGroup.DefaultIfEmpty()
-                                            select new GetCrmTaskListVm
-                                            {
-                                                TaskId = a.TaskId,
-                                                TaskTitle = a.Title,
-                                                DueDate = a.DueDate,
-                                                Priority = a.Priority,
-                                                Status = (a.DueDate < localDateTime.ToUniversalTime() && a.Status != 1) ? 4: (a.Status==null || a.Status==-1)? 3:a.Status,
-                                                Description = a.Description,
-                                                TaskOwner = a.TaskOwner,
-                                                CreatedBy = a.CreatedBy,
-                                                CreatedDate = a.CreatedDate,
-                                                TaskType = a.Type,
-                                                Order = a.Order,
-                                                StatusTitle = (a.DueDate < localDateTime.ToUniversalTime() && a.Status != 1) ? "Overdue" : (a.Status == null || a.Status == -1) ? "Pending" : ss.StatusTitle,
-                                            }).OrderBy(a => a.Order).ToListAsync();
+                List<GetCrmTaskListVm> obj = await (from a in _dbContext.CrmTask.Where(a => a.IsDeleted == 0
+                                                              && a.TenantId == TenantId
+                                                              && (Id == "-1" || a.CreatedBy == Id)
+                                                              && (a.Id == ContactId)
+                                                              && (a.ContactTypeId == ContactTypeId))
+                                                    join s in _dbContext.CrmTaskStatus on a.Status equals s.StatusId into all
+                                                    from ss in all.DefaultIfEmpty()
+
+                                                    select new GetCrmTaskListVm
+                                                    {
+                                                        TaskId = a.TaskId,
+                                                        TaskTitle = a.Title,
+                                                        DueDate = a.DueDate,
+                                                        Priority = a.Priority,
+                                                        Status = (a.DueDate < localDateTime.ToUniversalTime() && a.Status != 1) ? 4 : (a.Status == null || a.Status == -1) ? 3 : a.Status,
+                                                        Description = a.Description,
+                                                        TaskOwner = a.TaskOwner,
+                                                        CreatedBy = a.CreatedBy,
+                                                        CreatedDate = a.CreatedDate,
+                                                        TaskType = a.Type,
+                                                        Order = a.Order,
+                                                        StatusTitle = (a.DueDate < localDateTime.ToUniversalTime() && a.Status != 1) ? "Overdue" : (a.Status == null || a.Status == -1) ? "Pending" : ss.StatusTitle,
+                                                        TasktypeId = a.TaskTypeId
+                                                    }).OrderBy(a => a.Order).ToListAsync();
                 return obj;
             }
             catch (Exception ex)
@@ -121,41 +118,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.TenantId = request.TenantId;
                     task.Type = request.Type;
                     task.IsDeleted = 0;
-                    if (request.CompanyId == -1)
-                    {
-                        task.IsCompany = -1;
-                    }
-                    else
-                    {
-                        task.IsCompany = 1;
-                        task.Id = request.CompanyId;
-                    }
-                    if (request.LeadId == -1)
-                    {
-                        task.IsLead = -1;
-                    }
-                    else
-                    {
-                        task.IsLead = 1;
-                        task.Id = request.LeadId;
-                    }
-                    if (request.OpportunityId == -1)
-                    {
-                        task.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        task.IsOpportunity = 1;
-                        task.Id = request.OpportunityId;
-                    }
-                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
-                    {
-                        task.Id = -1;
-                    }
+                    task.ContactTypeId = request.ContactTypeId;
+                    task.Id = request.ContactId;
+                    task.TaskTypeId = request.Task.TaskTypeId;
                     await _dbContext.AddAsync(task);
                     await _dbContext.SaveChangesAsync();
+                    var result = _dbContext.Database.ExecuteSqlRaw(
+                                                   "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                                      task.CreatedBy, (int)CrmEnum.UserActivityEnum.Task, 1, task.Title, task.CreatedBy, task.TenantId, task.ContactTypeId, task.TaskId, "Insertion", task.Id);
 
-                   
+
                     List<int> TagIds = new List<int>();
                     if (!string.IsNullOrEmpty(request.Task.Tags))
                         TagIds = (request.Task.Tags.Split(',').Select(Int32.Parse).ToList());
@@ -173,88 +145,19 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                     CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                     CalenderObj.UserId = task.CreatedBy;
-                    CalenderObj.Description = "You have a task " + task.Title;
-                    CalenderObj.Type = 5;
+                    CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
+                    CalenderObj.Type = task.TaskTypeId = request.Task.TaskTypeId;
                     CalenderObj.CreatedBy = task.CreatedBy;
                     CalenderObj.CreatedDate = task.CreatedDate;
-                    CalenderObj.StartTime = localDateTime.ToUniversalTime();
-                    CalenderObj.EndTime = localDateTime.ToUniversalTime();
+                    CalenderObj.StartTime = request.Task.DueDate ?? DateTime.Now.ToUniversalTime();
+                    CalenderObj.EndTime = (request.Task.DueDate ?? DateTime.Now.ToUniversalTime()).AddDays(1);
                     CalenderObj.TenantId = task.TenantId;
-                    if (request.CompanyId == -1)
-                    {
-                        CalenderObj.IsCompany = -1;
-                    }
-                    else
-                    {
-                        CalenderObj.IsCompany = 1;
-                        CalenderObj.Id = request.CompanyId;
-                    }
-                    if (request.LeadId == -1)
-                    {
-                        CalenderObj.IsLead = -1;
-                    }
-                    else
-                    {
-                        CalenderObj.IsLead = 1;
-                        CalenderObj.Id = request.LeadId;
-                    }
-                    if (request.OpportunityId == -1)
-                    {
-                        CalenderObj.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        CalenderObj.IsOpportunity = 1;
-                        CalenderObj.Id = request.OpportunityId;
-                    }
-                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
-                    {
-                        CalenderObj.Id = -1;
-                    }
                     CalenderObj.AllDay = false;
-                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
-                    await _dbContext.SaveChangesAsync();
+                    CalenderObj.ContactTypeId = request.ContactTypeId;
+                    CalenderObj.Id = request.ContactId;
+                    CalenderObj.ActivityId = task.TaskId;
 
-                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                    ActivityObj.UserId = task.TaskOwner;
-                    ActivityObj.Detail = "Task: " + task.Title;
-                    ActivityObj.ActivityType = 5;
-                    ActivityObj.ActivityStatus = 1;
-                    ActivityObj.TenantId = task.TenantId;
-                    if (request.CompanyId == -1)
-                    {
-                        ActivityObj.IsCompany = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsCompany = 1;
-                        ActivityObj.Id = request.CompanyId;
-                    }
-                    if (request.LeadId == -1)
-                    {
-                        ActivityObj.IsLead = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsLead = 1;
-                        ActivityObj.Id = request.LeadId;
-                    }
-                    if (request.OpportunityId == -1)
-                    {
-                        ActivityObj.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsOpportunity = 1;
-                        ActivityObj.Id = request.OpportunityId;
-                    }
-                    if (request.LeadId == -1 && request.CompanyId == -1 && request.OpportunityId == -1)
-                    {
-                        ActivityObj.Id = -1;
-                    }
-                    ActivityObj.CreatedBy = task.CreatedBy;
-                    ActivityObj.CreatedDate = task.CreatedDate;
-                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                    await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
                     await _dbContext.SaveChangesAsync();
                 }
                 else
@@ -276,16 +179,23 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         task.LastModifiedDate = localDateTime.ToUniversalTime();
                         task.LastModifiedBy = request.Id;
                         task.TenantId = request.TenantId;
+                        task.ContactTypeId = request.ContactTypeId;
+                        task.Id = request.ContactId;
+                        task.TaskTypeId = request.Task.TaskTypeId;
                         await _dbContext.SaveChangesAsync();
 
+                        var result = _dbContext.Database.ExecuteSqlRaw(
+                                                   "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                                      task.CreatedBy, (int)CrmEnum.UserActivityEnum.Task, 1, task.Title, task.CreatedBy, task.TenantId, task.ContactTypeId, task.TaskId, "Update", task.Id);
+
                         CrmTaskTags? taskTags = await (from a in _dbContext.CrmTaskTags.Where(a => a.TaskId == request.Task.TaskId)
-                                          select a).FirstOrDefaultAsync();
+                                                       select a).FirstOrDefaultAsync();
                         if (taskTags != null)
                         {
                             _dbContext.CrmTaskTags.RemoveRange(taskTags);
                             _dbContext.SaveChanges();
                         }
-                        
+
                         List<int> TagIds = new List<int>();
                         if (!string.IsNullOrEmpty(request.Task.Tags))
                             TagIds = (request.Task.Tags.Split(',').Select(Int32.Parse).ToList());
@@ -300,6 +210,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             await _dbContext.AddAsync(tags);
                             await _dbContext.SaveChangesAsync();
                         }
+
+                        var CalenderObj = await (from a in _dbContext.CrmCalenderEvents.Where(a => a.TenantId == request.TenantId
+                                                 && a.ActivityId == request.Task.TaskId
+                                                 && a.ContactTypeId == request.ContactTypeId
+                                                 && a.Id == request.ContactId)
+                                                 select a).FirstOrDefaultAsync();
+
+                        CalenderObj.Description = /*GetNameById(request.Task.TaskTypeId) + */task.Title;
+                        CalenderObj.Type = task.TaskTypeId = request.Task.TaskTypeId;
+                        CalenderObj.StartTime = request.Task.DueDate ?? DateTime.Now.ToUniversalTime();
+                        CalenderObj.EndTime = (request.Task.DueDate ?? DateTime.Now.ToUniversalTime()).AddDays(1);
+                        await _dbContext.SaveChangesAsync();
                     }
                 }
             }
@@ -307,7 +229,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
-     }
+        }
         public async Task UpdateTaskOrder(List<UpdateTaskOrderDto> request)
         {
             try
@@ -364,6 +286,26 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
+        //public static string GetNameById(int id)
+        //{
+        //    switch (id)
+        //    {
+        //        case 1:
+        //            return "You have a Call ";
+        //        case 2:
+        //            return "You have a Email ";
+        //        case 3:
+        //            return "You have a Meeting ";
+        //        case 4:
+        //            return "You have a Important Task ";
+        //        case 5:
+        //            return "You have a Task ";
+        //        default:
+        //            return "";
+        //    }
+        //}
+
     }
 }
 

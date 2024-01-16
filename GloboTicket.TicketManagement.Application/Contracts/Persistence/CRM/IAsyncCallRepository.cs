@@ -13,7 +13,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncCallRepository : IAsyncRepository<CrmCall>
     {
-        Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId);
+        Task<List<GetCallVm>> GetAllList(string Id, int TenantId, int ContactTypeId, int ContactId);
         Task DeleteCall(DeleteCallCommand callId);
         Task SaveCall(SaveCallCommand call);
         Task<List<GetCallScenariosVm>> ScenariosList();

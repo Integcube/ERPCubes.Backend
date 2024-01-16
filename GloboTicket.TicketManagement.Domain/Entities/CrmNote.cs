@@ -14,9 +14,7 @@ namespace ERPCubes.Domain.Entities
         public int NoteId { get; set; }
         public string Content { get; set; } = String.Empty;
         public int Id { get; set; }
-        public int IsCompany { get; set; }
-        public int IsLead { get; set; }
-        public int IsOpportunity {  get; set; }
+        public int ContactTypeId { get; set; }
         public int TenantId { get; set; }
         public string NoteTitle { get; set; } = string.Empty;
     }

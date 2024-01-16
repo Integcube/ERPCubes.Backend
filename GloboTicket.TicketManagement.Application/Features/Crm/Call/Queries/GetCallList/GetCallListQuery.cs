@@ -12,9 +12,7 @@ namespace ERPCubes.Application.Features.Crm.Call.Queries.GetCallList
     {
         public string Id { get; set; } = String.Empty;
         public int TenantId { get; set; }
-        public int LeadId { get; set; }
-        public int CompanyId { get; set; }
-        public int OpportunityId { get; set; }
-
+        public int ContactId { get; set; }
+        public int ContactTypeId { get; set; }
     }
 }

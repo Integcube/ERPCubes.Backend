@@ -12,7 +12,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             Lead = 1,
             Company = 2,
-            Opportunity = 4,
+            Opportunity = 3,
         }
 
         public enum TaskEnum
@@ -22,5 +22,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
             Pending = 3,
             Overdue = 4,
         }
+
+        public enum UserActivityEnum
+        {
+            Call = 1,
+            Email = 2,
+            Meeting = 3,
+            Note = 4,
+            Task = 5,
+        }
+
+
     }
 }

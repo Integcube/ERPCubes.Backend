@@ -13,11 +13,10 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Commands.SaveMeeting
         public string Subject { get; set; } = String.Empty;
         public string Note { get; set; } = String.Empty;
         public string Id { get; set; } = String.Empty;
-        public int CompanyId { get; set; }
-        public int LeadId { get; set; }
-        public int OpportunityId { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public int TenantId { get; set; }
+        public int ContactTypeId { get; set; }
+        public int ContactId { get; set; }
     }
 }

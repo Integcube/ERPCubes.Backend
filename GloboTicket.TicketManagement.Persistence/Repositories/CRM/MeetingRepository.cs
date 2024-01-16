@@ -22,17 +22,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public MeetingRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
         }
-        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
+        public async Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int ContactTypeId, int ContactId)
         {
             try
             {
-                var users = await _dbContextIdentity.Users.Where(u => u.TenantId == TenantId).ToDictionaryAsync(user => user.Id);
                 List<GetMeetingVm> Meeting = await (
-                    from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 && a.TenantId == TenantId &&
-                    (Id == "-1" || a.CreatedBy == Id) &&
-                    (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
-                    (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
-                    (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
+                    from a in _dbContext.CrmMeeting.Where(a => a.IsDeleted == 0 
+                    && a.TenantId == TenantId 
+                    && (Id == "-1" || a.CreatedBy == Id)
+                    && (a.Id == ContactId)
+                    && (a.ContactTypeId == ContactTypeId))
+                    join uer in _dbContext.AppUser on a.CreatedBy equals uer.Id into all
+                    from user in all.DefaultIfEmpty()
                     select new GetMeetingVm
                     {
                         MeetingId = a.MeetingId,
@@ -42,7 +43,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         EndTime = a.EndTime,
                         CreatedBy = a.CreatedBy,
                         CreatedDate = a.CreatedDate,
-                       CreatedByName = users.ContainsKey(a.CreatedBy) ? users[a.CreatedBy].FirstName + " " + users[a.CreatedBy].LastName : null,
+                        CreatedByName = user == null ? "User Not Found" : user.FirstName + " " + user.LastName,
                     }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Meeting;
@@ -91,80 +92,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addMeeting.TenantId = meeting.TenantId;
                         addMeeting.CreatedBy = meeting.Id;
                         addMeeting.CreatedDate = localDateTime.ToUniversalTime();
-                        if (meeting.CompanyId == -1)
-                        {
-                            addMeeting.IsCompany = -1;
-                        }
-                        else
-                        {
-                            addMeeting.IsCompany = 1;
-                            addMeeting.Id = meeting.CompanyId;
-                        }
-                        if (meeting.LeadId == -1)
-                        {
-                            addMeeting.IsLead = -1;
-                        }
-                        else
-                        {
-                            addMeeting.IsLead = 1;
-                            addMeeting.Id = meeting.LeadId;
-                        }
-                        if (meeting.OpportunityId == -1)
-                        {
-                            addMeeting.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            addMeeting.IsOpportunity = 1;
-                            addMeeting.Id = meeting.OpportunityId;
-                        }
-                        if (meeting.LeadId == -1 && meeting.CompanyId == -1 && meeting.OpportunityId == -1)
-                        {
-                            addMeeting.Id = -1;
-                        }
+                        addMeeting.ContactTypeId = meeting.ContactTypeId;
+                        addMeeting.Id = meeting.ContactId;
                         await _dbContext.AddAsync(addMeeting);
                         await _dbContext.SaveChangesAsync();
-
-                        CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                        ActivityObj.UserId = addMeeting.CreatedBy;
-                        ActivityObj.Detail = addMeeting.Subject;
-                        ActivityObj.ActivityType = 3;
-                        ActivityObj.ActivityStatus = 1;
-                        ActivityObj.TenantId = addMeeting.TenantId;
-                        if (meeting.CompanyId == -1)
-                        {
-                            ActivityObj.IsCompany = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsCompany = 1;
-                            ActivityObj.Id = meeting.CompanyId;
-                        }
-                        if (meeting.LeadId == -1)
-                        {
-                            ActivityObj.IsLead = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsLead = 1;
-                            ActivityObj.Id = meeting.LeadId;
-                        }
-                        if (meeting.OpportunityId == -1)
-                        {
-                            ActivityObj.IsOpportunity = -1;
-                        }
-                        else
-                        {
-                            ActivityObj.IsOpportunity = 1;
-                            ActivityObj.Id = meeting.OpportunityId;
-                        }
-                        if (meeting.LeadId == -1 && meeting.CompanyId == -1 && meeting.OpportunityId == -1)
-                        {
-                            ActivityObj.Id = -1;
-                        }
-                        ActivityObj.CreatedBy = meeting.Id;
-                        ActivityObj.CreatedDate = localDateTime.ToUniversalTime();
-                        await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
+                        var result = _dbContext.Database.ExecuteSqlRaw(
+                                    "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                       meeting.Id, (int)CrmEnum.UserActivityEnum.Meeting, 1, meeting.Subject, meeting.Id, meeting.TenantId, meeting.ContactTypeId, addMeeting.MeetingId, "Insertion", meeting.ContactId);
                         await _dbContext.SaveChangesAsync();
                     }
                     else
@@ -183,6 +117,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             existingMeeting.LastModifiedBy = meeting.Id;
                             existingMeeting.EndTime = meeting.EndTime.ToUniversalTime();
                             existingMeeting.LastModifiedDate = localDateTime.ToUniversalTime();
+                            await _dbContext.SaveChangesAsync();
+                            
+                            var result = _dbContext.Database.ExecuteSqlRaw(
+                                                                "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                                                   meeting.Id, (int)CrmEnum.UserActivityEnum.Meeting, 1, meeting.Subject, meeting.Id, meeting.TenantId, meeting.ContactTypeId, meeting.MeetingId, "Update", meeting.ContactId);
                             await _dbContext.SaveChangesAsync();
                         }
 

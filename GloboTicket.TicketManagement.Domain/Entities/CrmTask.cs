@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    public class CrmTask:AuditableEntity
+    public class CrmTask : AuditableEntity
     {
         [Key]
         public int TaskId { get; set; }
@@ -19,11 +19,12 @@ namespace ERPCubes.Domain.Entities
         public string Description { get; set; } = String.Empty;
         public string TaskOwner { get; set; } = String.Empty;
         public int Id { get; set; }
-        public int IsCompany { get; set; }
-        public int IsLead { get; set; }
-        public int IsOpportunity { get; set; }
         public int TenantId { get; set; }
         public string Type { get; set; } = String.Empty;
         public int Order { get; set; }
+        public int ContactTypeId { get; set; }
+        public int TaskTypeId { get; set; }
+        
+
     }
 }

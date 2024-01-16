@@ -16,5 +16,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Commands.SaveTask
         public string TaskOwner { get; set; } = String.Empty;
         public string Tags { get; set; }=string.Empty;
         public DateTime? DueDate { get; set; }
+        public int TaskTypeId { get; set; }
+        
     }
 }

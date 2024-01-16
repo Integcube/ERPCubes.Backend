@@ -16,7 +16,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
     public interface IAsyncMeetingRepository : IAsyncRepository<CrmMeeting>
     {
-        Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId);
+        Task<List<GetMeetingVm>> GetAllList(string Id, int TenantId, int ContactTypeId, int ContactId);
         Task DeleteMeeting(DeleteMeetingCommand meetingId);
         Task SaveMeeting(SaveMeetingCommand meeting);
     }

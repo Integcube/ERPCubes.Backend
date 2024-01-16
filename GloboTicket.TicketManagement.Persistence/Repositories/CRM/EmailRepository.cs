@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,32 +24,33 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public async Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int LeadId, int CompanyId, int OpportunityId)
+        public async Task<List<GetEmailVm>> GetAllList(string Id, int TenantId, int ContactTypeId, int ContactId)
         {
             try
             {
-
-                var users = await _dbContextIdentity.Users.Where(a => a.TenantId == TenantId).ToDictionaryAsync(user => user.Id);
-
-                var emails = await _dbContext.CrmEmail
-                    .Where(a => a.IsDeleted == 0 &&
-                                a.TenantId == TenantId &&
-                                (Id == "-1" || a.CreatedBy == Id) &&
-                                (LeadId == -1 || (a.Id == LeadId && a.IsLead == 1)) &&
-                                (CompanyId == -1 || (a.Id == CompanyId && a.IsCompany == 1)) &&
-                                (OpportunityId == -1 || (a.Id == OpportunityId && a.IsOpportunity == 1)))
-                    .OrderByDescending(a => a.CreatedDate).Select(email => new GetEmailVm
-                    {
-                        EmailId = email.EmailId,
-                        Subject = email.Subject,
-                        Description = email.Description,
-                        Reply = email.Reply,
-                        CreatedBy = email.CreatedBy,
-                        CreatedDate = email.CreatedDate,
-                        CreatedbyName = users[email.CreatedBy].FirstName + " " + users[email.CreatedBy].LastName
-                    }).ToListAsync();
+                var emails = await (from a in _dbContext.CrmEmail.Where(a => a.IsDeleted == 0
+                                    && a.TenantId == TenantId
+                                    && (Id == "-1" || a.CreatedBy == Id)
+                                    && (a.Id == ContactId)
+                                    && (a.ContactTypeId == ContactTypeId))
+                                    join user in _dbContext.AppUser on a.CreatedBy equals user.Id into allUsers
+                                    from user in allUsers.DefaultIfEmpty()
+                                    select new GetEmailVm
+                                    {
+                                        EmailId = a.EmailId,
+                                        Subject = a.Subject,
+                                        Description = a.Description,
+                                        Reply = a.Reply,
+                                        CreatedBy = a.CreatedBy,
+                                        CreatedDate = a.CreatedDate,
+                                        CreatedbyName = user == null ? "User Not Found" : user.FirstName + " " + user.LastName
+                                    })
+                 .OrderByDescending(a => a.CreatedDate)
+                 .ToListAsync();
 
                 return emails;
+
+
             }
             catch (Exception ex)
             {
@@ -80,115 +82,64 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         public async Task SaveEmail(SaveEmailCommand email)
         {
-            try
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
             {
-                DateTime localDateTime = DateTime.Now;
-                if (email.EmailId == -1)
-                {
-                    CrmEmail addEmail = new CrmEmail();
-                    addEmail.Subject = email.Subject;
-                    addEmail.Description = email.Description;
-                    addEmail.CreatedBy = email.Id;
-                    addEmail.CreatedDate = localDateTime.ToUniversalTime();
-                    addEmail.TenantId = email.TenantId;
-                    if (email.CompanyId == -1)
-                    {
-                        addEmail.IsCompany = -1;
-                    }
-                    else
-                    {
-                        addEmail.IsCompany = 1;
-                        addEmail.Id = email.CompanyId;
-                    }
-                    if (email.LeadId == -1)
-                    {
-                        addEmail.IsLead = -1;
-                    }
-                    else
-                    {
-                        addEmail.IsLead = 1;
-                        addEmail.Id = email.LeadId;
-                    }
-                    if (email.OpportunityId == -1)
-                    {
-                        addEmail.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        addEmail.IsOpportunity = 1;
-                        addEmail.Id = email.OpportunityId;
-                    }
-                    if (email.LeadId == -1 && email.CompanyId == -1 && email.OpportunityId == -1)
-                    {
-                        addEmail.Id = email.EmailId;
-                    }
-                    await _dbContext.AddAsync(addEmail);
-                    await _dbContext.SaveChangesAsync();
 
-                    CrmUserActivityLog ActivityObj = new CrmUserActivityLog();
-                    ActivityObj.UserId = addEmail.CreatedBy;
-                    ActivityObj.Detail = addEmail.Subject;
-                    ActivityObj.ActivityType = 2;
-                    ActivityObj.ActivityStatus = 1;
-                    ActivityObj.TenantId = addEmail.TenantId;
-                    if (email.CompanyId == -1)
-                    {
-                        ActivityObj.IsCompany = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsCompany = 1;
-                        ActivityObj.Id = email.CompanyId;
-                    }
-                    if (email.LeadId == -1)
-                    {
-                        ActivityObj.IsLead = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsLead = 1;
-                        ActivityObj.Id = email.LeadId;
-                    }
-                    if (email.OpportunityId == -1)
-                    {
-                        ActivityObj.IsOpportunity = -1;
-                    }
-                    else
-                    {
-                        ActivityObj.IsOpportunity = 1;
-                        ActivityObj.Id = email.OpportunityId;
-                    }
-                    if (email.LeadId == -1 && email.CompanyId == -1 && email.OpportunityId == -1)
-                    {
-                        ActivityObj.Id = -1;
-                    }
-                    ActivityObj.CreatedBy = addEmail.CreatedBy;
-                    ActivityObj.CreatedDate = addEmail.CreatedDate;
-                    await _dbContext.CrmUserActivityLog.AddAsync(ActivityObj);
-                    await _dbContext.SaveChangesAsync();
-                }
-                else
+                try
                 {
-                    var existingEmail = await (from a in _dbContext.CrmEmail.Where(a => a.EmailId == email.EmailId)
-                                               select a).FirstOrDefaultAsync();
-                    if (existingEmail == null)
+                    DateTime localDateTime = DateTime.Now;
+                    if (email.EmailId == -1)
                     {
-                        throw new NotFoundException(email.Subject, email.EmailId);
+                        CrmEmail addEmail = new CrmEmail();
+                        addEmail.Subject = email.Subject;
+                        addEmail.Description = email.Description;
+                        addEmail.CreatedBy = email.Id;
+                        addEmail.CreatedDate = localDateTime.ToUniversalTime();
+                        addEmail.TenantId = email.TenantId;
+                        addEmail.ContactTypeId = email.ContactTypeId;
+                        addEmail.Id = email.ContactId;
+                        await _dbContext.AddAsync(addEmail);
+                        await _dbContext.SaveChangesAsync();
+
+                        var result = _dbContext.Database.ExecuteSqlRaw(
+                                   "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                      addEmail.CreatedBy, (int)CrmEnum.UserActivityEnum.Email, 1, addEmail.Subject, addEmail.CreatedBy, addEmail.TenantId, addEmail.ContactTypeId, addEmail.EmailId, "Insertion", addEmail.Id);
+
+                        await _dbContext.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
                     }
                     else
                     {
-                        existingEmail.Subject = email.Subject;
-                        existingEmail.Description = email.Description;
-                        existingEmail.LastModifiedDate = localDateTime.ToUniversalTime();
-                        existingEmail.LastModifiedBy = email.Id;
-                        existingEmail.TenantId = email.TenantId;
-                        await _dbContext.SaveChangesAsync();
+                        var existingEmail = await (from a in _dbContext.CrmEmail.Where(a => a.EmailId == email.EmailId)
+                                                   select a).FirstOrDefaultAsync();
+                        if (existingEmail == null)
+                        {
+                            throw new NotFoundException(email.Subject, email.EmailId);
+                        }
+                        else
+                        {
+                            existingEmail.Subject = email.Subject;
+                            existingEmail.Description = email.Description;
+                            existingEmail.LastModifiedDate = localDateTime.ToUniversalTime();
+                            existingEmail.LastModifiedBy = email.Id;
+                            existingEmail.TenantId = email.TenantId;
+                            await _dbContext.SaveChangesAsync();
+                            var result = _dbContext.Database.ExecuteSqlRaw(
+                                   "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
+                                      existingEmail.CreatedBy, (int)CrmEnum.UserActivityEnum.Email, 1, existingEmail.Subject, existingEmail.CreatedBy, existingEmail.TenantId, existingEmail.ContactTypeId, existingEmail.EmailId, "Update", existingEmail.Id);
+                            await _dbContext.SaveChangesAsync();
+                            await transaction.CommitAsync();
+
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new BadRequestException(ex.Message);
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new BadRequestException(ex.Message);
+
+                }
             }
         }
     }
