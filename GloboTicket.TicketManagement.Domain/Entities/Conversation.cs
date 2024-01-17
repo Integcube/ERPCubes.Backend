@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    internal class Conversation
+    public class Conversation
     {
     }
 }
