@@ -9,7 +9,6 @@ namespace ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityRepo
     public class GetUserActivityReportVm
     {
         public string LeadOwner { get; set; } = string.Empty;
-
         public int? Lead {  get; set; }
         public int? Note { get; set;}
         public int? Call { get; set; }
@@ -17,7 +16,5 @@ namespace ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityRepo
         public int? Task { get; set; }
         public int? Meeting { get; set; }
         public string LeadOwnerName { get; set; }
-        
-
     }
 }
