@@ -15,6 +15,8 @@ namespace ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityRepo
         public int? Email { get; set; }
         public int? Task { get; set; }
         public int? Meeting { get; set; }
+        public string LeadOwnerName { get; set; }
+        
 
     }
 }
