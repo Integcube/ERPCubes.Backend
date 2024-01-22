@@ -68,12 +68,16 @@ namespace ERPCubes.Persistence
         public DbSet<CrmCampaign> CrmCampaign { get; set; }
         public DbSet<GetleadPiplineReportVm> GetleadPiplineReportVm { get; set; }
         public DbSet<CrmProject> CrmProject { get; set; }
-        //public DbSet<CrmCampaignSource> CrmCampaignSource { get; set; }
         public DbSet<GetLeadSourceWiseVm> GetCrmLeadSourceWise { get; set; }
         public DbSet<GetLeadOwnerWiseVm> GetCrmLeadOwnerWise { get; set; }
-
         public DbSet<GetCampaigWiseReportQueryVm> GetCampaigWiseReportQueryVm { get; set; }
         public DbSet<Notification> Notification { get; set; }
+        public DbSet<CrmForm> CrmForms { get; set; }
+        public DbSet<CrmFormFields> CrmFormFields { get; set; }
+        public DbSet<CrmFieldTypes> CrmFieldTypes { get; set; }
+        public DbSet<CrmFormResults> CrmFormResults { get; set; }
+        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<Conversation> Conversation { get; set; }
         
 
     }

@@ -2,8 +2,10 @@
 using ERPCubes.Application.Contracts.Notifications;
 using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.Social.Webhooks;
 using ERPCubes.Persistence.Repositories;
 using ERPCubes.Persistence.Repositories.CRM;
+using ERPCubes.Persistence.Repositories.Social;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +43,9 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncProjectRepository, ProjectRepository>();
             services.AddScoped<IAsyncReportsRepository, ReportsRepository>();
             services.AddScoped<IAsyncNotificationRepository, NotificationRepository>();
+            services.AddScoped<IAsyncFormsRepository, FormsRepository>();
+            services.AddScoped<IAsyncWebhookRepository, WebhookRepository>();
+            services.AddScoped<IAsyncTicketRepository, TicketRepository>();
 
             return services;    
         }
