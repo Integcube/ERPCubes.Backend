@@ -1,10 +1,15 @@
 ﻿using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.Social.Webhooks;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Tickets.Commands.SaveTicketInfo;
 using ERPCubes.Application.Features.Tickets.Commands.SendMessage;
 using ERPCubes.Application.Features.Tickets.Commands.SetReadStatus;
 using ERPCubes.Application.Features.Tickets.Queries.GetAllTickets;
 using ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketPriorityList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketPriorityList.GetTicketPriorityList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketStatusList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketTypeList;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +46,7 @@ namespace ERPCubes.Persistence.Repositories
                                                            DueDate = a.DueDate,
                                                            RecentlyActive = a.RecentlyActive,
                                                            Notes = a.Notes,
+                                                           Type = a.Type,
                                                            TenantId = a.TenantId,
                                                            LatestConversation = (
                                                                from b in _dbContext.Conversation
@@ -105,6 +111,81 @@ namespace ERPCubes.Persistence.Repositories
                                                                           CreatedDate = a.CreatedDate
                                                                       }).OrderBy(a => a.CreatedDate).ToListAsync();
                 return coversations;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetTicketPriorityListVm>> GetTicketPriority(GetTicketPriorityListQuery request)
+        {
+            try
+            {
+
+                List<GetTicketPriorityListVm> priority= await(from a in _dbContext.TicketPriority.Where(a=>a.IsDeleted == 0)
+                                                      select new GetTicketPriorityListVm
+                                                      {
+                                                          TicketPriorityId = a.TicketPriorityId,
+                                                          PriorityName = a.PriorityName,
+                                                      }).ToListAsync();
+                return priority;
+
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetTicketStatusListVm>> GetTicketStatus(GetTicketStatusListQuery request)
+        {
+            try
+            {
+                List<GetTicketStatusListVm> priority = await (from a in _dbContext.TicketStatus.Where(a => a.IsDeleted == 0)
+                                                                select new GetTicketStatusListVm
+                                                                {
+                                                                    TicketStatusId = a.TicketStatusId,
+                                                                    StatusName = a.StatusName,
+                                                                }).ToListAsync();
+                return priority;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetTicketTypeListVm>> GetTicketType(GetTicketTypeListQuery request)
+        {
+            try
+            {
+                List<GetTicketTypeListVm> priority = await(from a in _dbContext.TicketType.Where(a => a.IsDeleted == 0)
+                                                               select new GetTicketTypeListVm
+                                                               {
+                                                                   TicketTypeId = a.TicketTypeId,
+                                                                   TypeName = a.TypeName,
+                                                               }).ToListAsync();
+                return priority;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task SaveTicketInfo(SaveTicketInfoCommand request)
+        {
+            try
+            {
+                Ticket ticket = await (from a in _dbContext.Ticket.Where(a => a.TicketId == request.TicketId)
+                                       select a).FirstOrDefaultAsync();
+                ticket.Priority = request.Priority;
+                ticket.Type = request.Type;
+                ticket.AssigneeId = request.AssigneeId;
+                ticket.Status = request.Status;
+                ticket.Notes = request.Notes;
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

@@ -1,14 +1,21 @@
 ﻿using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
+using ERPCubes.Application.Features.Tickets.Commands.SaveTicketInfo;
 using ERPCubes.Application.Features.Tickets.Commands.SendMessage;
 using ERPCubes.Application.Features.Tickets.Commands.SetReadStatus;
 using ERPCubes.Application.Features.Tickets.Queries.GetAllTickets;
 using ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketPriorityList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketPriorityList.GetTicketPriorityList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketStatusList;
+using ERPCubes.Application.Features.Tickets.Queries.GetTicketTypeList;
+using ERPCubes.Domain.Entities;
 using ERPCubesApi.Hubs;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using static ERPCubesApi.Controllers.ConnectGoogleController;
 
 namespace ERPCubesApi.Controllers
@@ -53,6 +60,33 @@ namespace ERPCubesApi.Controllers
             var message = await _mediator.Send(ticket);
             await _hubContext.Clients.All.SendAsync("ReceiveNewTicket", message);
 
+        }
+        [HttpPost("getPriority", Name = "GetPriority")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetTicketPriorityListVm>>> GetPriority(GetTicketPriorityListQuery ticket)
+        {
+            var priority = await _mediator.Send(ticket);
+            return Ok(priority);
+        }
+        [HttpPost("getStatus", Name = "GetStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetTicketStatusListVm>>> GetStatus(GetTicketStatusListQuery ticket)
+        {
+            var status = await _mediator.Send(ticket);
+            return Ok(status);
+        }
+        [HttpPost("getType", Name = "GetType")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetTicketTypeListVm>>> GetType(GetTicketTypeListQuery ticket)
+        {
+            var priority = await _mediator.Send(ticket);
+            return Ok(priority);
+        }
+        [HttpPost("saveInfo", Name = "SaveInfo")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task SaveInfo(SaveTicketInfoCommand ticket)
+        {
+            await _mediator.Send(ticket);
         }
     }
 }

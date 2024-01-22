@@ -15,9 +15,10 @@ namespace ERPCubes.Domain.Entities
         public string SocialMediaPlatform { get; set; }
         public string CustomerId { get; set; }
         public DateTime Timestamp { get; set; }
-        public string Status { get; set; }
+        public int Status { get; set; }
         public string AssigneeId { get; set; }
-        public string Priority { get; set; }
+        public int Priority { get; set; }
+        public int Type { get; set; }
         public string Category { get; set; }
         public string ResolutionStatus { get; set; }
         public DateTime DueDate { get; set; }
