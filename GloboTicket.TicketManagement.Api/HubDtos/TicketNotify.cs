@@ -1,4 +1,4 @@
-﻿namespace ERPCubesApi.Hubs.HubDtos
+﻿namespace ERPCubesApi.HubDtos
 {
     public class TicketNotify
     {

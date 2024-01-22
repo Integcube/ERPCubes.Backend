@@ -1,16 +1,17 @@
-﻿using ERPCubes.Domain.Common;
+﻿using ERPCubes.Application.Features.Tickets.Queries.GetAllTickets;
+using ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation;
+using MediatR;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Domain.Entities
+namespace ERPCubes.Application.Features.Tickets.Commands.SendMessage
 {
-    public class Ticket:AuditableEntity
+    public class SendMessageCommand:IRequest<SendMessageCommand>
     {
-        [Key]
+        public string Id { get; set; }
         public int TicketId { get; set; }
         public string SocialMediaPlatform { get; set; }
         public string CustomerId { get; set; }
@@ -23,6 +24,7 @@ namespace ERPCubes.Domain.Entities
         public DateTime DueDate { get; set; }
         public DateTime RecentlyActive { get; set; }
         public string Notes { get; set; }
+        public GetSelectedConversationVm LatestConversation { get; set; }
         public int TenantId { get; set; }
     }
 }

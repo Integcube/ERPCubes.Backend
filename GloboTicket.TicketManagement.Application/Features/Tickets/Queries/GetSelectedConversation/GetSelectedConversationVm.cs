@@ -1,11 +1,13 @@
-﻿using ERPCubes.Domain.Common;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ERPCubes.Domain.Entities
+namespace ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation
 {
-    public class Conversation : AuditableEntity
+    public class GetSelectedConversationVm
     {
-        [Key]
         public int ConversationId { get; set; }
         public int TicketId { get; set; }
         public string FromId { get; set; }
@@ -14,11 +16,12 @@ namespace ERPCubes.Domain.Entities
         public string MessageType { get; set; }
         public string MessageBody { get; set; }
         public string MediaType { get; set; }
-        public bool ReadStatus { get; set; }
+        public bool? ReadStatus { get; set; }
         public string Reaction { get; set; }
-        public bool ForwardedStatus { get; set; }
+        public bool? ForwardedStatus { get; set; }
         public string Location { get; set; }
         public string MessageStatus { get; set; }
+        public DateTime CreatedDate { get; set; }
         public string EventType { get; set; }
         public string CustomerFeedback { get; set; }
         public int TenantId { get; set; }

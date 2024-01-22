@@ -1,8 +1,11 @@
-﻿using ERPCubes.Domain.Entities;
+﻿using ERPCubes.Application.Features.Social.Webhooks.Instagram.Commands;
+using ERPCubes.Domain.Entities;
+using ERPCubesApi.Hubs;
 using ERPCubesApi.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Text;
@@ -14,9 +17,12 @@ namespace ERPCubesApi.Controllers
     public class WebhookController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public WebhookController(IMediator mediator)
+        private readonly IHubContext<TicketHub> _hubContext;
+
+        public WebhookController(IMediator mediator, IHubContext<TicketHub> hubContext)
         {
             _mediator = mediator;
+            _hubContext = hubContext;
         }
         [HttpGet]
         public IActionResult VerifyWebhook([FromQuery(Name = "hub.mode")] string mode,
@@ -41,8 +47,15 @@ namespace ERPCubesApi.Controllers
                 {
                     string body = await reader.ReadToEndAsync();
                     InstagramWebhook instagramWebhook = JsonConvert.DeserializeObject<InstagramWebhook>(body);
-                    
-                    return Ok();
+                    InstagramWebhookCommand data = new InstagramWebhookCommand
+                    {
+                        TenantId = tenantId,
+                        Data = instagramWebhook
+                    };
+                    InstagramWebhookVm dtos = await _mediator.Send(data);
+                    await _hubContext.Clients.All.SendAsync("ReceiveNewTicket", dtos.Ticket);
+
+                    return Ok(dtos);
                 }
             }
             catch (Exception ex)
@@ -51,7 +64,6 @@ namespace ERPCubesApi.Controllers
                 return StatusCode(500, "An error occurred while processing the Instagram webhook");
             }
         }
-
 
     }
 }
