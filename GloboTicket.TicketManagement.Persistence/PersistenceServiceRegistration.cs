@@ -45,6 +45,7 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncNotificationRepository, NotificationRepository>();
             services.AddScoped<IAsyncFormsRepository, FormsRepository>();
             services.AddScoped<IAsyncWebhookRepository, WebhookRepository>();
+            services.AddScoped<IAsyncTicketRepository, TicketRepository>();
 
             return services;    
         }
