@@ -23,6 +23,8 @@
         public string IndustryTitle { get; set; } = string.Empty;
         public int ProductId { get; set; }
         public string ProductTitle { get; set; } = string.Empty;
+        public string CampaignId { get; set; } = string.Empty;
+        public string CampaignTitle { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string LeadOwnerName { get; set; }

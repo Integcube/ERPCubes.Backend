@@ -29,6 +29,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead
         public string IndustryTitle { get; set; } = string.Empty;
         public int ProductId { get; set; }
         public string ProductTitle { get; set; } = string.Empty;
+        public string CampaignId { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
     }
 }

@@ -65,6 +65,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                from zz in all2.DefaultIfEmpty()
                                                join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
                                                from pp in all3.DefaultIfEmpty()
+                                               join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
+                                               from cc in all4.DefaultIfEmpty()
                                                join user in _dbContext.AppUser on a.LeadOwner equals user.Id
                                               
                                                select new GetLeadVm
@@ -90,6 +92,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    IndustryTitle = ii.IndustryTitle,
                                                    ProductId = a.ProductId,
                                                    ProductTitle = pp.ProductName,
+                                                   CampaignId = a.CampaignId,
+                                                   CampaignTitle = cc.Title,
                                                    CreatedDate = a.CreatedDate,
                                                    ModifiedDate = a.LastModifiedDate,
                                                    LeadOwnerName= user.FirstName+" "+ user.LastName
@@ -323,6 +327,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         LeadObj.SourceId = Lead.SourceId;
                         LeadObj.IndustryId = Lead.IndustryId;
                         LeadObj.ProductId = Lead.ProductId;
+                        LeadObj.CampaignId = Lead.CampaignId;
                         LeadObj.LastModifiedBy = Id;
                         LeadObj.LastModifiedDate = localDateTime.ToUniversalTime();
                         await _dbContext.SaveChangesAsync();
@@ -348,6 +353,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.SourceId = Lead.SourceId;
                     LeadObj.IndustryId = Lead.IndustryId;
                     LeadObj.ProductId = Lead.ProductId;
+                    LeadObj.CampaignId = Lead.CampaignId;
                     LeadObj.CreatedBy = Id;
                     LeadObj.CreatedDate = localDateTime.ToUniversalTime();
                     LeadObj.IsDeleted = 0;

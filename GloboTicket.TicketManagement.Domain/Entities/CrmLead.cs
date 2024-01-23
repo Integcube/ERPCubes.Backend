@@ -30,5 +30,6 @@ namespace ERPCubes.Domain.Entities
         public int SourceId { get; set; }
         public int IndustryId { get; set; }
         public int ProductId { get; set; }
+        public string CampaignId { get; set; } = string.Empty;
     }
 }
