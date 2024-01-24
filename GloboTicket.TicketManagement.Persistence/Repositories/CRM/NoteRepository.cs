@@ -54,46 +54,33 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var notes = await (from a in _dbContext.CrmNote.Where(a => a.TenantId == TenantId && a.CreatedBy == Id && a.ContactTypeId == -1)
-                                   join b in _dbContext.CrmNoteTags on a.NoteId equals b.NoteId into all1
-                                   from bb in all1.DefaultIfEmpty()
-                                   join d in _dbContext.CrmTags on bb.TagId equals d.TagId into all3
-                                   from dd in all3.DefaultIfEmpty()
-                                   join c in _dbContext.CrmNoteTasks on a.NoteId equals c.NoteId into all2
-                                   from cc in all2.DefaultIfEmpty()
-                                   select new
-                                   {
-                                       a.NoteId,
-                                       a.NoteTitle,
-                                       a.CreatedDate,
-                                       bb.TagId,
-                                       dd.TagTitle,
-                                       cc.Task,
-                                       cc.NoteTaskId,
-                                       cc.IsCompleted,
-                                   }).ToListAsync();
-                List<GetNotesWithTasksVm> result = notes.GroupBy(
-           n => new { n.NoteId, n.NoteTitle, n.CreatedDate },
-           (key, group) => new GetNotesWithTasksVm
-           {
-               NoteId = key.NoteId,
-               Content = string.Empty,
-               NoteTitle = key.NoteTitle,
-               CreatedDate = key.CreatedDate,
-               Tags = group.Where(g => g.TagId != null).Select(g => new GetNotesTagsDto
-               {
-                   TagId = g.TagId,
-                   TagTitle = g.TagTitle ?? string.Empty
-               }).ToList(),
-               Tasks = group.Where(g => g.NoteTaskId != null).Select(g => new GetNotesTaskDto
-               {
-                   TaskId = g.NoteTaskId,
-                   TaskTitle = g.Task ?? string.Empty,
-                   IsCompleted = g.IsCompleted == 1 ? true : false
-               }).ToList()
-           }).ToList();
+                var notes = await (from a in _dbContext.CrmNote.Where(a => a.TenantId == TenantId && a.CreatedBy == Id && a.ContactTypeId == -1 && a.IsDeleted == 0)
 
-                return result;
+                                   select new GetNotesWithTasksVm
+                                   {
+                                       NoteId = a.NoteId,
+                                       NoteTitle = a.NoteTitle,
+                                       Content = a.Content,
+                                       CreatedDate = a.CreatedDate,
+                                       Tags = (from b in _dbContext.CrmNoteTags
+                                               where a.NoteId == b.NoteId
+                                               join t in _dbContext.CrmTags on b.TagId equals t.TagId
+                                               select new GetNotesTagsDto
+                                               {
+                                                   TagId = b.TagId,
+                                                   TagTitle = t.TagTitle
+                                               }).ToList(),
+                                       Tasks = (from c in _dbContext.CrmNoteTasks
+                                                where a.NoteId == c.NoteId
+                                                select new GetNotesTaskDto
+                                                {
+                                                    TaskId = c.NoteTaskId,
+                                                    TaskTitle = c.Task,
+                                                    IsCompleted = c.IsCompleted == 1 ? true : false,
+                                                }).ToList(),
+                                   }).ToListAsync();
+
+                return notes;
             }
             catch (Exception ex)
             {
