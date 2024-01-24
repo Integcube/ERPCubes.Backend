@@ -108,7 +108,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     CrmTask task = new CrmTask();
                     task.Title = request.Task.TaskTitle;
-                    task.DueDate = request.Task.DueDate;
+                    task.DueDate = request.Task.DueDate.Value.ToUniversalTime();
                     task.Priority = (int)(request.Task.PriorityId != null ? request.Task.PriorityId : -1);
                     task.Status = (int)(request.Task.StatusId != null ? request.Task.StatusId : -1);
                     task.TaskOwner = request.Task.TaskOwner;
@@ -116,10 +116,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.CreatedDate = localDateTime.ToUniversalTime();
                     task.CreatedBy = request.Id;
                     task.TenantId = request.TenantId;
-                    task.Type = request.Type;
+                    task.Type = request.Task.Type;
                     task.IsDeleted = 0;
-                    task.ContactTypeId = request.ContactTypeId;
-                    task.Id = request.ContactId;
+                    task.ContactTypeId = request.Task.ContactTypeId;
+                    task.Id = request.Task.ContactId;
                     task.TaskTypeId = request.Task.TaskTypeId;
                     await _dbContext.AddAsync(task);
                     await _dbContext.SaveChangesAsync();
@@ -148,13 +148,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
                     CalenderObj.Type = task.TaskTypeId = request.Task.TaskTypeId;
                     CalenderObj.CreatedBy = task.CreatedBy;
-                    CalenderObj.CreatedDate = task.CreatedDate;
-                    CalenderObj.StartTime = request.Task.DueDate ?? DateTime.Now.ToUniversalTime();
-                    CalenderObj.EndTime = (request.Task.DueDate ?? DateTime.Now.ToUniversalTime()).AddDays(1);
+                    CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();
+                    CalenderObj.StartTime = request.Task.DueDate != null ? request.Task.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
+                    CalenderObj.EndTime = (request.Task.DueDate != null ? request.Task.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime()).AddDays(1);
                     CalenderObj.TenantId = task.TenantId;
                     CalenderObj.AllDay = false;
-                    CalenderObj.ContactTypeId = request.ContactTypeId;
-                    CalenderObj.Id = request.ContactId;
+                    CalenderObj.ContactTypeId = request.Task.ContactTypeId;
+                    CalenderObj.Id = request.Task.ContactId;
                     CalenderObj.ActivityId = task.TaskId;
 
                     await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
@@ -171,17 +171,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     else
                     {
                         task.Title = request.Task.TaskTitle;
-                        task.DueDate = request.Task.DueDate;
+                        task.DueDate = (DateTime)(request.Task.DueDate);
                         task.Priority = (int)(request.Task.PriorityId != null ? request.Task.PriorityId : -1);
                         task.Status = (int)(request.Task.StatusId != null ? request.Task.StatusId : -1);
                         task.TaskOwner = request.Task.TaskOwner;
                         task.Description = request.Task.Description;
                         task.LastModifiedDate = localDateTime.ToUniversalTime();
                         task.LastModifiedBy = request.Id;
-                        task.TenantId = request.TenantId;
-                        task.ContactTypeId = request.ContactTypeId;
-                        task.Id = request.ContactId;
-                        task.TaskTypeId = request.Task.TaskTypeId;
                         await _dbContext.SaveChangesAsync();
 
                         var result = _dbContext.Database.ExecuteSqlRaw(
@@ -213,8 +209,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                         var CalenderObj = await (from a in _dbContext.CrmCalenderEvents.Where(a => a.TenantId == request.TenantId
                                                  && a.ActivityId == request.Task.TaskId
-                                                 && a.ContactTypeId == request.ContactTypeId
-                                                 && a.Id == request.ContactId)
+                                                 && a.ContactTypeId == request.Task.ContactTypeId
+                                                 && a.Id == request.Task.ContactId)
                                                  select a).FirstOrDefaultAsync();
 
                         CalenderObj.Description = /*GetNameById(request.Task.TaskTypeId) + */task.Title;
@@ -308,4 +304,3 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
     }
 }
-

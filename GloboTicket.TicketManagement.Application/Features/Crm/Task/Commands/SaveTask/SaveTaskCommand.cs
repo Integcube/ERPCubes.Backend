@@ -11,9 +11,6 @@ namespace ERPCubes.Application.Features.Crm.Task.Commands.SaveTask
     {
         public string Id { get; set; } = string.Empty;
         public int TenantId { get; set; }
-        public string Type { get; set; } = string.Empty;
-        public int ContactTypeId { get; set; }
-        public int ContactId { get; set; }
         public SaveTaskDto? Task { get; set; }
     }
 }

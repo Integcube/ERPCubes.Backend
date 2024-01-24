@@ -106,6 +106,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     events.TenantId = request.TenantId;
                     events.IsDeleted = 0;
                     events.UserId = request.Id;
+                    events.ContactTypeId = request.ContactTypeId;
+                    events.ActivityId = request.ActivityId;
+                    // for calendar hardcoded to -1
+                    events.Id = -1 ;
                     //if (request.CompanyId == -1)
                     //{
                     //    events.IsCompany = -1;
@@ -152,9 +156,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     else
                     {
                         events.AllDay = request.Event.AllDay;
-                        events.StartTime = request.Event.Start;
+                        events.StartTime = request.Event.Start.ToUniversalTime();
                         events.Description = request.Event.Title;
-                        events.EndTime = request.Event.End;
+                        events.EndTime = request.Event.End.ToUniversalTime();
                         events.Type = request.Event.Type;
                         events.LastModifiedBy = request.Id;
                         events.LastModifiedDate = localDateTime.ToUniversalTime();
