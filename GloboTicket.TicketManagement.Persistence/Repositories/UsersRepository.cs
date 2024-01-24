@@ -22,12 +22,12 @@ namespace ERPCubes.Persistence.Repositories
                                    {
                                        Id = a.Id,
                                        FirstName = a.FirstName,
-                                       LastName=a.LastName,
+                                       LastName = a.LastName,
                                        Email = a.Email,
                                        UserName = a.UserName,
                                        PhoneNumber = a.PhoneNumber,
-                                       Name = a.FirstName + " " +a.LastName,
-                                   }).ToListAsync();
+                                       Name = a.FirstName + " " + a.LastName,
+                                   }).OrderBy(A => A.FirstName).ToListAsync();
                 return users;
             }
             catch (Exception ex)
@@ -41,8 +41,8 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
-                var existingUser = await(from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == updateUser.TenantId && a.Id == updateUser.Id)
-                                         select a).FirstOrDefaultAsync();
+                var existingUser = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == updateUser.TenantId && a.Id == updateUser.Id)
+                                          select a).FirstOrDefaultAsync();
                 existingUser.FirstName = updateUser.FirstName;
                 existingUser.LastName = updateUser.LastName;
                 existingUser.UserName = updateUser.UserName;
@@ -50,7 +50,7 @@ namespace ERPCubes.Persistence.Repositories
                 existingUser.PhoneNumber = updateUser.PhoneNumber;
                 await _dbContextIdentity.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
