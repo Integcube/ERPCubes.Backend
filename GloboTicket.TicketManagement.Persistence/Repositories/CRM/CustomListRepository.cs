@@ -48,7 +48,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                         ListId = a.ListId,
                                                         ListTitle = a.ListTitle,
                                                         Filter = a.Filter,
-                                                    }).ToListAsync();
+                                                    }).OrderBy(a=>a.ListId).ToListAsync();
                 return List;
             }
             catch (Exception ex)
