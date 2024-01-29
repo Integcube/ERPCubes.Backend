@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
+﻿using ERPCubes.Application.Features.Crm.Product.Commands.SaveProductBulk;
+using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
 using ERPCubes.Application.Features.Product.Commands.SaveProduct;
 using ERPCubes.Application.Features.Product.Queries.GetProductList;
 using MediatR;
@@ -33,6 +34,14 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> SaveProductList(SaveProductCommand saveProduct)
         {
             var dtos = await _mediator.Send(saveProduct);
+            return Ok(dtos);
+        }
+        [HttpPost("bulkSave", Name = "BulkSaveProduct")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> BulkSave(SaveProductBulkCommand productCommand)
+        {
+            var dtos = await _mediator.Send(productCommand);
             return Ok(dtos);
         }
         [Authorize]

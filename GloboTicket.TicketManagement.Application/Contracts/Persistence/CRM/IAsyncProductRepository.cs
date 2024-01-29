@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
+﻿using ERPCubes.Application.Features.Crm.Product.Commands.SaveProductBulk;
+using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
 using ERPCubes.Application.Features.Product.Commands.SaveProduct;
 using ERPCubes.Application.Features.Product.Queries.GetProductList;
 using ERPCubes.Domain.Entities;
@@ -10,6 +11,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetProductVm>> GetAllProducts(int TenantId, string Id);
         Task SaveProduct(SaveProductCommand product);
+        Task SaveProductBulk(SaveProductBulkCommand request);
         Task DeleteProduct(DeleteProductCommand productId);
 
     }

@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Product.Commands.SaveProductBulk;
 using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
 using ERPCubes.Application.Features.Product.Commands.SaveProduct;
 using ERPCubes.Application.Features.Product.Queries.GetProductList;
@@ -80,6 +81,33 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
 
+        }
+
+        public async Task SaveProductBulk(SaveProductBulkCommand request)
+        {
+            try
+            {
+                DateTime localDateTime = DateTime.Now;
+                foreach (var Product in request.Products)
+                {
+                    CrmProduct ProductObj = new CrmProduct();
+                    ProductObj.ProductName = Product.ProductName;
+                    ProductObj.Description = Product.Description;
+                    ProductObj.Price = Product.Price;
+                    ProductObj.ProjectId = Product.ProjectId;
+                    ProductObj.CreatedBy = request.Id;
+                    ProductObj.CreatedDate = localDateTime.ToUniversalTime();
+                    ProductObj.IsDeleted = 0;
+                    ProductObj.TenantId = request.TenantId;
+                    await _dbContext.AddAsync(ProductObj);
+                    await _dbContext.SaveChangesAsync();
+                }
+
+            }
+            catch (Exception e)
+            {
+                throw new BadRequestException(e.Message);
+            }
         }
         public async Task DeleteProduct(DeleteProductCommand productId)
         {
