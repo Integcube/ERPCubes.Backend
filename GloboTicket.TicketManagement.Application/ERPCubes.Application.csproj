@@ -7,8 +7,11 @@
     </PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Features\Crm\DocumentLog\**" />
 	  <Compile Remove="Features\Crm\Projects\**" />
+	  <EmbeddedResource Remove="Features\Crm\DocumentLog\**" />
 	  <EmbeddedResource Remove="Features\Crm\Projects\**" />
+	  <None Remove="Features\Crm\DocumentLog\**" />
 	  <None Remove="Features\Crm\Projects\**" />
 	</ItemGroup>
 
@@ -28,7 +31,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Features\Crm\DocumentLog\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookLead\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookCampaign\" />
 	  <Folder Include="Features\Notification\Queries\" />

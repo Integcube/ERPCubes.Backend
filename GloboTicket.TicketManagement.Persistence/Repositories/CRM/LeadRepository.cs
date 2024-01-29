@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using System;
 using static System.Net.Mime.MediaTypeNames;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -477,8 +478,39 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        
 
+        public async Task<List<GetStatusWiseLeadsVm>> GetStatusWiseLeads(GetStatusWiseLeadsQuery request)
+        {
+            try
+            {
+                var leadsWithStatus = await (from status in _dbContext.CrmLeadStatus
+                                             join lead in _dbContext.CrmLead on status.StatusId equals lead.Status
+                                             where status.IsDeleted == 0 && lead.IsDeleted == 0 && lead.TenantId == request.TenantId
+                                             group lead by new { status.StatusId, status.StatusTitle, status.Order } into g
+                                             select new GetStatusWiseLeadsVm
+                                             {
+                                                 StatusId = g.Key.StatusId,
+                                                 StatusTitle = g.Key.StatusTitle,
+                                                 Order = g.Key.Order,
+                                                 Leads = g.Select(b => new GetStatusWiseLeadsDto
+                                                 {
+                                                     LeadId = b.LeadId,
+                                                     LeadOwner = b.LeadOwner,
+                                                     FirstName = b.FirstName,
+                                                     LastName = b.LastName,
+                                                     Email = b.Email,
+                                                     Status = b.Status,
+                                                     Mobile = b.Mobile,
+                                                 }).ToList()
+                                             }).ToListAsync();
 
+                return leadsWithStatus;
+
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

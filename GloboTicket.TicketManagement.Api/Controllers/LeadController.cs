@@ -10,6 +10,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -121,6 +122,12 @@ namespace ERPCubesApi.Controllers
             return Ok(dtos);
         }
 
-        
+        [HttpPost("getStatusWiseLeads", Name = "GetStatusWiseLeads")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetStatusWiseLeads(GetStatusWiseLeadsQuery obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
     }
 }

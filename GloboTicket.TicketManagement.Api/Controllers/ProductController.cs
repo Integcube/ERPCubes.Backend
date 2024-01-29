@@ -18,7 +18,6 @@ namespace ERPCubesApi.Controllers
             _mediator = mediator;
         }
 
-        [Authorize]
         [HttpPost("all", Name = "GetAllProducts")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<GetProductVm>>> GetAllCategories(GetProductListQuery getProductList)

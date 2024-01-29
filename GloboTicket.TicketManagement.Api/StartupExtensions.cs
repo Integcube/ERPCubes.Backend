@@ -67,6 +67,15 @@ namespace ERPCubes.Api
 
             app.UseAuthorization();
 
+            //var supportedCultures = new[] { "en", "ur", "es" };
+            //app.UseRequestLocalization(options =>
+            //{
+            //    options.AddSupportedCultures(supportedCultures)
+            //    .AddSupportedUICultures(supportedCultures)
+            //    .SetDefaultCulture("en");
+            //}
+            //    );
+
             app.MapControllers();
 
             app.MapHub<TicketHub>("/ticketHub").RequireCors("Open");
