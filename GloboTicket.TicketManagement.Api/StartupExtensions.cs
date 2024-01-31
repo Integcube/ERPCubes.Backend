@@ -7,6 +7,7 @@ using ERPCubes.Identity;
 using ERPCubes.Infrastructure;
 using ERPCubes.Persistence;
 using ERPCubesApi.Hubs;
+using ERPCubesApi.Services;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 //using Serilog;
@@ -26,7 +27,7 @@ namespace ERPCubes.Api
             builder.Services.AddIdentityServices(builder.Configuration);
 
             builder.Services.AddScoped<ILoggedInUserService, LoggedInUserService>();
-
+            //builder.Services.AddScoped<FileServerService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers().AddJsonOptions(options =>
     {

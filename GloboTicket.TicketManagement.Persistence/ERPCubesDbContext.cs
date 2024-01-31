@@ -81,7 +81,8 @@ namespace ERPCubes.Persistence
         public DbSet<TicketPriority> TicketPriority { get; set; }
         public DbSet<TicketStatus> TicketStatus { get; set; }
         public DbSet<TicketType> TicketType { get; set; }
-        
+
+        public DbSet<DocumentLibrary> DocumentLibrary { get; set; }
 
     }
 }
