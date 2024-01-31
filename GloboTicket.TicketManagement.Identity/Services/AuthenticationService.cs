@@ -72,6 +72,7 @@ namespace ERPCubes.Identity.Services
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
+                PhoneNumber = request.PhoneNumber,
                 EmailConfirmed = true,
                 TenantId = request.TenantId,
             };
@@ -88,7 +89,13 @@ namespace ERPCubes.Identity.Services
                 }
                 else
                 {
-                    throw new Exception($"{result.Errors}");
+
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    // Log or handle errors as needed
+                    // For example, you might want to log the errors using a logging framework
+                    // logger.LogError($"User registration failed. Errors: {errors}");
+
+                    throw new Exception($"{errors}");
                 }
             }
             else
@@ -96,6 +103,80 @@ namespace ERPCubes.Identity.Services
                 throw new Exception($"Email {request.Email } already exists.");
             }
         }
+
+        public async Task<RegistrationResponse> UpdateUserAsync(RegistrationRequest request)
+        {
+            try
+            {
+                // Find the existing user by user ID
+                var existingUser = await _userManager.FindByIdAsync(request.UserId);
+
+                if (existingUser == null)
+                {
+                    throw new Exception($"User with ID '{request.UserId}' not found.");
+                }
+
+                // Update user properties
+                existingUser.Email = request.Email;
+                existingUser.FirstName = request.FirstName;
+                existingUser.LastName = request.LastName;
+                existingUser.PhoneNumber = request.LastName; 
+
+                // Check if the email is being changed
+                if (!string.Equals(existingUser.NormalizedEmail, request.Email, StringComparison.OrdinalIgnoreCase))
+                {
+                    var existingEmail = await _userManager.FindByEmailAsync(request.Email);
+
+                    if (existingEmail != null && existingEmail.Id != existingUser.Id)
+                    {
+                        throw new Exception($"Email '{request.Email}' is already associated with another user.");
+                    }
+                }
+
+                // Update the password if provided
+                if (!string.IsNullOrWhiteSpace(request.Password))
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(existingUser);
+                    var result = await _userManager.ResetPasswordAsync(existingUser, token, request.Password);
+
+                    if (!result.Succeeded)
+                    {
+                        // Handle password update failure
+                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                  
+
+                        throw new Exception($"{errors}");
+                    }
+                }
+
+                // Update the user
+                var resultUpdate = await _userManager.UpdateAsync(existingUser);
+
+                if (resultUpdate.Succeeded)
+                {
+                    return new RegistrationResponse() { UserId = existingUser.Id };
+                }
+                else
+                {
+                    // Handle user update failure
+                    var errors = string.Join(", ", resultUpdate.Errors.Select(e => e.Description));
+
+
+                    throw new Exception($"{errors}");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for internal investigation
+                // logger.LogError(ex, "Error occurred while updating user.");
+                throw; // Rethrow the exception for the calling code to handle
+            }
+        }
+
+
+
+
+
 
         private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
         {

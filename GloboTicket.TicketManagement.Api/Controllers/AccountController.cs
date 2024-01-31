@@ -26,5 +26,12 @@ namespace ERPCubes.Api.Controllers
             return Ok(await _authenticationService.RegisterAsync(request));
         }
 
+        [HttpPost("Update")]
+        public async Task<ActionResult<RegistrationResponse>> UpdateUser(RegistrationRequest request)
+        {
+            return Ok(await _authenticationService.UpdateUserAsync(request));
+        }
+        
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
+﻿using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
+using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace ERPCubes.Application.Contracts.Persistence
     {
         Task<List<GetUserListVm>> GetUserList(int TenantId, string Id);
         Task UpdateUser(UpdateUserCommand updateUser);
-
+        Task DeleteUser(DeleteUserCommand cm);
+        
     }
 }

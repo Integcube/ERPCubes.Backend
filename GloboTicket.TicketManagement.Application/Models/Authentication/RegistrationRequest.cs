@@ -4,6 +4,10 @@ namespace ERPCubes.Application.Models.Authentication
 {
     public class RegistrationRequest
     {
+
+
+        
+        public string UserId { get; set; } = string.Empty;
         [Required] 
         public string FirstName { get; set; } = string.Empty;
 
@@ -24,5 +28,7 @@ namespace ERPCubes.Application.Models.Authentication
         [Required]
         [MinLength(6)]
         public string Password { get; set; } = string.Empty;
+
+        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

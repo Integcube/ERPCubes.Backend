@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
+﻿using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
+using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -33,5 +34,16 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(updateRequest);
             return Ok(dtos);
         }
+
+        [HttpPost("delete", Name = "DeleteUser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> DeleteUser(DeleteUserCommand getUserList)
+        {
+            var dto = await _mediator.Send( getUserList);
+            return Ok(dto);
+        }
+        
+
+
     }
 }

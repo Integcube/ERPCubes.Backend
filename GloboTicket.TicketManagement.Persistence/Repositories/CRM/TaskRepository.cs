@@ -230,9 +230,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                foreach (var items in request)
+                if (request.Any())
                 {
-                    await _dbContext.Database.ExecuteSqlRawAsync("UPDATE \"CrmTask\" SET \"Order\" = {0} WHERE \"TaskId\" = {1}", items.TaskId, items.Order);
+                    var updateStatements = request.Select(item =>
+                        $"UPDATE \"CrmTask\" SET \"Order\" = {item.Order} WHERE \"TaskId\" = {item.TaskId}");
+
+                    var updateSql = string.Join(";\n", updateStatements);
+
+                    await _dbContext.Database.ExecuteSqlRawAsync(updateSql);
+
+                    await _dbContext.SaveChangesAsync();
                 }
             }
             catch (Exception ex)

@@ -1,7 +1,9 @@
 ﻿using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
 using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
+using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +19,7 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
-                var users = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == TenantId)
+                var users = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == TenantId && a.IsActive == 0)
                                    select new GetUserListVm
                                    {
                                        Id = a.Id,
@@ -27,6 +29,7 @@ namespace ERPCubes.Persistence.Repositories
                                        UserName = a.UserName,
                                        PhoneNumber = a.PhoneNumber,
                                        Name = a.FirstName + " " + a.LastName,
+                                       IsActive = a.IsActive,
                                    }).OrderBy(A => A.FirstName).ToListAsync();
                 return users;
             }
@@ -49,6 +52,26 @@ namespace ERPCubes.Persistence.Repositories
                 existingUser.Email = updateUser.Email;
                 existingUser.PhoneNumber = updateUser.PhoneNumber;
                 await _dbContextIdentity.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task DeleteUser(DeleteUserCommand cm)
+        {
+            try
+            {
+                var existingUser = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == cm.TenantId && a.Id == cm.UserId)
+                                          select a).FirstOrDefaultAsync();
+
+                existingUser.IsActive = 1;
+                existingUser.ModifiedOn= DateTime.Now.ToUniversalTime();
+                existingUser.ModifiedBy = cm.Id;
+
+                await _dbContextIdentity.SaveChangesAsync();
+
             }
             catch (Exception ex)
             {

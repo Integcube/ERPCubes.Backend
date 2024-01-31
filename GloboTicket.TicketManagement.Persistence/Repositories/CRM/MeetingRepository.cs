@@ -44,6 +44,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         CreatedBy = a.CreatedBy,
                         CreatedDate = a.CreatedDate,
                         CreatedByName = user == null ? "User Not Found" : user.FirstName + " " + user.LastName,
+                        MeetingDate= a.MeetingDate,
                     }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return Meeting;
@@ -94,6 +95,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addMeeting.CreatedDate = localDateTime.ToUniversalTime();
                         addMeeting.ContactTypeId = meeting.ContactTypeId;
                         addMeeting.Id = meeting.ContactId;
+                        addMeeting.MeetingDate = meeting.MeetingDate.ToUniversalTime();
                         await _dbContext.AddAsync(addMeeting);
                         await _dbContext.SaveChangesAsync();
                         var result = _dbContext.Database.ExecuteSqlRaw(
@@ -117,6 +119,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             existingMeeting.LastModifiedBy = meeting.Id;
                             existingMeeting.EndTime = meeting.EndTime.ToUniversalTime();
                             existingMeeting.LastModifiedDate = localDateTime.ToUniversalTime();
+                            existingMeeting.MeetingDate = meeting.MeetingDate.ToUniversalTime();
                             await _dbContext.SaveChangesAsync();
                             
                             var result = _dbContext.Database.ExecuteSqlRaw(

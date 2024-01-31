@@ -21,6 +21,8 @@ namespace ERPCubes.Domain.Entities
         public int ReasonId { get; set; }
         public int TaskId { get; set; }
         public int ContactTypeId { get; set; }
+        public DateTime CallDate { get; set; }
         
+
     }
 }

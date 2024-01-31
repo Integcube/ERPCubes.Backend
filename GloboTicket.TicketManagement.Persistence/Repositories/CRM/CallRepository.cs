@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static ERPCubes.Persistence.Repositories.CRM.CrmEnum;
@@ -89,7 +90,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    ReasonId = a.ReasonId,
                                                    TaskId = a.TaskId,
                                                    DueDate = tasks.DueDate,
-                                                   IsTask = -1
+                                                   IsTask = -1,
+                                                   CallDate= a.CallDate,
                                                }).OrderByDescending(a => a.CreatedDate).ToListAsync();
 
                 return calls;
@@ -122,6 +124,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         task.CreatedBy = call.Id;
                         task.TenantId = call.TenantId;
                         task.Type = "task";
+                        task.TaskTypeId = (int)CrmEnum.UserActivityEnum.Call;
                         task.IsDeleted = 0;
                         task.Id = call.ContactId;
                         task.ContactTypeId = call.ContactTypeId; //For Contact Type exp. lead,company
@@ -163,6 +166,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         addCall.TaskId = TaskId;
                         addCall.Id = call.ContactId;
                         addCall.ContactTypeId = call.ContactTypeId;//For Contact Type exp. lead,company
+                        addCall.CallDate = call.CallDate.ToUniversalTime();
                         await _dbContext.AddAsync(addCall);
                         await _dbContext.SaveChangesAsync();
 
@@ -189,6 +193,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             existingCall.LastModifiedBy = call.Id;
                             existingCall.LastModifiedDate = localDateTime.ToUniversalTime();
                             existingCall.ReasonId = call.ReasonId;
+                            existingCall.CallDate = call.CallDate.ToUniversalTime();
                             existingCall.TaskId = TaskId;
                             await _dbContext.SaveChangesAsync();
 

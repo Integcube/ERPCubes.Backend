@@ -18,5 +18,7 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Commands.SaveMeeting
         public int TenantId { get; set; }
         public int ContactTypeId { get; set; }
         public int ContactId { get; set; }
+        public DateTime MeetingDate { get; set; }
+        
     }
 }

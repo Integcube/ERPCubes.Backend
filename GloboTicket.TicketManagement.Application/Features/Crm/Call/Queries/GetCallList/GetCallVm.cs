@@ -20,5 +20,7 @@ namespace ERPCubes.Application.Features.Crm.Call.Queries.GetCallList
         public DateTime? DueDate { get; set; }
         public int TaskId { get; set; }
         public int IsTask { get; set; }
+        public DateTime CallDate { get; set; }
+        
     }
 }

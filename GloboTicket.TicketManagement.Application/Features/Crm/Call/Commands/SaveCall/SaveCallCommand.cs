@@ -23,6 +23,7 @@ namespace ERPCubes.Application.Features.Crm.Call.Commands.SaveCall
         public int IsTask { get; set; }
         public int ContactTypeId { get; set; }
         public int ContactId { get; set; }
-
+        public DateTime CallDate { get; set; }
+        
     }
 }

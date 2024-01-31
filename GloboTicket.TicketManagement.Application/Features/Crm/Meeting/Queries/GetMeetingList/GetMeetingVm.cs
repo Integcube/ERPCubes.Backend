@@ -16,6 +16,7 @@ namespace ERPCubes.Application.Features.Crm.Meeting.Queries.GetMeetingList
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public string CreatedByName { get; set; }
+         public DateTime MeetingDate { get; set; }
         
     }
 }
