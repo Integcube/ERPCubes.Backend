@@ -26,7 +26,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth
             try
             {
                 List<GetLeadByMonthListVm> LeadByMonth = new List<GetLeadByMonthListVm>();
-                LeadByMonth = await _leadRepository.GetLeadByMonth(request.TenantId, request.Id);
+                LeadByMonth = await _leadRepository.GetLeadByMonth(request.TenantId, request.Id, request.ProductId, request.SourceId, request.UserId, request.Year);
                 return LeadByMonth;
             }
             catch (Exception ex)

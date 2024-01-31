@@ -89,6 +89,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             UserId = TeamMemberId,
                             TenantId = request.TenantId,
                             CreatedBy = request.UserId,
+                            CreatedDate = localDateTime.ToUniversalTime(),
                         };
 
                         _dbContext.CrmTeamMember.Add(NewTeamMember);

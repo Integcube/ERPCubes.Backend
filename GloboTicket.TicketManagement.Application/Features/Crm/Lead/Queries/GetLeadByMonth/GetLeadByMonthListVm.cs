@@ -13,7 +13,5 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth
         public int Month { get; set; }
         public int TotalLeads { get; set; }
         public List<GetLeadStatusListVm> LeadStatusList { get; set; }
-
-
     }
 }

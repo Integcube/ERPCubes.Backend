@@ -49,7 +49,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetFormsListVm> obj = await (
-                            from a in _dbContext.CrmForms
+                            from a in _dbContext.CrmForm
                             .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId)                              
                             select new GetFormsListVm
                             {
@@ -137,7 +137,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     var existingForm = await (
-                        from a in _dbContext.CrmForms
+                        from a in _dbContext.CrmForm
                         .Where(id => id.TenantId == request.TenantId && id.FormId == request.FormId) 
                         select a).FirstOrDefaultAsync();
                     existingForm.Name = request.Name;

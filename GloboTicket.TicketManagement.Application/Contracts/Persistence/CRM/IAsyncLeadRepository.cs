@@ -1,7 +1,9 @@
 using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
@@ -25,12 +27,14 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     public interface IAsyncLeadRepository:IAsyncRepository<CrmLead>
     {
         Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id);
+        //Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id);
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
         Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId);
         Task DeleteLead(string Id, int TenantId, int LeadId, string Name);
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
-        Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id);
+        //Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request);
+        Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id, int ProductId, int SourceId, string UserId, string Year);
         Task SaveLeadBulk(SaveBulkLeadCommand request);
         Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj);
         Task<List<GetLeadSourceWiseVm>> GetLeadSourceWise(int TenantId, string Id, DateTime startDate, DateTime endDate, int sourceId);

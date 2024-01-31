@@ -17,6 +17,10 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using System;
 using static System.Net.Mime.MediaTypeNames;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
+using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
+using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -48,9 +52,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id
-            //, DateTime? CreatedDate, DateTime? ModifiedDate, string? LeadOwner, string? LeadStatus
-            ) 
+        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id) 
         {
             try
 
@@ -107,7 +109,42 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+        //public async Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
+        //    {
+        //    try
+        //    {
+        //        List<GetDeletedLeadsVm> dLeads = await (
+        //            from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+        //            join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
+        //            join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
+        //            from pp in all3.DefaultIfEmpty()
+        //            join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
+        //            from cc in all4.DefaultIfEmpty()
+        //            join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+        //            select new GetDeletedLeadsVm
+        //            {
+        //                LeadId = a.LeadId,
+        //                Name = a.FirstName + " " + a.LastName,
+        //                Status = a.Status,
+        //                StatusTitle = s.StatusTitle,
+        //                LeadOwner = a.LeadOwner,
+        //                LeadOwnerName = user.FirstName + " " + user.LastName,
+        //                ProductId = pp.ProductId == null?-1 : pp.ProductId,
+        //                ProductTitle = pp.ProductName,
+        //                CampaignId = cc.CampaignId,
+        //                CampaignTitle = cc.Title,
+        //                CreatedDate = a.CreatedDate
+        //            }).OrderByDescending(a => a.LeadId).ToListAsync();
 
+        //        return dLeads;
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new BadRequestException(ex.Message);
+        //    }
+            
+        //}
         public async Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id)
         {
             try
@@ -148,17 +185,20 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id)
+        public async Task<List<GetLeadByMonthListVm>> GetLeadByMonth(int TenantId, string Id, int ProductId, int SourceId, string UserId, string Year)
         {
             try
             {
+                int.TryParse(Year, out int year);
+                DateTime localStartDateTime = new DateTime(year, 1,1,0,0,0,DateTimeKind.Utc);
+                DateTime localEndDateTime = new DateTime(year, 12, 31, 23, 59, 59, DateTimeKind.Utc);
                 var groupedLeads = await (
-                    from a in _dbContext.CrmLead
+                    from a in _dbContext.CrmLead.Where(lead => (ProductId == -1 || lead.ProductId == ProductId) && (SourceId == -1 || lead.SourceId == SourceId) && (UserId == "-1" || lead.LeadOwner == UserId) && (lead.CreatedDate > localStartDateTime) && (lead.CreatedDate < localEndDateTime))
                     where (a.TenantId == -1 || a.TenantId == TenantId) && a.IsDeleted == 0
-                    group a by new { a.CreatedDate.Year, a.CreatedDate.Month } into g
+                    group a by new { a.CreatedDate.Month } into g
                     select new GetLeadByMonthListVm
                     {
-                        Year = g.Key.Year,
+                        Year = year,
                         Month = g.Key.Month,
                         TotalLeads = g.Count(),
                         LeadStatusList = new List<GetLeadStatusListVm>() // Initialize an empty list
@@ -176,7 +216,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             StatusTitle = l.StatusTitle,
                             IsDeletable = l.IsDeletable,
                             Order = l.Order,
-                            Count = _dbContext.CrmLead.Count(lead => lead.Status == l.StatusId && lead.CreatedDate.Year == leadByMonth.Year && lead.CreatedDate.Month == leadByMonth.Month)
+                            Count = _dbContext.CrmLead.Count(lead => lead.Status == l.StatusId && lead.CreatedDate.Month == leadByMonth.Month && (ProductId == -1 || lead.ProductId == ProductId) && (SourceId == -1 || lead.SourceId == SourceId) && (UserId == "-1" || lead.LeadOwner == UserId) && (lead.CreatedDate > localStartDateTime) && (lead.CreatedDate < localEndDateTime))
                         }
                     ).ToListAsync();
                 }
@@ -405,6 +445,34 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        //public async Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request)
+        //{
+        //    try
+        //    {
+        //        DateTime localDateTime = DateTime.Now;
+        //        foreach (var Lead in request.deletedleads)
+        //        {
+        //            var deletedLead = await (
+        //                from a in _dbContext.CrmLead.Where(lead => lead.TenantId == request.TenantId && lead.IsDeleted == 1 && lead.LeadId == Lead.LeadId) select a)?.FirstOrDefaultAsync();
+        //            if (deletedLead == null)
+        //            {
+        //                throw new NotFoundException(request.Id, Lead.LeadId);
+        //            }
+        //            else
+        //            {
+        //                deletedLead.IsDeleted = 0;
+        //                deletedLead.LastModifiedBy = request.Id;
+        //                deletedLead.LastModifiedDate = localDateTime.ToUniversalTime();
+        //                await _dbContext.SaveChangesAsync();
+        //            }
+        //        }
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        throw new BadRequestException(e.Message);
+        //    }
+        //}
 
         public async Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj)
         {

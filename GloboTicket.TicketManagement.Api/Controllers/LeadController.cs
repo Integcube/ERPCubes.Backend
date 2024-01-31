@@ -1,7 +1,9 @@
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
@@ -35,6 +37,22 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(getLeadList);
             return Ok(dtos);
         }
+        //[Authorize]
+        //[HttpPost("allDeleted", Name = "GetDeletedLeads")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public async Task<ActionResult<List<GetLeadVm>>> GetDeletedLeads(GetDeletedLeadsQuery getDeletedLeadsList)
+        //{
+        //    var dtos = await _mediator.Send(getDeletedLeadsList);
+        //    return Ok(dtos);
+        //}
+        //[Authorize]
+        //[HttpPost("restore", Name = "RestoreDeletedLeads")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public async Task<ActionResult> RestoreDeletedLeads(RestoreDeletedLeadsCommand restoreDeletedLeads)
+        //{
+        //    var dtos = await _mediator.Send(restoreDeletedLeads);
+        //    return Ok(dtos);
+        //}
         [Authorize]
         [HttpPost("allStatus", Name = "GetAllLeadStatus")]
         [ProducesResponseType(StatusCodes.Status200OK)]
