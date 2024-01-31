@@ -1,4 +1,7 @@
-﻿using ERPCubes.Application.Features.Crm.Product.Commands.SaveProductBulk;
+﻿using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.SaveProductBulk;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
 using ERPCubes.Application.Features.Product.Commands.SaveProduct;
 using ERPCubes.Application.Features.Product.Queries.GetProductList;
@@ -52,5 +55,32 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(deleteProduct);
             return Ok(dtos);
         }
+
+        [HttpPost("del", Name = "GetDeletedProducts")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedProductVm>>> GetDeletedCategories(GetDeletedProductListQuery getProductList)
+        {
+            var dtos = await _mediator.Send(getProductList);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restore", Name = "RestoreProduct")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreProduct(RestoreProductCommand deleteProduct)
+        {
+            var dtos = await _mediator.Send(deleteProduct);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restoreBulk", Name = "RestoreBulk")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkProduct(RestoreBulkProductCommand deleteProduct)
+        {
+            var dtos = await _mediator.Send(deleteProduct);
+            return Ok(dtos);
+        }
+
     }
 }
