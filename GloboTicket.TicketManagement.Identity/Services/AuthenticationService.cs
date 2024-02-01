@@ -28,7 +28,7 @@ namespace ERPCubes.Identity.Services
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email == request.Email);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email.ToLower() == request.Email.ToLower());
 
             if (user == null)
             {
@@ -120,6 +120,7 @@ namespace ERPCubes.Identity.Services
                 existingUser.Email = request.Email;
                 existingUser.FirstName = request.FirstName;
                 existingUser.LastName = request.LastName;
+                existingUser.UserName = request.UserName;
                 existingUser.PhoneNumber = request.LastName; 
 
                 // Check if the email is being changed
