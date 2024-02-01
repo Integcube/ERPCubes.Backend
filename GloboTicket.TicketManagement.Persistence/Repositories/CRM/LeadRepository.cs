@@ -551,27 +551,24 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var leadsWithStatus = await (from status in _dbContext.CrmLeadStatus
-                                             join lead in _dbContext.CrmLead on status.StatusId equals lead.Status
-                                             where status.IsDeleted == 0 && lead.IsDeleted == 0 && lead.TenantId == request.TenantId
-                                             group lead by new { status.StatusId, status.StatusTitle, status.Order } into g
-                                             select new GetStatusWiseLeadsVm
-                                             {
-                                                 StatusId = g.Key.StatusId,
-                                                 StatusTitle = g.Key.StatusTitle,
-                                                 Order = g.Key.Order,
-                                                 Leads = g.Select(b => new GetStatusWiseLeadsDto
-                                                 {
-                                                     LeadId = b.LeadId,
-                                                     LeadOwner = b.LeadOwner,
-                                                     FirstName = b.FirstName,
-                                                     LastName = b.LastName,
-                                                     Email = b.Email,
-                                                     Status = b.Status,
-                                                     Mobile = b.Mobile,
-                                                 }).ToList()
-                                             }).ToListAsync();
-
+                List<GetStatusWiseLeadsVm> leadsWithStatus = await (from a in _dbContext.CrmLeadStatus.Where(a => a.IsDeleted == 0)
+                                                                    select new GetStatusWiseLeadsVm
+                                                                    {
+                                                                        StatusId = a.StatusId,
+                                                                        StatusTitle = a.StatusTitle,
+                                                                        Order = a.Order,
+                                                                        Leads = (from b in _dbContext.CrmLead.Where(b => b.IsDeleted == 0 && b.Status == a.StatusId && a.TenantId == request.TenantId)
+                                                                                 select new GetStatusWiseLeadsDto
+                                                                                 {
+                                                                                     LeadId = b.LeadId,
+                                                                                     LeadOwner = b.LeadOwner,
+                                                                                     FirstName = b.FirstName,
+                                                                                     LastName = b.LastName,
+                                                                                     Email = b.Email,
+                                                                                     Status = b.Status,
+                                                                                     Mobile = b.Mobile,
+                                                                                 }).OrderByDescending(a=>a.LeadId).ToList()
+                                                                    }).ToListAsync();
                 return leadsWithStatus;
 
             }
@@ -579,6 +576,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
+        }
+
+        public Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

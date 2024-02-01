@@ -39,7 +39,7 @@ namespace ERPCubes.Api
 .AllowAnyHeader().AllowAnyMethod().AllowCredentials());
             });
             builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
-
+            //builder.Services.AddHttpClient();
 
             return builder.Build();
 
@@ -84,6 +84,7 @@ namespace ERPCubes.Api
             return app;
 
         }
+
         private static void AddSwagger(IServiceCollection services)
         {
             services.AddSwaggerGen(c =>

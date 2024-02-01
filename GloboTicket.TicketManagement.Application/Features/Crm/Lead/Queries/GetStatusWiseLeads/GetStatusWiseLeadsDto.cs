@@ -15,5 +15,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads
         public int Status { get; set; }
         public string LeadOwner { get; set; } = String.Empty;
         public string Mobile { get; set; } = string.Empty;
+        public string Activity { get; set; }
+
     }
 }

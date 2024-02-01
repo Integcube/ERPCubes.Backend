@@ -41,6 +41,9 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetLeadOwnerWiseVm>> GetLeadOwnerWise(int TenantId, string Id, DateTime startDate, DateTime endDate, string leadOwner, int sourceId, int status);
         Task ChangeLeadStatus(ChangeLeadStatusCommand oj);
         Task<List<GetStatusWiseLeadsVm>> GetStatusWiseLeads(GetStatusWiseLeadsQuery request);
+        Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request);
+        Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id);
+
 
 
 
