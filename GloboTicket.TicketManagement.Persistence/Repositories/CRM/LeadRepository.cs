@@ -21,6 +21,11 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
+using MediatR;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
+using System.Linq;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -52,7 +57,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id) 
+        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id)
         {
             try
 
@@ -71,7 +76,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
                                                from cc in all4.DefaultIfEmpty()
                                                join user in _dbContext.AppUser on a.LeadOwner equals user.Id
-                                              
+
                                                select new GetLeadVm
                                                {
                                                    LeadId = a.LeadId,
@@ -99,7 +104,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                    CampaignTitle = cc.Title,
                                                    CreatedDate = a.CreatedDate,
                                                    ModifiedDate = a.LastModifiedDate,
-                                                   LeadOwnerName= user.FirstName+" "+ user.LastName
+                                                   LeadOwnerName = user.FirstName + " " + user.LastName
                                                }
                                               ).OrderByDescending(a => a.LeadId).ToListAsync();
                 return Leads;
@@ -143,7 +148,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         //    {
         //        throw new BadRequestException(ex.Message);
         //    }
-            
+
         //}
         public async Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id)
         {
@@ -190,7 +195,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 int.TryParse(Year, out int year);
-                DateTime localStartDateTime = new DateTime(year, 1,1,0,0,0,DateTimeKind.Utc);
+                DateTime localStartDateTime = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
                 DateTime localEndDateTime = new DateTime(year, 12, 31, 23, 59, 59, DateTimeKind.Utc);
                 var groupedLeads = await (
                     from a in _dbContext.CrmLead.Where(lead => (ProductId == -1 || lead.ProductId == ProductId) && (SourceId == -1 || lead.SourceId == SourceId) && (UserId == "-1" || lead.LeadOwner == UserId) && (lead.CreatedDate > localStartDateTime) && (lead.CreatedDate < localEndDateTime))
@@ -503,9 +508,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     Value = obj.ProductId
                 };
-                
+
                 var results = await _dbContext.GetleadPiplineReportVm.FromSqlRaw(
-                    "SELECT * FROM public.crmleadstagewiserpt({0},{1},{2},{3},{4},{5})", tenantIdPrm, SourceIdPrm, Status, startDatePrm,endDatePrm, ProductId)
+                    "SELECT * FROM public.crmleadstagewiserpt({0},{1},{2},{3},{4},{5})", tenantIdPrm, SourceIdPrm, Status, startDatePrm, endDatePrm, ProductId)
                     .ToListAsync();
 
                 return results;
@@ -527,7 +532,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 else
                 {
-                    Lead.Status= obj.statusId;
+                    Lead.Status = obj.statusId;
                     Lead.LastModifiedBy = obj.userId;
                     Lead.LastModifiedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
@@ -567,7 +572,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                                      Email = b.Email,
                                                                                      Status = b.Status,
                                                                                      Mobile = b.Mobile,
-                                                                                 }).OrderByDescending(a=>a.LeadId).ToList()
+                                                                                 }).OrderByDescending(a => a.LeadId).ToList()
                                                                     }).ToListAsync();
                 return leadsWithStatus;
 
@@ -586,6 +591,88 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<GetScoreListVm>> GetleadScoreList(int TenantId, int LeadId)
+        {
+            try
+            {
+                List<GetScoreListVm> LeadStatus = await (from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == -1 || a.TenantId == TenantId && a.IsDeleted == 0)
+                                                         join led in _dbContext.CrmLead.Where(a => a.LeadId == LeadId) on a.ProductId equals led.ProductId
+                                                         join ledsc in _dbContext.CrmLeadScore on a.QuestionId equals ledsc.QuestionId into ab
+                                                         from scor in ab.DefaultIfEmpty()
+
+                                                         select new GetScoreListVm
+                                                         {
+                                                             QuestionId = a.QuestionId,
+                                                             Title = a.Title,
+                                                             Code = a.Code,
+                                                             Order = a.Order,
+                                                             Rating = scor == null ? 0 : scor.Rating,
+                                                             Weightage = a.Weightage,
+
+                                                         }
+                                           ).OrderBy(a => a.Order).ToListAsync();
+                return LeadStatus;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task SaveleadScore(SaveLeadScoreCommand Leads)
+        {
+            try
+            {
+
+                var deleteSql = $"DELETE FROM \"CrmLeadScore\" WHERE \"LeadId\" = {Leads.leadId}";
+                await _dbContext.Database.ExecuteSqlRawAsync(deleteSql);
+
+                DateTime localDateTime = DateTime.Now;
+                foreach (var lead in Leads.Leads)
+                {
+                    CrmLeadScore LeadObj = new CrmLeadScore();
+                    LeadObj.LeadId = Leads.leadId;
+                    LeadObj.QuestionId = lead.QuestionId;
+                    LeadObj.Rating = lead.Rating;
+                    LeadObj.CreatedDate = DateTime.Now.ToUniversalTime();
+                    LeadObj.CreatedBy = Leads.Id;
+                    await _dbContext.AddAsync(LeadObj);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new BadRequestException(e.Message);
+            }
+        }
+
+        public async Task<GetCalculateleadScoreListVm> GetCalculateleadScore(GetCalculateleadScoreQuery obj)
+        {
+
+
+            try
+            {
+                var groupedLeadStatus = await _dbContext.CrmLeadScore.Where(ledsc => ledsc.LeadId == obj.LeadId).Join(
+                                      _dbContext.CrmIScoringQuestion,
+                                       ledsc => ledsc.QuestionId,
+                                        qus => qus.QuestionId,
+                                      (ledsc, qus) => new { ledsc.LeadId, ledsc.QuestionId, ledsc.Rating, qus.Weightage }).GroupBy(ls => ls.LeadId)
+                                      .Select(group => new GetCalculateleadScoreListVm
+                                      {
+                                          LeadId = group.Key,
+                                          Rating = group.Sum(ls => ls.Rating * ls.Weightage) / group.Sum(ls => ls.Weightage),
+                                      }).FirstOrDefaultAsync();
+
+                return groupedLeadStatus;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+
+
         }
     }
 }

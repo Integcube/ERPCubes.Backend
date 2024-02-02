@@ -3,6 +3,8 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -12,6 +14,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
 using ERPCubes.Domain.Entities;
@@ -43,8 +46,11 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetStatusWiseLeadsVm>> GetStatusWiseLeads(GetStatusWiseLeadsQuery request);
         Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request);
         Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id);
-
-
+      
+        Task<List<GetScoreListVm>> GetleadScoreList(int TenantId, int LeadId);
+        Task SaveleadScore(SaveLeadScoreCommand Leads);
+        Task<GetCalculateleadScoreListVm> GetCalculateleadScore(GetCalculateleadScoreQuery obj);
+        
 
 
     }

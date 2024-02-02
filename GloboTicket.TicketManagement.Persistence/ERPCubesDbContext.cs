@@ -83,6 +83,9 @@ namespace ERPCubes.Persistence
         public DbSet<TicketType> TicketType { get; set; }
 
         public DbSet<DocumentLibrary> DocumentLibrary { get; set; }
+        public DbSet<CrmLeadScore> CrmLeadScore { get; set; }
+
+        public DbSet<CrmIScoringQuestion> CrmIScoringQuestion { get; set; }
 
     }
 }

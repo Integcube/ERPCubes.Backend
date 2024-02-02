@@ -3,6 +3,8 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
@@ -12,6 +14,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -147,5 +150,31 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
+
+
+        [HttpPost("getScoreList", Name = "GetScoreList")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetScoreList(GetScoreListQuery obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
+        [HttpPost("saveleadScore", Name = "SaveleadScore")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> SaveleadScore(SaveLeadScoreCommand obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
+        [HttpPost("calculateleadScore", Name = "CalculateleadScore")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> CalculateleadScore(GetCalculateleadScoreQuery obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+        
     }
 }
