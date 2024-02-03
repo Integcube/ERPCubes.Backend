@@ -63,93 +63,126 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
             {
 
-                List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0
-                                               //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
-                                               )
-                                               join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
-                                               join i in _dbContext.CrmIndustry.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
-                                               from ii in all.DefaultIfEmpty()
-                                               join z in _dbContext.CrmLeadSource.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.SourceId equals z.SourceId into all2
-                                               from zz in all2.DefaultIfEmpty()
-                                               join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
-                                               from pp in all3.DefaultIfEmpty()
-                                               join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
-                                               from cc in all4.DefaultIfEmpty()
-                                               join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+                //List<GetLeadVm> Leads = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 0
+                //                               //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.LeadOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
+                //                               )
+                //                               join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
+                //                               join i in _dbContext.CrmIndustry.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
+                //                               from ii in all.DefaultIfEmpty()
+                //                               join z in _dbContext.CrmLeadSource.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.SourceId equals z.SourceId into all2
+                //                               from zz in all2.DefaultIfEmpty()
+                //                               join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
+                //                               from pp in all3.DefaultIfEmpty()
+                //                               join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
+                //                               from cc in all4.DefaultIfEmpty()
+                //                               join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+                //                               join scro in _dbContext.CrmLeadScore on a.LeadId equals scro.LeadId into  absc
+                //                               from sc in absc.DefaultIfEmpty()
+                //                               join scro in _dbContext.CrmIScoringQuestion on sc.QuestionId equals scro.QuestionId into QUS
+                //                               from ques in absc.DefaultIfEmpty()
+                //                               select new GetLeadVm
+                //                               {
+                //                                   LeadId = a.LeadId,
+                //                                   FirstName = a.FirstName,
+                //                                   LastName = a.LastName,
+                //                                   Email = a.Email,
+                //                                   Status = a.Status,
+                //                                   StatusTitle = s.StatusTitle,
+                //                                   LeadOwner = a.LeadOwner,
+                //                                   Mobile = a.Mobile,
+                //                                   Work = a.Work,
+                //                                   Address = a.Address,
+                //                                   Street = a.Street,
+                //                                   City = a.City,
+                //                                   Zip = a.Zip,
+                //                                   State = a.State,
+                //                                   Country = a.Country,
+                //                                   SourceId = a.SourceId,
+                //                                   SourceTitle = zz.SourceTitle,
+                //                                   IndustryId = a.IndustryId,
+                //                                   IndustryTitle = ii.IndustryTitle,
+                //                                   ProductId = a.ProductId,
+                //                                   ProductTitle = pp.ProductName,
+                //                                   CampaignId = a.CampaignId,
+                //                                   CampaignTitle = cc.Title,
+                //                                   CreatedDate = a.CreatedDate,
+                //                                   ModifiedDate = a.LastModifiedDate,
+                //                                   LeadOwnerName = user.FirstName + " " + user.LastName
 
-                                               select new GetLeadVm
-                                               {
-                                                   LeadId = a.LeadId,
-                                                   FirstName = a.FirstName,
-                                                   LastName = a.LastName,
-                                                   Email = a.Email,
-                                                   Status = a.Status,
-                                                   StatusTitle = s.StatusTitle,
-                                                   LeadOwner = a.LeadOwner,
-                                                   Mobile = a.Mobile,
-                                                   Work = a.Work,
-                                                   Address = a.Address,
-                                                   Street = a.Street,
-                                                   City = a.City,
-                                                   Zip = a.Zip,
-                                                   State = a.State,
-                                                   Country = a.Country,
-                                                   SourceId = a.SourceId,
-                                                   SourceTitle = zz.SourceTitle,
-                                                   IndustryId = a.IndustryId,
-                                                   IndustryTitle = ii.IndustryTitle,
-                                                   ProductId = a.ProductId,
-                                                   ProductTitle = pp.ProductName,
-                                                   CampaignId = a.CampaignId,
-                                                   CampaignTitle = cc.Title,
-                                                   CreatedDate = a.CreatedDate,
-                                                   ModifiedDate = a.LastModifiedDate,
-                                                   LeadOwnerName = user.FirstName + " " + user.LastName
-                                               }
-                                              ).OrderByDescending(a => a.LeadId).ToListAsync();
+                //                               }
+                //                              ).OrderByDescending(a => a.LeadId).ToListAsync();
+                //return Leads;
+
+
+                List<GetLeadVm> Leads = await (
+    from a in _dbContext.CrmLead
+        .Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
+    join s in _dbContext.CrmLeadStatus
+        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
+        on a.Status equals s.StatusId
+    join i in _dbContext.CrmIndustry
+        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
+        on a.IndustryId equals i.IndustryId into all
+    from ii in all.DefaultIfEmpty()
+    join z in _dbContext.CrmLeadSource
+        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
+        on a.SourceId equals z.SourceId into all2
+    from zz in all2.DefaultIfEmpty()
+    join p in _dbContext.CrmProduct
+        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
+        on a.ProductId equals p.ProductId into all3
+    from pp in all3.DefaultIfEmpty()
+    join c in _dbContext.CrmCampaign
+        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
+        on a.CampaignId equals c.CampaignId into all4
+    from cc in all4.DefaultIfEmpty()
+    join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+    join scro in _dbContext.CrmLeadScore on a.LeadId equals scro.LeadId into absc
+    from sc in absc.DefaultIfEmpty()
+    join ques in _dbContext.CrmIScoringQuestion on sc.QuestionId equals ques.QuestionId into QUS
+    from question in QUS.DefaultIfEmpty()
+    orderby a.LeadId descending
+    group new { a, s, ii, zz, pp, cc, user, sc, question } by a.LeadId into grouped
+    select new GetLeadVm
+    {
+        LeadId = grouped.Key,
+        FirstName = grouped.First().a.FirstName,
+        LastName = grouped.First().a.LastName,
+        Email = grouped.First().a.Email,
+        Status = grouped.First().a.Status,
+        StatusTitle = grouped.First().s.StatusTitle,
+        LeadOwner = grouped.First().a.LeadOwner,
+        Mobile = grouped.First().a.Mobile,
+        Work = grouped.First().a.Work,
+        Address = grouped.First().a.Address,
+        Street = grouped.First().a.Street,
+        City = grouped.First().a.City,
+        Zip = grouped.First().a.Zip,
+        State = grouped.First().a.State,
+        Country = grouped.First().a.Country,
+        SourceId = grouped.First().a.SourceId,
+        SourceTitle = grouped.First().zz.SourceTitle,
+        IndustryId = grouped.First().a.IndustryId,
+        IndustryTitle = grouped.First().ii.IndustryTitle,
+        ProductId = grouped.First().a.ProductId,
+        ProductTitle = grouped.First().pp.ProductName,
+        CampaignId = grouped.First().a.CampaignId,
+        CampaignTitle = grouped.First().cc.Title,
+        CreatedDate = grouped.First().a.CreatedDate,
+        ModifiedDate = grouped.First().a.LastModifiedDate,
+        LeadOwnerName = grouped.First().user.FirstName + " " + grouped.First().user.LastName,
+        Rating = grouped.Sum(ls => ls.sc.Rating * ls.question.Weightage) / (grouped.Sum(ls => ls.question.Weightage) == 0 ? 1 : grouped.Sum(ls => ls.question.Weightage)),
+
+    }
+).ToListAsync();
                 return Leads;
+
             }
             catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
         }
-        //public async Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
-        //    {
-        //    try
-        //    {
-        //        List<GetDeletedLeadsVm> dLeads = await (
-        //            from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-        //            join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.Status equals s.StatusId
-        //            join p in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
-        //            from pp in all3.DefaultIfEmpty()
-        //            join c in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.CampaignId equals c.CampaignId into all4
-        //            from cc in all4.DefaultIfEmpty()
-        //            join user in _dbContext.AppUser on a.LeadOwner equals user.Id
-        //            select new GetDeletedLeadsVm
-        //            {
-        //                LeadId = a.LeadId,
-        //                Name = a.FirstName + " " + a.LastName,
-        //                Status = a.Status,
-        //                StatusTitle = s.StatusTitle,
-        //                LeadOwner = a.LeadOwner,
-        //                LeadOwnerName = user.FirstName + " " + user.LastName,
-        //                ProductId = pp.ProductId == null?-1 : pp.ProductId,
-        //                ProductTitle = pp.ProductName,
-        //                CampaignId = cc.CampaignId,
-        //                CampaignTitle = cc.Title,
-        //                CreatedDate = a.CreatedDate
-        //            }).OrderByDescending(a => a.LeadId).ToListAsync();
-
-        //        return dLeads;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new BadRequestException(ex.Message);
-        //    }
-
-        //}
         public async Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id)
         {
             try
@@ -206,7 +239,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         Year = year,
                         Month = g.Key.Month,
                         TotalLeads = g.Count(),
-                        LeadStatusList = new List<GetLeadStatusListVm>() // Initialize an empty list
+                        LeadStatusList = new List<GetLeadStatusListVm>()
                     }
                 ).ToListAsync();
 
@@ -599,7 +632,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 List<GetScoreListVm> LeadStatus = await (from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == -1 || a.TenantId == TenantId && a.IsDeleted == 0)
                                                          join led in _dbContext.CrmLead.Where(a => a.LeadId == LeadId) on a.ProductId equals led.ProductId
-                                                         join ledsc in _dbContext.CrmLeadScore on a.QuestionId equals ledsc.QuestionId into ab
+                                                         join ledsc in _dbContext.CrmLeadScore.Where(a => a.LeadId == LeadId) on   a.QuestionId equals ledsc.QuestionId into ab
                                                          from scor in ab.DefaultIfEmpty()
 
                                                          select new GetScoreListVm
@@ -662,8 +695,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                       .Select(group => new GetCalculateleadScoreListVm
                                       {
                                           LeadId = group.Key,
-                                          Rating = group.Sum(ls => ls.Rating * ls.Weightage) / group.Sum(ls => ls.Weightage),
+                                          Rating = group.Sum(ls => ls.Rating * ls.Weightage) / (group.Sum(ls => ls.Weightage) == 0 ? 1 : group.Sum(ls => ls.Weightage)),
                                       }).FirstOrDefaultAsync();
+                if (groupedLeadStatus == null)
+                {
+                    return new GetCalculateleadScoreListVm
+                    {
+                        LeadId = obj.LeadId,
+                        Rating = 0
+                    };
+                }
 
                 return groupedLeadStatus;
             }

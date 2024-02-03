@@ -25,7 +25,7 @@ namespace ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityRepo
             try
             {
                 List<GetUserActivityReportVm> ActivityReport = new List<GetUserActivityReportVm>();
-                ActivityReport = await _userActivityRepository.GetUserActivityReport(request.Id, request.TenantId);
+                ActivityReport = await _userActivityRepository.GetUserActivityReport(request);
                 return ActivityReport;
             }
             catch(Exception ex)

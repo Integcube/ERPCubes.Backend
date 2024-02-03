@@ -13,10 +13,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport
         public int TotalLeads { get; set; }
         public decimal TotalLeadValue { get; set; }
         public decimal AverageDealValue { get; set; }
-        public int WinLeads { get; set; }
-        public decimal WinRate { get; set; }
-        public int ConvertedLeads { get; set; }
-        public decimal ConversionRate { get; set; }
+        public decimal Percentage { get; set; }
         public decimal ExpectedRevenue { get; set; }
     }
 }

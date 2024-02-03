@@ -11,5 +11,11 @@ namespace ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityRepo
     {
         public string Id {  get; set; } = string.Empty;
         public int TenantId { get; set; }
+        public int ProjectId { get; set; }
+        public int Status { get; set; }
+        public int ProductId { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+
     }
 }

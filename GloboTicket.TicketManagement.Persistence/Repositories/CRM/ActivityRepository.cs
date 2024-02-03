@@ -124,17 +124,44 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new Exception(ex.Message);
             }
         }
-        public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(string Id, int TenantId)
+        public async Task<List<GetUserActivityReportVm>> GetUserActivityReport(GetUserActivityReportQuery obj)
         {
             try
             {
                 var tenantIdParameter = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
                 {
-                    Value = TenantId
+                    Value = obj.TenantId
+                };
+
+                var UserId = new Npgsql.NpgsqlParameter("@p_UserId", NpgsqlTypes.NpgsqlDbType.Varchar)
+                {
+                    Value = obj.Id
+                };
+                var ProjectIdPrm = new Npgsql.NpgsqlParameter("@p_ProjectId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.ProjectId
+                };
+                var Status = new Npgsql.NpgsqlParameter("@Status", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.Status
+                };
+
+                var startDatePrm = new Npgsql.NpgsqlParameter("@SourceId", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = obj.StartDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@EndDate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = obj.EndDate
+                };
+                var ProductId = new Npgsql.NpgsqlParameter("@ProductId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = obj.ProductId
                 };
 
                 var results = await _dbContext.GetCrmUserActivity.FromSqlRaw(
-                    "SELECT * FROM public.calculateleadevent({0})", tenantIdParameter).ToListAsync();
+                    "SELECT * FROM public.calculateleadevent({0},{1},{2},{3},{4},{5})", tenantIdParameter, startDatePrm, endDatePrm,ProductId, ProjectIdPrm, Status )
+                    .ToListAsync();
                 return results;
             }
             catch (Exception ex)
