@@ -13,6 +13,7 @@ namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentL
         public int TenantId { get; set; }
         public int ParentId { get; set; }
         public int ContactTypeId { get; set; }
+        public int ContactId { get; set; }
 
     }
 }

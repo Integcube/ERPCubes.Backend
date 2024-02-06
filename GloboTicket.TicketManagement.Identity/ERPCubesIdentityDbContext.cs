@@ -14,6 +14,7 @@ namespace ERPCubes.Identity
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<SocialUsers> SocialUsers { get; set; }
         public DbSet<SocialUserTokens> SocialUserTokens { get; set; }
+        public DbSet<Tenant> Tenant { get; set; }
 
     }
 }

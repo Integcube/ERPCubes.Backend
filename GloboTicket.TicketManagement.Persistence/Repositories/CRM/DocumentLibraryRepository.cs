@@ -17,7 +17,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public DocumentLibraryRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
         }
-        public async Task<List<GetDocumentLibraryVm>> GetAllList(string Id, int TenantId, int ParentId, int ContactTypeId)
+        public async Task<List<GetDocumentLibraryVm>> GetAllList(string Id, int TenantId, int ParentId, int ContactTypeId, int ContactId)
         {
             try
             {
@@ -25,7 +25,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 List<GetDocumentLibraryVm> documents = await (from a in _dbContext.DocumentLibrary.Where(a => a.IsDeleted == 0
                                                 && a.TenantId == TenantId
                                                 && a.ParentId == ParentId
-                                                && (a.ContactTypeId == ContactTypeId))
+                                                && (a.ContactTypeId == ContactTypeId)
+                                                && (a.Id == ContactId))
                                                               select new GetDocumentLibraryVm
                                                               {
                                                                   FileId = a.FileId,
@@ -34,7 +35,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                   Type = a.Type,
                                                                   Path = a.Path,
                                                                   ParentId = a.ParentId,
-
+                                                                  Size = a.Size,
+                                                                  CreatedBy = a.CreatedBy,
+                                                                  CreatedDate = a.CreatedDate,
                                                               }).ToListAsync();
 
 

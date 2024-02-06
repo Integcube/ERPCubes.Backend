@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Contracts.Facebook
+namespace ERPCubes.Application.Contracts.Persistence.Facebook
 {
     public interface IAsyncSocialRepository
     {

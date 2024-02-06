@@ -1,6 +1,5 @@
 ﻿namespace ERPCubesApi.Models
 {
-
     public class InstagramWebhook
     {
 

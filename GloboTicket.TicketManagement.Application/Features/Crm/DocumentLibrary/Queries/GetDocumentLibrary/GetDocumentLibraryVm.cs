@@ -14,5 +14,8 @@ namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentL
         public string Type { get; set; }
         public string Path { get; set; }
         public int ParentId { get; set; }
+        public decimal Size { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
     }
 }

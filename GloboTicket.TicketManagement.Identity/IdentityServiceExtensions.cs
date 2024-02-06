@@ -1,6 +1,5 @@
-﻿using ERPCubes.Application.Contracts.Facebook;
-using ERPCubes.Application.Contracts.Identity;
-using ERPCubes.Application.Contracts.Persistence.CRM;
+﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.Identity;
 using ERPCubes.Application.Models.Authentication;
 using ERPCubes.Identity.Models;
 using ERPCubes.Identity.Services;
@@ -29,6 +28,7 @@ namespace ERPCubes.Identity
                 .AddEntityFrameworkStores<ERPCubesIdentityDbContext>().AddDefaultTokenProviders();
 
             services.AddTransient<IAuthenticationService, AuthenticationService>();
+
 
             services.AddAuthentication(options =>
             {

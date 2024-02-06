@@ -562,7 +562,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                         StatusId = a.StatusId,
                                                                         StatusTitle = a.StatusTitle,
                                                                         Order = a.Order,
-                                                                        Leads = (from b in _dbContext.CrmLead.Where(b => b.IsDeleted == 0 && b.Status == a.StatusId && a.TenantId == request.TenantId)
+                                                                        Leads = (from b in _dbContext.CrmLead.Where(b => b.Status == a.StatusId && b.IsDeleted == 0 && b.TenantId == request.TenantId)
                                                                                  select new GetStatusWiseLeadsDto
                                                                                  {
                                                                                      LeadId = b.LeadId,
