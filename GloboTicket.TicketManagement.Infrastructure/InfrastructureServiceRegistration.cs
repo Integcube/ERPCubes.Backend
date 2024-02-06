@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Infrastructure;
+﻿using ERPCubes.Application.Contracts.Persistence.Infrastructure;
 using ERPCubes.Application.Models.Mail;
 //using ERPCubes.Infrastructure.FileExport;
 using ERPCubes.Infrastructure.Mail;

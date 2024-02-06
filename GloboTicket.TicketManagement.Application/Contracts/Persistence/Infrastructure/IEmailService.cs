@@ -1,7 +1,7 @@
 ﻿using ERPCubes.Application.Models.Mail;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Contracts.Infrastructure
+namespace ERPCubes.Application.Contracts.Persistence.Infrastructure
 {
     public interface IEmailService
     {

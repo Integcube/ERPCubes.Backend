@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Contracts.Notifications
+namespace ERPCubes.Application.Contracts.Persistence.Notifications
 {
     public interface IAsyncNotificationRepository
     {

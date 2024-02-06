@@ -1,5 +1,5 @@
-﻿using ERPCubes.Application.Contracts.Facebook;
-using ERPCubes.Application.Contracts.Persistence;
+﻿using ERPCubes.Application.Contracts.Persistence;
+using ERPCubes.Application.Contracts.Persistence.Facebook;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using ERPCubes.Application.Features.Facebook.Commands.SaveFacebookUser;

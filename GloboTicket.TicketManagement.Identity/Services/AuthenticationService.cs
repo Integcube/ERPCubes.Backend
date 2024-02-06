@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Identity;
+﻿using ERPCubes.Application.Contracts.Persistence.Identity;
 using ERPCubes.Application.Models.Authentication;
 using ERPCubes.Identity.Models;
 using Microsoft.AspNetCore.Identity;
@@ -16,19 +16,24 @@ namespace ERPCubes.Identity.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtSettings _jwtSettings;
-
+        private readonly ERPCubesIdentityDbContext _dbContext;
         public AuthenticationService(UserManager<ApplicationUser> userManager,
             IOptions<JwtSettings> jwtSettings,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+        ERPCubesIdentityDbContext dbContext)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings.Value;
             _signInManager = signInManager;
+            _dbContext = dbContext;
         }
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email.ToLower() == request.Email.ToLower());
+            var user = await (from a in _userManager.Users.Where(u => (u.UserName.ToLower() == request.Email.ToLower() || u.Email.ToLower() == request.Email.ToLower()) && u.IsActive == 1)
+                              join t in _dbContext.Tenant.Where(a => a.Subdomain == request.Subdomain) on a.TenantId equals t.TenantId
+                              select a).FirstOrDefaultAsync();
+            //var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email == request.Email);
 
             if (user == null)
             {

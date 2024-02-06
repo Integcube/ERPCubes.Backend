@@ -1,8 +1,9 @@
-﻿using ERPCubes.Application.Contracts.Facebook;
-using ERPCubes.Application.Contracts.Notifications;
-using ERPCubes.Application.Contracts.Persistence;
+﻿using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.Facebook;
+using ERPCubes.Application.Contracts.Persistence.Notifications;
 using ERPCubes.Application.Contracts.Persistence.Social.Webhooks;
+using ERPCubes.Application.Contracts.Persistence.TenantChecker;
 using ERPCubes.Persistence.Repositories;
 using ERPCubes.Persistence.Repositories.CRM;
 using ERPCubes.Persistence.Repositories.Social;
@@ -47,6 +48,8 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncWebhookRepository, WebhookRepository>();
             services.AddScoped<IAsyncTicketRepository, TicketRepository>();
             services.AddScoped<IAsyncDocumentLibraryRepository, DocumentLibraryRepository>();
+            services.AddScoped<IAsyncTenantRepository, TenantRepository>();
+            services.AddScoped<IAsyncChatbotRepository, ChatbotRepository>();
             return services;    
         }
     }

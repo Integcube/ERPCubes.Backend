@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Notifications;
+﻿using ERPCubes.Application.Contracts.Persistence.Notifications;
 using ERPCubes.Application.Features.Notification.Commands.SaveNotification;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;

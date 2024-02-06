@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Facebook;
+﻿using ERPCubes.Application.Contracts.Persistence.Facebook;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Facebook.Commands.SaveFacebookUser;
 using MediatR;

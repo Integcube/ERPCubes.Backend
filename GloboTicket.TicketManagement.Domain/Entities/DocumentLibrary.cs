@@ -19,8 +19,7 @@ namespace ERPCubes.Domain.Entities
         public int ParentId { get; set; }
         public int Id { get; set; }
         public int TenantId { get; set; }
-
         public int ContactTypeId { get; set; }
-
+        public decimal Size { get; set; }
     }
 }

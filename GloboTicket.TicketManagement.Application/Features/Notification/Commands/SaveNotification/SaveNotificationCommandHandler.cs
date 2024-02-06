@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using ERPCubes.Application.Contracts.Notifications;
 using ERPCubes.Application.Contracts.Persistence.CRM;
+using ERPCubes.Application.Contracts.Persistence.Notifications;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
 using MediatR;

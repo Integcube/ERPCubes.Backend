@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Identity;
+﻿using ERPCubes.Application.Contracts.Persistence.Identity;
 using ERPCubes.Application.Models.Authentication;
 using Microsoft.AspNetCore.Mvc;
 

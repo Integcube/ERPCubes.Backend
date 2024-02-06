@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Text;
+using static ERPCubesApi.Models.WhatsappWebhook;
 
 namespace ERPCubesApi.Controllers
 {
@@ -64,6 +65,26 @@ namespace ERPCubesApi.Controllers
                 return StatusCode(500, "An error occurred while processing the Instagram webhook");
             }
         }
+        [HttpPost("whatsapp")]
+        public async Task<IActionResult> HandleWhatsAppWebhook([FromQuery(Name = "tenantId")] string tenantId)
+        {
+            try
+            {
+                using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+                {
+                    string body = await reader.ReadToEndAsync();
+                    WhatsAppWebhook whatsappWebhook = JsonConvert.DeserializeObject<WhatsAppWebhook>(body);
 
+
+
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing WhatsApp webhook: {ex.Message}");
+                return StatusCode(500, "An error occurred while processing the WhatsApp webhook");
+            }
+        }
     }
 }

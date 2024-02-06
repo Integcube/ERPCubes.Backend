@@ -25,7 +25,7 @@ namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentL
             try
             {
                 List<GetDocumentLibraryVm> documents = new List<GetDocumentLibraryVm>();
-                documents = await _documentlRepository.GetAllList(request.Id, request.TenantId, request.ParentId, request.ContactTypeId);
+                documents = await _documentlRepository.GetAllList(request.Id, request.TenantId, request.ParentId, request.ContactTypeId, request.ContactId);
                 return documents;
             }
             catch (Exception ex)

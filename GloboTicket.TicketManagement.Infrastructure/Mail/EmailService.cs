@@ -1,4 +1,4 @@
-﻿using ERPCubes.Application.Contracts.Infrastructure;
+﻿using ERPCubes.Application.Contracts.Persistence.Infrastructure;
 using ERPCubes.Application.Models.Mail;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

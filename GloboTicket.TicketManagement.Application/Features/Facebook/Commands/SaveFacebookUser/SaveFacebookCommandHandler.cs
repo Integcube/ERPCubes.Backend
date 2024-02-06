@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using ERPCubes.Application.Contracts.Facebook;
 using ERPCubes.Application.Contracts.Persistence;
+using ERPCubes.Application.Contracts.Persistence.Facebook;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
 using ERPCubes.Domain.Entities;
