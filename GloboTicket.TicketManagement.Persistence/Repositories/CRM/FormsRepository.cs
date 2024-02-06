@@ -28,7 +28,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 DateTime localDateTime = DateTime.Now;
 
                 List<GetFieldTypesVm> obj = await (
-                            from a in _dbContext.CrmFieldTypes
+                            from a in _dbContext.CrmFormFieldTypes
                             .Where(a => a.IsDeleted == 0)
                             select new GetFieldTypesVm
                             {

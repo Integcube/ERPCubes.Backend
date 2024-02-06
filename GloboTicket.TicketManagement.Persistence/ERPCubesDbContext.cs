@@ -74,14 +74,13 @@ namespace ERPCubes.Persistence
         public DbSet<Notification> Notification { get; set; }
         public DbSet<CrmForm> CrmForm { get; set; }
         public DbSet<CrmFormFields> CrmFormFields { get; set; }
-        public DbSet<CrmFieldTypes> CrmFieldTypes { get; set; }
+        public DbSet<CrmFormFieldTypes> CrmFormFieldTypes { get; set; }
         public DbSet<CrmFormResults> CrmFormResults { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
         public DbSet<Conversation> Conversation { get; set; }
         public DbSet<TicketPriority> TicketPriority { get; set; }
         public DbSet<TicketStatus> TicketStatus { get; set; }
         public DbSet<TicketType> TicketType { get; set; }
-
         public DbSet<DocumentLibrary> DocumentLibrary { get; set; }
         public DbSet<CrmLeadScore> CrmLeadScore { get; set; }
 

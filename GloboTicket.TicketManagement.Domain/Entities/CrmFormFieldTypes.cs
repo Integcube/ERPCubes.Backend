@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    public class CrmFieldTypes: AuditableEntity
+    public class CrmFormFieldTypes: AuditableEntity
     {
         [Key]
         public int TypeId { get; set; }
