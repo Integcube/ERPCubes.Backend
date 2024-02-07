@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveForm;
+﻿using ERPCubes.Application.Features.Crm.Call.Commands.Delete;
+using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveForm;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormFields;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormResult;
 using ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFieldTypes;
@@ -16,5 +17,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task SaveForm(SaveFormCommand request);
         Task SaveFormFields(SaveFormFieldsCommand request);
         Task SaveFormResult(SaveFormResultCommand request);
+        Task Delete(DeleteCommand request);
+        
     }
 }

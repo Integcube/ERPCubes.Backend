@@ -10,7 +10,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead
     public class SaveLeadCommand:IRequest
     {
         public int TenantId { get; set; }
-        public string Id { get; set; } = String.Empty;
+        public string Id { get; set; } 
         public SaveLeadDto Lead {  get; set; } = new SaveLeadDto();
     }
 }

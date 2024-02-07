@@ -1,5 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Call.Commands.Delete;
+using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveForm;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormFields;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormResult;
@@ -245,5 +247,29 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
+
+        public async Task Delete(DeleteCommand callId)
+        {
+            try
+            {
+                var deleteCall = await (from a in _dbContext.CrmForm.Where(a => a.FormId == callId.FormId)
+                                        select a).FirstOrDefaultAsync();
+                if (deleteCall == null)
+                {
+                    throw new NotFoundException("callId", callId);
+                }
+                else
+                {
+                    deleteCall.IsDeleted = 1;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
     }
 }

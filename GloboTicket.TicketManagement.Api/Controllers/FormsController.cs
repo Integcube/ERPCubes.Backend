@@ -1,4 +1,6 @@
-﻿using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
+﻿using ERPCubes.Application.Features.Crm.Call.Commands.Delete;
+using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
+using ERPCubes.Application.Features.Crm.Email.Queries.GetEmailList;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveForm;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormFields;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormResult;
@@ -67,6 +69,16 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> SaveFormResult(SaveFormResultCommand saveFormResult)
         {
             var dtos = await _mediator.Send(saveFormResult);
+            return Ok(dtos);
+        }
+
+
+        [HttpPost("delete", Name = "Delete")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Delete(DeleteCommand delete)
+        {
+            var dtos = await _mediator.Send(delete);
             return Ok(dtos);
         }
     }

@@ -30,7 +30,7 @@ namespace ERPCubes.Identity.Services
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await (from a in _userManager.Users.Where(u => (u.UserName.ToLower() == request.Email.ToLower() || u.Email.ToLower() == request.Email.ToLower()) && u.IsActive == 1)
+            var user = await (from a in _userManager.Users.Where(u => (u.UserName.ToLower() == request.Email.ToLower() || u.Email.ToLower() == request.Email.ToLower()) && u.IsActive ==0)
                               join t in _dbContext.Tenant.Where(a => a.Subdomain == request.Subdomain) on a.TenantId equals t.TenantId
                               select a).FirstOrDefaultAsync();
             //var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email == request.Email);

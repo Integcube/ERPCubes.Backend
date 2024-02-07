@@ -33,6 +33,8 @@ namespace ERPCubes.Api
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
+
+
             //builder.Services.AddCors(options =>
             //{
             //    options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
@@ -41,14 +43,24 @@ namespace ERPCubes.Api
             //                                                .AllowAnyMethod()
             //                                                .AllowCredentials());
             //});
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
-                                                            .WithOrigins("http://127.0.0.1:5501")
+                                                            .WithOrigins("http://*.localhost:4200/")
                                                             .AllowAnyHeader()
                                                             .AllowAnyMethod()
                                                             .AllowCredentials());
             });
+
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
+            //                                                .WithOrigins("http://127.0.0.1:5501")
+            //                                                .AllowAnyHeader()
+            //                                                .AllowAnyMethod()
+            //                                                .AllowCredentials());
+            //});
 
 
             builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
