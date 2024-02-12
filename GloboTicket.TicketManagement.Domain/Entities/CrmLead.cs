@@ -31,6 +31,7 @@ namespace ERPCubes.Domain.Entities
         public int IndustryId { get; set; }
         public int ProductId { get; set; }
         public string CampaignId { get; set; } = string.Empty;
-        public string DeletedBy {  get; set; } = string.Empty;
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }

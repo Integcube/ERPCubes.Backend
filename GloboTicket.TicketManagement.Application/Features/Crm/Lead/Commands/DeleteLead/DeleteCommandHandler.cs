@@ -24,11 +24,11 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead
         {
             try
             {
-                await _leadRepository.DeleteLead(request.Id, request.TenantId, request.LeadId, request.Name);
+                await _leadRepository.DeleteLead(request);
             }
             catch(Exception ex)
             {
-                _logger.LogError($"Deleting lead {request.Name} failed due to : {ex.Message}");
+                _logger.LogError($"Deleting lead {request.LeadId} failed due to : {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
             return Unit.Value;
