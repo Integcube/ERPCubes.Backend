@@ -5,6 +5,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
@@ -12,6 +13,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
@@ -183,6 +185,20 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> RestoreBulkLead(RestoreBulkLeadCommand restore)
         {
             var dtos = await _mediator.Send(restore);
+
+        [HttpPost("getQuestions", Name = "GetLeadScoreQuestions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadScoreQuestions(GetLeadScoreQuestionsQuery obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
+        [HttpPost("saveQuestions", Name = "SaveLeadScoreQuestions")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> SaveLeadScoreQuestions(SaveLeadScoreQuestionsCommand obj)
+        {
+            var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
     }
