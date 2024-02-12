@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ERPCubes.Identity", "GloboT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ERPCubesApi", "GloboTicket.TicketManagement.Api\ERPCubesApi.csproj", "{041CBA37-647B-4606-9D41-76255D2A6BD7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "File Management Project", "File Management Project", "{06875A92-4B82-488B-9473-7DA6F50767A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileServer", "FileServer\FileServer.csproj", "{98491C14-455E-4716-A666-5CEAEB3DBC63}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,10 @@ Global
 		{041CBA37-647B-4606-9D41-76255D2A6BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{041CBA37-647B-4606-9D41-76255D2A6BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{041CBA37-647B-4606-9D41-76255D2A6BD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98491C14-455E-4716-A666-5CEAEB3DBC63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98491C14-455E-4716-A666-5CEAEB3DBC63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98491C14-455E-4716-A666-5CEAEB3DBC63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98491C14-455E-4716-A666-5CEAEB3DBC63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,5 +75,6 @@ Global
 		{35A62C76-606D-4F4A-9AC4-E981FE1E92D9} = {F84D790F-CDAE-47D4-9A36-DE1D67903915}
 		{D9C3C9C2-D294-4FF3-B458-7089B424837E} = {F84D790F-CDAE-47D4-9A36-DE1D67903915}
 		{041CBA37-647B-4606-9D41-76255D2A6BD7} = {F1CDF616-2596-4754-90A0-00E53424B183}
+		{98491C14-455E-4716-A666-5CEAEB3DBC63} = {06875A92-4B82-488B-9473-7DA6F50767A2}
 	EndGlobalSection
 EndGlobal

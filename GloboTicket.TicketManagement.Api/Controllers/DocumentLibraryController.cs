@@ -1,8 +1,12 @@
 ﻿
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
+using ERPCubes.Identity.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Text;
 
 namespace ERPCubesApi.Controllers
 {
@@ -10,13 +14,15 @@ namespace ERPCubesApi.Controllers
     [ApiController]
     public class DocumentLibraryController : ControllerBase
     {
-
+        
         private readonly IMediator _mediator;
-        //private readonly HttpClient _httpClient;
-        public DocumentLibraryController(IMediator mediator)
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<DocumentLibraryController> _logger;
+        public DocumentLibraryController(IMediator mediator,IConfiguration configuration, ILogger<DocumentLibraryController> logger)
         {
             _mediator = mediator;
-            //_httpClient = httpClientFactory.CreateClient();
+            _configuration = configuration;
+            _logger = logger;
         }
 
         [HttpPost("all", Name = "GetAllDocuments")]
@@ -26,62 +32,83 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(getDocument);
             return Ok(dtos);
         }
+        [HttpPost("SaveFile")]
+        public async Task<IActionResult> SaveFile(IFormFile file, int tenantId)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("Invalid file");
+                }
 
-        //[HttpPost("SaveFile")]
-        //public async Task<IActionResult> SaveFile(IFormFile file, string tenantId)
-        //{
-        //    try
-        //    {
-        //        if (file == null || file.Length == 0)
-        //        {
-        //            return BadRequest("Invalid file");
-        //        }
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    byte[] fileBytes = memoryStream.ToArray();
 
-        //        // Convert file to byte array
-        //        using (var memoryStream = new MemoryStream())
-        //        {
-        //            await file.CopyToAsync(memoryStream);
-        //            byte[] fileBytes = memoryStream.ToArray();
+                    var directApiBaseUrl = _configuration["AppSettings:FileServerUrl"];
+                    if (directApiBaseUrl == null)
+                    {
+                        _logger.LogError("AppSettings:FileServerUrl is not configured.");
+                        return BadRequest("Internal server error.");
+                    }
 
-        //            // Serialize file bytes into JSON
-        //            string json = JsonSerializer.Serialize(fileBytes);
+                    var saveFileUrl = $"{directApiBaseUrl}/api/FileManagment/savefile?tenantId={tenantId}";
 
-        //            // Send file bytes to the endpoint
-        //            var response = await _httpClient.PostAsync("https://localhost:7046/FileServer/SaveFile", new StringContent(json));
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        using (var formData = new MultipartFormDataContent())
+                        {
+                            var fileContent = new ByteArrayContent(fileBytes);
+                            formData.Add(fileContent, "file", file.FileName);
+                            var saveFileResponse = await httpClient.PostAsync(saveFileUrl, formData);
+                            saveFileResponse.EnsureSuccessStatusCode();
+                            var responseContent = await saveFileResponse.Content.ReadAsStringAsync();
 
-        //            response.EnsureSuccessStatusCode(); // Ensure successful response
+                            return Ok(responseContent);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error during file upload: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
-        //            return Ok("File saved successfully.");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {ex.Message}");
-        //    }
-        //}
 
 
-        //[HttpGet("ReturnFile")]
-        //public async Task<IActionResult> ReturnFile(string filePath)
-        //{
-        //    try
-        //    {
-        //        var response = await _httpClient.GetAsync($"/FileServer/ReturnFile?filePath={filePath}");
 
-        //        if (!response.IsSuccessStatusCode)
-        //        {
-        //            return StatusCode((int)response.StatusCode, response.ReasonPhrase);
-        //        }
+        [HttpGet("getfile")]
+        public async Task<IActionResult> ReturnFile(string filePath)
+        {
+            try
+            {
+                var saveFileUrl = $"{_configuration["AppSettings:FileServerUrl"]}/api/FileManagment/getfile?filePath={Uri.EscapeDataString(filePath)}";
+               
 
-        //        var fileBytes = await response.Content.ReadAsByteArrayAsync();
-        //        var fileStream = new MemoryStream(fileBytes);
+                using (HttpClient httpClient = new HttpClient())
+                 {
+                    var response = await httpClient.GetAsync(saveFileUrl);
+                    response.EnsureSuccessStatusCode();
 
-        //        return File(fileStream, "application/octet-stream", Path.GetFileName(filePath));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {ex.Message}");
-        //    }
-        //}
+                    var fileBytes = await response.Content.ReadAsByteArrayAsync();
+                    var fileStream = new MemoryStream(fileBytes);
+
+                    return File(fileStream, "application/octet-stream", Path.GetFileName(filePath));
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Unexpected error: {ex.Message}");
+            }
+        }
+
     }
 }
