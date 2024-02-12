@@ -703,8 +703,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
-        
-        public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+            public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
         {
             try
             {

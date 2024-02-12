@@ -184,7 +184,9 @@ namespace ERPCubesApi.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> RestoreBulkLead(RestoreBulkLeadCommand restore)
         {
-            var dtos = await _mediator.Send(restore);
+            await _mediator.Send(restore);
+            return Ok(0);
+        }
 
         [HttpPost("getQuestions", Name = "GetLeadScoreQuestions")]
         [ProducesResponseType(StatusCodes.Status200OK)]
