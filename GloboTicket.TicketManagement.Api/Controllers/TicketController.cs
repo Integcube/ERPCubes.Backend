@@ -26,12 +26,13 @@ namespace ERPCubesApi.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IHubContext<TicketHub> _hubContext;
+        private readonly IHubContext<ChatHub> _chatHubContext;
 
-        public TicketController(IMediator mediator, IHubContext<TicketHub> hubContext)
+        public TicketController(IMediator mediator, IHubContext<TicketHub> hubContext, IHubContext<ChatHub> chatHubContext)
         {
             _mediator = mediator;
             _hubContext = hubContext;
-
+            _chatHubContext = chatHubContext;
         }
         [HttpPost("allTickets", Name = "GetAllTickets")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -59,6 +60,7 @@ namespace ERPCubesApi.Controllers
         {
             var message = await _mediator.Send(ticket);
             await _hubContext.Clients.All.SendAsync("ReceiveNewTicket", message);
+
 
         }
         [HttpPost("getPriority", Name = "GetPriority")]

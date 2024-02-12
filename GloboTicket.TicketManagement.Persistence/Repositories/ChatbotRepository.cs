@@ -58,7 +58,7 @@ namespace ERPCubes.Persistence.Repositories
                     {
                         Ticket ticket = new Ticket
                         {
-                            SocialMediaPlatform = "Instagram",
+                            SocialMediaPlatform = "Chatbot",
                             CustomerId = request.BrowserId,
                             Timestamp = DateTime.Now.ToUniversalTime(),
                             Status = -1,
@@ -69,7 +69,7 @@ namespace ERPCubes.Persistence.Repositories
                             ResolutionStatus = null,
                             DueDate = DateTime.Now.ToUniversalTime(),
                             Notes = null,
-                            CreatedBy = "InstagramWebhook",
+                            CreatedBy = "Chatbot",
                             CreatedDate = DateTime.Now.ToUniversalTime(),
                             LastModifiedBy = null,
                             LastModifiedDate = null,

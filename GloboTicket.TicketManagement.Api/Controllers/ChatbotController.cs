@@ -16,11 +16,13 @@ namespace ERPCubesApi.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IHubContext<TicketHub> _hubContext;
+        private readonly IHubContext<ChatHub> _chatHubContext;
 
-        public ChatbotController(IMediator mediator, IHubContext<TicketHub> hubContext)
+        public ChatbotController(IMediator mediator, IHubContext<TicketHub> hubContext, IHubContext<ChatHub> chatHubContext)
         {
             _mediator = mediator;
             _hubContext = hubContext;
+            _chatHubContext = chatHubContext;
         }
         [HttpPost("all", Name = "GetAllConversation")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -30,7 +32,6 @@ namespace ERPCubesApi.Controllers
             return Ok(dto);
         }
         [HttpPost("save", Name = "SaveConversation")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<GetCbConversationVm>> SaveConversation(SaveCbConversationCommand saveConversation)
         {
             var dto = await _mediator.Send(saveConversation);

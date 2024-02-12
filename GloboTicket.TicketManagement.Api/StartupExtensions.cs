@@ -30,41 +30,19 @@ namespace ERPCubes.Api
             //builder.Services.AddScoped<FileServerService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers().AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-    });
-
-
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
-            //                                                .WithOrigins("https://*.myquantus.com")
-            //                                                .AllowAnyHeader()
-            //                                                .AllowAnyMethod()
-            //                                                .AllowCredentials());
-            //});
-
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            });
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
-                                                            .WithOrigins("http://*.localhost:4200/")
-                                                            .AllowAnyHeader()
-                                                            .AllowAnyMethod()
-                                                            .AllowCredentials());
+                options.AddPolicy("Open", builder => builder
+        .SetIsOriginAllowed(_ => true)
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials());
             });
 
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("Open", builder => builder.SetIsOriginAllowedToAllowWildcardSubdomains()
-            //                                                .WithOrigins("http://127.0.0.1:5501")
-            //                                                .AllowAnyHeader()
-            //                                                .AllowAnyMethod()
-            //                                                .AllowCredentials());
-            //});
-
-
             builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
-            //builder.Services.AddHttpClient();
 
             return builder.Build();
 
@@ -93,18 +71,11 @@ namespace ERPCubes.Api
 
             app.UseAuthorization();
 
-            //var supportedCultures = new[] { "en", "ur", "es" };
-            //app.UseRequestLocalization(options =>
-            //{
-            //    options.AddSupportedCultures(supportedCultures)
-            //    .AddSupportedUICultures(supportedCultures)
-            //    .SetDefaultCulture("en");
-            //}
-            //    );
 
             app.MapControllers();
 
             app.MapHub<TicketHub>("/ticketHub").RequireCors("Open");
+            //app.MapHub<ChatHub>("/chatHub").RequireCors("Open");
 
             return app;
 
