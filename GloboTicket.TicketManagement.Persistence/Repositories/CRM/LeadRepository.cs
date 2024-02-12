@@ -26,6 +26,10 @@ using MediatR;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using System.Linq;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -35,20 +39,24 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public async Task DeleteLead(string Id, int TenantId, int LeadId, string Name)
+        public async Task DeleteLead(DeleteLeadCommand leadId)
         {
             try
             {
-                CrmLead? Lead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == LeadId)
-                                       select a
-                                           ).FirstOrDefaultAsync();
-                if (Lead == null)
+                DateTime localDateTime = DateTime.Now;
+                var deleteLead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == leadId.LeadId)
+                                           select a).FirstOrDefaultAsync();
+                if (deleteLead == null)
                 {
-                    throw new NotFoundException(Name, LeadId);
+                    throw new NotFoundException("leadId", leadId);
                 }
+
+
                 else
                 {
-                    Lead.IsDeleted = 1;
+                    deleteLead.DeletedBy = leadId.Id;
+                    deleteLead.DeletedDate = localDateTime.ToUniversalTime();
+                    deleteLead.IsDeleted = 1;
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -432,34 +440,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        //public async Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request)
-        //{
-        //    try
-        //    {
-        //        DateTime localDateTime = DateTime.Now;
-        //        foreach (var Lead in request.deletedleads)
-        //        {
-        //            var deletedLead = await (
-        //                from a in _dbContext.CrmLead.Where(lead => lead.TenantId == request.TenantId && lead.IsDeleted == 1 && lead.LeadId == Lead.LeadId) select a)?.FirstOrDefaultAsync();
-        //            if (deletedLead == null)
-        //            {
-        //                throw new NotFoundException(request.Id, Lead.LeadId);
-        //            }
-        //            else
-        //            {
-        //                deletedLead.IsDeleted = 0;
-        //                deletedLead.LastModifiedBy = request.Id;
-        //                deletedLead.LastModifiedDate = localDateTime.ToUniversalTime();
-        //                await _dbContext.SaveChangesAsync();
-        //            }
-        //        }
-
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new BadRequestException(e.Message);
-        //    }
-        //}
+        public async Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request)
+        {
+            try
+            {
+                var deleteProduct = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == request.LeadId)
+                                           select a).FirstOrDefaultAsync();
+                if (deleteProduct == null)
+                {
+                    throw new NotFoundException("leadId", request);
+                }
+                else
+                {
+                    deleteProduct.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
 
         public async Task<List<GetleadPiplineReportVm>> GetleadPiplineReport(GetleadPiplineReportQuery obj)
         {
@@ -565,14 +566,26 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
+        public async Task<List<GetDeletedLeadsVm>> GetDeletedLeads(int TenantId, string Id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                List<GetDeletedLeadsVm> detail = await(from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedLeadsVm
+                                                                {
+                                                                    LeadId = a.LeadId,
+                                                                    FirstName = a.FirstName,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.FirstName).ToListAsync();
+                return detail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
         public async Task<List<GetScoreListVm>> GetleadScoreList(int TenantId, int LeadId)
@@ -663,6 +676,32 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
 
 
+        }
+
+        public async Task RestoreBulkLead(RestoreBulkLeadCommand command)
+        {
+            try
+            {
+                foreach (var leadId in command.LeadId)
+                {
+                    var lead = await _dbContext.CrmLead
+                        .Where(p => p.LeadId == leadId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (lead == null)
+                    {
+                        throw new NotFoundException(nameof(leadId), leadId);
+                    }
+
+                    lead.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
     }
 }

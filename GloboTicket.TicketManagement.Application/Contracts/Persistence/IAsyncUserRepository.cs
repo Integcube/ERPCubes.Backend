@@ -1,6 +1,12 @@
-﻿using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
+﻿using ERPCubes.Application.Features.AppUser.Commands.BulkRestoreUser;
+using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
+using ERPCubes.Application.Features.AppUser.Commands.RestoreUser;
 using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
+using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
+using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +20,10 @@ namespace ERPCubes.Application.Contracts.Persistence
         Task<List<GetUserListVm>> GetUserList(int TenantId, string Id);
         Task UpdateUser(UpdateUserCommand updateUser);
         Task DeleteUser(DeleteUserCommand cm);
-        
+        Task<List<GetDeletedUserListVm>> GetDeletedUsers(int TenantId, string Id);
+        Task RestoreUser(RestoreUserCommand user);
+        Task RestoreBulkUser(RestoreBulkUserCommand user);
+
+
     }
 }

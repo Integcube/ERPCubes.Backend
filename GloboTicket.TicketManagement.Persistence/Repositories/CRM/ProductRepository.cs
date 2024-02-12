@@ -135,29 +135,32 @@ namespace ERPCubes.Persistence.Repositories.CRM
         }
 
         public async Task<List<GetDeletedProductVm>> GetDeletedProducts(int TenantId, string Id)
-        {         
-                try
-                {
-                    List<GetDeletedProductVm> productDetail = await (from a in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-                                                              select new GetDeletedProductVm
-                                                              {
-                                                                  ProductId = a.ProductId,
-                                                                  ProductName = a.ProductName,
-                                                              }).OrderBy(a => a.ProductName).ToListAsync();
-                    return productDetail;
-                }
-                catch (Exception ex)
-                {
-                    throw new BadRequestException(ex.Message);
-                }
+        {
+            try
+            {
+                List<GetDeletedProductVm> productDetail = await (from a in _dbContext.CrmProduct.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                 join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                 select new GetDeletedProductVm
+                                                                 {
+                                                                     ProductId = a.ProductId,
+                                                                     ProductName = a.ProductName,
+                                                                     DeletedBy = user.FirstName + " " + user.LastName,
+                                                                     DeletedDate = a.DeletedDate,
+                                                                 }).OrderBy(a => a.ProductName).ToListAsync();
+                return productDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
         public async Task RestoreProduct(RestoreProductCommand productId)
         {
             try
             {
-                var deleteProduct = await(from a in _dbContext.CrmProduct.Where(a => a.ProductId == productId.ProductId)
-                                          select a).FirstOrDefaultAsync();
+                var deleteProduct = await (from a in _dbContext.CrmProduct.Where(a => a.ProductId == productId.ProductId)
+                                           select a).FirstOrDefaultAsync();
                 if (deleteProduct == null)
                 {
                     throw new NotFoundException("productId", productId);
@@ -181,7 +184,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 foreach (var productId in command.ProductId)
                 {
                     var product = await _dbContext.CrmProduct
-                        .Where(p => p.ProductId == productId && p.IsDeleted == 1) 
+                        .Where(p => p.ProductId == productId && p.IsDeleted == 1)
                         .FirstOrDefaultAsync();
 
                     if (product == null)
@@ -189,7 +192,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         throw new NotFoundException(nameof(productId), productId);
                     }
 
-                    product.IsDeleted = 0; 
+                    product.IsDeleted = 0;
                 }
 
                 await _dbContext.SaveChangesAsync();

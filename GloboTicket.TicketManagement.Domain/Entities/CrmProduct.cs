@@ -17,5 +17,7 @@ namespace ERPCubes.Domain.Entities
         public decimal Price { get; set; }
         public int ProjectId {  get; set; }
         public int TenantId { get; set; }
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }
