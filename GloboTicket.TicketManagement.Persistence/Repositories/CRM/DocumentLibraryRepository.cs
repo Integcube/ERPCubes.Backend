@@ -24,9 +24,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                 List<GetDocumentLibraryVm> documents = await (from a in _dbContext.DocumentLibrary.Where(a => a.IsDeleted == 0
                                                 && a.TenantId == TenantId
-                                                && a.ParentId == ParentId
+                                                && (a.ParentId == ParentId || a.FileId == ParentId)
                                                 && (a.ContactTypeId == ContactTypeId)
                                                 && (a.Id == ContactId))
+                                                join b in _dbContext.AppUser on a.CreatedBy equals b.Id
+                                                              join c in _dbContext.AppUser on a.LastModifiedBy equals c.Id into all
+                                                              from cc in all.DefaultIfEmpty()
                                                               select new GetDocumentLibraryVm
                                                               {
                                                                   FileId = a.FileId,
@@ -36,8 +39,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                   Path = a.Path,
                                                                   ParentId = a.ParentId,
                                                                   Size = a.Size,
-                                                                  CreatedBy = a.CreatedBy,
+                                                                  CreatedBy = b.FirstName + b.LastName,
                                                                   CreatedDate = a.CreatedDate,
+                                                                  ModifiedBy = cc.FirstName + cc.LastName,
+                                                                  ModifiedDate = a.LastModifiedDate,
                                                               }).ToListAsync();
 
 

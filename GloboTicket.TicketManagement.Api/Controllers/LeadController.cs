@@ -1,9 +1,11 @@
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
@@ -11,6 +13,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
@@ -175,7 +178,6 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
-<<<<<<< Updated upstream
         [HttpPost("restoreBulkLead", Name = "RestoreBulkLeads")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -200,8 +202,6 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
-=======
-        
->>>>>>> Stashed changes
+
     }
 }
