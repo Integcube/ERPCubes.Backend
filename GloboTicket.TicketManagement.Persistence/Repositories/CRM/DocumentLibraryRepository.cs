@@ -39,9 +39,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                   Path = a.Path,
                                                                   ParentId = a.ParentId,
                                                                   Size = a.Size,
-                                                                  CreatedBy = b.FirstName + b.LastName,
+                                                                  CreatedBy = b.FirstName +" "+ b.LastName,
                                                                   CreatedDate = a.CreatedDate,
-                                                                  ModifiedBy = cc.FirstName + cc.LastName,
+                                                                  ModifiedBy = cc.FirstName + " " + cc.LastName,
                                                                   ModifiedDate = a.LastModifiedDate,
                                                               }).ToListAsync();
 
