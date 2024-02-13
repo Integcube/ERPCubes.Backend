@@ -30,7 +30,7 @@ using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
-using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 
 namespace ERPCubes.Persistence.Repositories.CRM
@@ -707,12 +707,12 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new Exception(ex.Message);
             }
         }
-            public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
+        public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
         {
             try
             {
-                var scores = await(
-                    from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == TenantId && a.ProductId == ProductId)
+                var questions = await(
+                    from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.ProductId == ProductId)
                     select new GetLeadScoreQuestionsVm
                     {
                         QuestionId = a.QuestionId,
@@ -721,56 +721,69 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         Order = a.Order,
                         ProductId = a.ProductId,
                         Weightage = a.Weightage,
+                        CreatedDate = a.CreatedDate,
                         TenantId = a.TenantId,
-                    }).ToListAsync();
-                return scores;
+                    }).OrderBy(a=>a.CreatedDate).ToListAsync();
+                return questions;
             }
             catch(Exception ex)
             {
                 throw new Exception(ex.Message);
             }
-
         }
 
-        public async Task SaveLeadScoreQuestions(SaveLeadScoreQuestionsCommand request)
+        public async Task SaveLeadScoreQuestion(SaveLeadScoreQuestionCommand request)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
-                foreach (var question in request.Questions)
+                if(request.Question.QuestionId == -1)
                 {
-                    if(question.QuestionId == -1)
-                    {
-                        CrmIScoringQuestion NewQuestion = new CrmIScoringQuestion();
-                        NewQuestion.TenantId = request.TenantId;
-                        NewQuestion.Title = question.Title;
-                        NewQuestion.Code = question.Code;
-                        NewQuestion.Order = question.Order;
-                        NewQuestion.ProductId = question.ProductId;
-                        NewQuestion.Weightage = question.Weightage;
-                        NewQuestion.CreatedBy = request.Id;
-                        NewQuestion.CreatedDate = localDateTime.ToUniversalTime();
-                        await _dbContext.AddAsync(NewQuestion);
-                        await _dbContext.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        CrmIScoringQuestion existingQuestion = await(
-                            from q in _dbContext.CrmIScoringQuestion.Where(q => q.TenantId == request.TenantId && q.QuestionId == question.QuestionId)
-                            select q).FirstOrDefaultAsync();
-                        existingQuestion.Title = question.Title;
-                        existingQuestion.Code = question.Code;
-                        existingQuestion.Order = question.Order;
-                        existingQuestion.Weightage = question.Weightage;
-                        existingQuestion.LastModifiedBy = request.Id;
-                        existingQuestion.LastModifiedDate = localDateTime.ToUniversalTime();
-                        await _dbContext.SaveChangesAsync();
-                    }
+                    CrmIScoringQuestion NewQuestion = new CrmIScoringQuestion();
+                    NewQuestion.TenantId = request.TenantId;
+                    NewQuestion.Title = request.Question.Title;
+                    NewQuestion.Code = request.Question.Code;
+                    NewQuestion.Order = request.Question.Order;
+                    NewQuestion.ProductId = request.Question.ProductId;
+                    NewQuestion.Weightage = request.Question.Weightage;
+                    NewQuestion.CreatedBy = request.Id;
+                    NewQuestion.CreatedDate = localDateTime.ToUniversalTime();
+                    await _dbContext.AddAsync(NewQuestion);
+                    await _dbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    CrmIScoringQuestion existingQuestion = await(
+                        from q in _dbContext.CrmIScoringQuestion.Where(q => q.TenantId == request.TenantId && q.QuestionId == request.Question.QuestionId)
+                        select q).FirstOrDefaultAsync();
+                    existingQuestion.Title = request.Question.Title;
+                    existingQuestion.Code = request.Question.Code;
+                    existingQuestion.Order = request.Question.Order;
+                    existingQuestion.Weightage = request.Question.Weightage;
+                    existingQuestion.LastModifiedBy = request.Id;
+                    existingQuestion.LastModifiedDate = localDateTime.ToUniversalTime();
+                    await _dbContext.SaveChangesAsync();
                 }
             }
             catch(Exception ex)
             {
                 throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task DeleteLeadScoreQuestion(int TenantId, int QuestionId)
+        {
+            try
+            {
+                var question = await (
+                    from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == TenantId && a.QuestionId == QuestionId)
+                    select a).FirstOrDefaultAsync();
+                question.IsDeleted = 1;
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

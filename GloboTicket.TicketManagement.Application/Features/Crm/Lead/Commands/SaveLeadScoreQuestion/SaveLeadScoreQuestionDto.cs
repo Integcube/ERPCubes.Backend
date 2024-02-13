@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions
+namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion
 {
-    public class SaveLeadScoreQuestionsDto
+    public class SaveLeadScoreQuestionDto
     {
         public int QuestionId { get; set; }
         public string Code { get; set; }

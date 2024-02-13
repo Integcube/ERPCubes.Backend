@@ -1,8 +1,10 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
+using ERPCubes.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -51,6 +53,41 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
             }
             catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+    
+        public async Task DeleteDocument(int FileId, string Id, int TenantId)
+        {
+            try
+            {
+                DocumentLibrary document = await( 
+                    from a in _dbContext.DocumentLibrary.Where(a => a.TenantId == TenantId && a.FileId == FileId)
+                    select a).FirstOrDefaultAsync();
+                document.IsDeleted = 1;
+                await _dbContext.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task UpdateDocument(UpdateDocumentCommand request)
+        {
+            DateTime localDateTime = DateTime.Now;
+            try
+            {
+                DocumentLibrary document = await (
+                    from a in _dbContext.DocumentLibrary.Where(a => a.TenantId == request.TenantId && a.FileId == request.FileId)
+                    select a).FirstOrDefaultAsync();
+                document.Description = request.Description;
+                document.LastModifiedBy = request.Id;
+                document.LastModifiedDate = localDateTime.ToUniversalTime();
+                await _dbContext.SaveChangesAsync();
+            }
+            catch(Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }

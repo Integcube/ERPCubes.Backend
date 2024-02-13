@@ -14,6 +14,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions
         public int Order { get; set; }
         public int ProductId { get; set; }
         public decimal Weightage { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public int TenantId { get; set; }
     }
 }

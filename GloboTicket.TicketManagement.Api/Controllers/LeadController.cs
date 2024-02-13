@@ -2,10 +2,11 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
-using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
@@ -195,13 +196,20 @@ namespace ERPCubesApi.Controllers
             return Ok(dtos);
         }
 
-        [HttpPost("saveQuestions", Name = "SaveLeadScoreQuestions")]
+        [HttpPost("saveQuestion", Name = "SaveLeadScoreQuestion")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> SaveLeadScoreQuestions(SaveLeadScoreQuestionsCommand obj)
+        public async Task<ActionResult> SaveLeadScoreQuestion(SaveLeadScoreQuestionCommand obj)
         {
             var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
 
+        [HttpPost("deleteQuestion", Name = "DeleteLeadScoreQuestion")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> DeleteLeadScoreQuestion(DeleteLeadScoreQuestionCommand obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.DeleteDocument;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Identity.Models;
 using MediatR;
@@ -110,5 +112,21 @@ namespace ERPCubesApi.Controllers
             }
         }
 
+
+        [HttpPost("update", Name = "UpdateDocument")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> UpdateDocument(UpdateDocumentCommand updateDocument)
+        {
+            var dtos = await _mediator.Send(updateDocument);
+            return Ok(dtos);
+        }
+
+        [HttpPost("delete", Name = "DeleteDocument")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> DeleteDocument(DeleteDocumentCommand deleteDocument)
+        {
+            var dtos = await _mediator.Send(deleteDocument);
+            return Ok(dtos);
+        }
     }
 }

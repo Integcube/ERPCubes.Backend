@@ -1,5 +1,7 @@
-﻿using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
+﻿using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Domain.Entities;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +14,8 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetDocumentLibraryVm>> GetAllList(string Id, int TenantId, int ParentId, int ContactTypeId, int ContactId);
 
+        Task DeleteDocument(int FileId, string Id, int TenantId);
+
+        Task UpdateDocument(UpdateDocumentCommand request);
     }
 }

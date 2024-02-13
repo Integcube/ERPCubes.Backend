@@ -8,22 +8,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestions
+namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion
 {
-    public class SaveLeadScoreQuestionsCommandHandler: IRequestHandler<SaveLeadScoreQuestionsCommand>
+    public class SaveLeadScoreQuestionCommandHandler: IRequestHandler<SaveLeadScoreQuestionCommand>
     {
         private IAsyncLeadRepository _leadRepository;
-        private ILogger<SaveLeadScoreQuestionsCommandHandler> _logger;
-        public SaveLeadScoreQuestionsCommandHandler(IAsyncLeadRepository leadRepository, ILogger<SaveLeadScoreQuestionsCommandHandler> logger)
+        private ILogger<SaveLeadScoreQuestionCommandHandler> _logger;
+        public SaveLeadScoreQuestionCommandHandler(IAsyncLeadRepository leadRepository, ILogger<SaveLeadScoreQuestionCommandHandler> logger)
         {
             _leadRepository = leadRepository;
             _logger = logger;
         }
-        public async Task<Unit> Handle(SaveLeadScoreQuestionsCommand request, CancellationToken token)
+        public async Task<Unit> Handle(SaveLeadScoreQuestionCommand request, CancellationToken token)
         {
             try
             {
-                await _leadRepository.SaveLeadScoreQuestions(request);
+                await _leadRepository.SaveLeadScoreQuestion(request);
             }
             catch (Exception ex)
             {
