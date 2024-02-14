@@ -1,4 +1,6 @@
-﻿using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
+﻿using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddDocument;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Domain.Entities;
 using MediatR;
@@ -17,5 +19,8 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task DeleteDocument(int FileId, string Id, int TenantId);
 
         Task UpdateDocument(UpdateDocumentCommand request);
+        Task<AddDocumentCommandVm> AddDocument(AddDocumentCommand request);
+
+        Task<AddFileCommandVm> AddFile(AddFileCommand request);
     }
 }

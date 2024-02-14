@@ -1,4 +1,6 @@
 ﻿
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddDocument;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.DeleteDocument;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
@@ -7,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Serilog.Sinks.File;
 using System.Net.Http;
 using System.Text;
 
@@ -16,11 +19,11 @@ namespace ERPCubesApi.Controllers
     [ApiController]
     public class DocumentLibraryController : ControllerBase
     {
-        
+
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
         private readonly ILogger<DocumentLibraryController> _logger;
-        public DocumentLibraryController(IMediator mediator,IConfiguration configuration, ILogger<DocumentLibraryController> logger)
+        public DocumentLibraryController(IMediator mediator, IConfiguration configuration, ILogger<DocumentLibraryController> logger)
         {
             _mediator = mediator;
             _configuration = configuration;
@@ -34,8 +37,8 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(getDocument);
             return Ok(dtos);
         }
-        [HttpPost("SaveFile")]
-        public async Task<IActionResult> SaveFile(IFormFile file, int tenantId)
+        [HttpPost("saveFile")]
+        public async Task<IActionResult> SaveFile(IFormFile file, int tenantId, string id, int parentId)
         {
             try
             {
@@ -67,8 +70,29 @@ namespace ERPCubesApi.Controllers
                             var saveFileResponse = await httpClient.PostAsync(saveFileUrl, formData);
                             saveFileResponse.EnsureSuccessStatusCode();
                             var responseContent = await saveFileResponse.Content.ReadAsStringAsync();
+                            dynamic responseObject = JsonConvert.DeserializeObject(responseContent);
+                            string extension = responseObject.extension;
+                            extension = extension.TrimStart('.').ToUpper();
+                            AddDocumentCommand vm = new AddDocumentCommand
+                            {
+                                Id = id,
+                                TenantId = tenantId,
+                                Document = new AddDocumentCommandVm
+                                {
+                                    FileId = -1,
+                                    FileName = responseObject.originalFileName,
+                                    Description = "",
+                                    Type = extension,
+                                    Path = responseObject.withoutExtension,
+                                    ParentId = parentId,
+                                    Size = responseObject.fileSize,
+                                    CreatedDate = DateTime.UtcNow,
+                                    CreatedBy = id
+                                },
 
-                            return Ok(responseContent);
+                            };
+                            var dtos = await _mediator.Send(vm);
+                            return Ok(dtos);
                         }
                     }
                 }
@@ -89,10 +113,10 @@ namespace ERPCubesApi.Controllers
             try
             {
                 var saveFileUrl = $"{_configuration["AppSettings:FileServerUrl"]}/api/FileManagment/getfile?filePath={Uri.EscapeDataString(filePath)}";
-               
+
 
                 using (HttpClient httpClient = new HttpClient())
-                 {
+                {
                     var response = await httpClient.GetAsync(saveFileUrl);
                     response.EnsureSuccessStatusCode();
 
@@ -101,10 +125,6 @@ namespace ERPCubesApi.Controllers
 
                     return File(fileStream, "application/octet-stream", Path.GetFileName(filePath));
                 }
-            }
-            catch (HttpRequestException ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -118,6 +138,14 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> UpdateDocument(UpdateDocumentCommand updateDocument)
         {
             var dtos = await _mediator.Send(updateDocument);
+            return Ok(dtos);
+        }
+
+        [HttpPost("addFolder", Name = "AddFolder")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> AddFolder(AddFileCommand addFile)
+        {
+            var dtos = await _mediator.Send(addFile);
             return Ok(dtos);
         }
 

@@ -24,13 +24,14 @@ namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Command.DeleteDocume
             try
             {
                 await _documentRepository.DeleteDocument(request.FileId, request.Id, request.TenantId);
+                return Unit.Value;
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"Deleting FileId {request.FileId} failed due to: {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
-            return Unit.Value;
         }
     }
 }

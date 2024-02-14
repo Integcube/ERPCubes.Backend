@@ -1,5 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddDocument;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Domain.Entities;
@@ -47,8 +49,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                   ModifiedDate = a.LastModifiedDate,
                                                               }).ToListAsync();
 
-
-
                 return documents;
 
             }
@@ -76,9 +76,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         public async Task UpdateDocument(UpdateDocumentCommand request)
         {
-            DateTime localDateTime = DateTime.Now;
             try
             {
+                DateTime localDateTime = DateTime.Now;
                 DocumentLibrary document = await (
                     from a in _dbContext.DocumentLibrary.Where(a => a.TenantId == request.TenantId && a.FileId == request.FileId)
                     select a).FirstOrDefaultAsync();
@@ -88,6 +88,88 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 await _dbContext.SaveChangesAsync();
             }
             catch(Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<AddDocumentCommandVm> AddDocument(AddDocumentCommand request)
+        {
+            try
+            {
+                DocumentLibrary doc = new DocumentLibrary
+                {
+                    FileName = request.Document.FileName,
+                    Type = request.Document.Type,
+                    Size = request.Document.Size,
+                    Path = request.Document.Path,
+                    ParentId = request.Document.ParentId,
+                    TenantId = request.TenantId,
+                    Description = request.Document.FileName,
+                    Id = -1,
+                    ContactTypeId = -1,
+                    CreatedBy = request.Id,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = 0
+                };
+                _dbContext.Add(doc);
+                _dbContext.SaveChanges();
+                AddDocumentCommandVm vm = new AddDocumentCommandVm
+                {
+                    FileId = doc.FileId,
+                    FileName = doc.FileName,
+                    Description = doc.Description,
+                    Type = doc.Type,
+                    Path = doc.Path,
+                    ParentId = doc.ParentId,
+                    Size = doc.Size,
+                    CreatedDate = doc.CreatedDate,
+                    CreatedBy = doc.CreatedBy
+                };
+                return vm;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<AddFileCommandVm> AddFile(AddFileCommand request)
+        {
+            try
+            {
+                DocumentLibrary doc = new DocumentLibrary
+                {
+                    FileName = request.FileName,
+                    Type = "Folder",
+                    Size = 0,
+                    Path = "",
+                    ParentId = request.ParentId,
+                    TenantId = request.TenantId,
+                    Description = request.Description,
+                    Id = -1,
+                    ContactTypeId = -1,
+                    CreatedBy = request.Id,
+                    CreatedDate = DateTime.UtcNow,
+                    IsDeleted = 0
+                };
+                _dbContext.Add(doc);
+                _dbContext.SaveChanges();
+                AddFileCommandVm vm = new AddFileCommandVm
+                {
+                    FileId = doc.FileId,
+                    FileName = doc.FileName,
+                    Description = doc.Description,
+                    Type = doc.Type,
+                    Path = doc.Path,
+                    ParentId = doc.ParentId,
+                    Size = doc.Size,
+                    CreatedDate = doc.CreatedDate,
+                    CreatedBy = doc.CreatedBy
+                };
+                return vm;
+            }
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
