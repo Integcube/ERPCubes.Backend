@@ -1,0 +1,52 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" ><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Worksheet</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table><div id="table-scroll" class="table-container" onscroll="highlightHeader()" style="height: 500px; overflow-y: auto;">
+                            <!--Table-->
+
+                            <table class="xls-table table-statement">
+                                <thead style="position:sticky!important">
+                                    <tr class="heading">
+                                        <th colspan="4"></th>
+
+
+                                        <th class="firstHeader stickycol1" colspan="3" style="text-align: center;">Design</th>
+                                        <th class="firstHeader stickycol1" colspan="3" style="text-align: center;">Installation</th>
+                                        <th class="firstHeader stickycol1" colspan="3" style="text-align: center;">Commissioning</th>
+                                          <th class="firstHeader stickycol1" colspan="2" style="text-align: center;">Overdue Status</th>
+
+                                    </tr>
+                                    <tr class="heading">
+                                        <th class="firstHeader stickycol1 text-right" style="min-width: 35px;">Sr.#</th>
+
+                                        <th class="firstHeader stickycol1" style="text-align: left !important; min-width: 140px; font-size: small;" colspan="1" ng-click="sortColumn(&quot;PlantName&quot;)" ng-class="sortClass(&quot;PlantName&quot;)" role="button" tabindex="0">Plant</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left !important; min-width: 140px; font-size: small;" colspan="1" ng-click="sortColumn(&quot;CLName&quot;)" ng-class="sortClass(&quot;CLName&quot;)" role="button" tabindex="0">Checklist Name </th>
+                                        <th class="firstHeader stickycol1 text-right" style="min-width: 70px; text-align: left;" ng-click="sortColumn(&quot;RefNo&quot;)" ng-class="sortClass(&quot;RefNo&quot;)" role="button" tabindex="0">Equipment</th>
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">From</th>
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">To</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left!important; min-width: 120px; font-size: small;" colspan="1">% Completed<br>
+                                            Design Checks</th>
+
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">From</th>
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">To</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left!important; min-width: 120px; font-size: small;" colspan="1">% Completed<br>
+                                            Installation Checks</th>
+
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">From</th>
+                                        <th class="firstHeader stickycol1" style="text-align: center!important; min-width: 120px; font-size: small;" colspan="1">To</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left!important; min-width: 120px; font-size: small;" colspan="1">% Completed<br>
+                                            Commission Checks</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left!important; min-width: 120px; font-size: small;" colspan="1">% Overdue<br>
+                                            &nbsp; &nbsp;  Inspector</th>
+                                        <th class="firstHeader stickycol1" style="text-align: left!important; min-width: 120px; font-size: small;" colspan="1">% Overdue<br>
+                                          &nbsp; &nbsp;  Othes</th>
+                                        
+                                    </tr>
+
+
+                                </thead>
+
+                                <tbody>
+                                    <!-- ngRepeat: ph in CLProgressList| orderBy:'CLName' -->
+
+                                </tbody>
+
+                            </table>
+                        </div></table></body></html>

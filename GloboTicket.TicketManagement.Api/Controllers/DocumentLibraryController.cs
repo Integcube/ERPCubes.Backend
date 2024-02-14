@@ -5,6 +5,7 @@ using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.DeleteDocument;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Identity.Models;
+using ERPCubesApi.Model;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -38,18 +39,18 @@ namespace ERPCubesApi.Controllers
             return Ok(dtos);
         }
         [HttpPost("saveFile")]
-        public async Task<IActionResult> SaveFile(IFormFile file, int tenantId, string id, int parentId)
+        public async Task<IActionResult> SaveFile([FromForm] SaveFileDto saveFileDto)
         {
             try
             {
-                if (file == null || file.Length == 0)
+                if (saveFileDto.File == null || saveFileDto.File.Length == 0)
                 {
                     return BadRequest("Invalid file");
                 }
 
                 using (var memoryStream = new MemoryStream())
                 {
-                    await file.CopyToAsync(memoryStream);
+                    await saveFileDto.File.CopyToAsync(memoryStream);
                     byte[] fileBytes = memoryStream.ToArray();
 
                     var directApiBaseUrl = _configuration["AppSettings:FileServerUrl"];
@@ -59,14 +60,14 @@ namespace ERPCubesApi.Controllers
                         return BadRequest("Internal server error.");
                     }
 
-                    var saveFileUrl = $"{directApiBaseUrl}/api/FileManagment/savefile?tenantId={tenantId}";
+                    var saveFileUrl = $"{directApiBaseUrl}/api/FileManagment/savefile?tenantId={int.Parse(saveFileDto.TenantId)}";
 
                     using (HttpClient httpClient = new HttpClient())
                     {
                         using (var formData = new MultipartFormDataContent())
                         {
                             var fileContent = new ByteArrayContent(fileBytes);
-                            formData.Add(fileContent, "file", file.FileName);
+                            formData.Add(fileContent, "file", saveFileDto.File.FileName);
                             var saveFileResponse = await httpClient.PostAsync(saveFileUrl, formData);
                             saveFileResponse.EnsureSuccessStatusCode();
                             var responseContent = await saveFileResponse.Content.ReadAsStringAsync();
@@ -75,8 +76,8 @@ namespace ERPCubesApi.Controllers
                             extension = extension.TrimStart('.').ToUpper();
                             AddDocumentCommand vm = new AddDocumentCommand
                             {
-                                Id = id,
-                                TenantId = tenantId,
+                                Id = saveFileDto.Id,
+                                TenantId = int.Parse(saveFileDto.TenantId),
                                 Document = new AddDocumentCommandVm
                                 {
                                     FileId = -1,
@@ -84,10 +85,10 @@ namespace ERPCubesApi.Controllers
                                     Description = "",
                                     Type = extension,
                                     Path = responseObject.withoutExtension,
-                                    ParentId = parentId,
+                                    ParentId = int.Parse(saveFileDto.ParentId),
                                     Size = responseObject.fileSize,
                                     CreatedDate = DateTime.UtcNow,
-                                    CreatedBy = id
+                                    CreatedBy = saveFileDto.Id
                                 },
 
                             };
