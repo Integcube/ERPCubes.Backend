@@ -142,11 +142,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                  join user in _dbContext.AppUser on a.DeletedBy equals user.Id
                                                                  select new GetDeletedProductVm
                                                                  {
-                                                                     ProductId = a.ProductId,
-                                                                     ProductName = a.ProductName,
+                                                                     Id = a.ProductId,
+                                                                     Title = a.ProductName,
                                                                      DeletedBy = user.FirstName + " " + user.LastName,
                                                                      DeletedDate = a.DeletedDate,
-                                                                 }).OrderBy(a => a.ProductName).ToListAsync();
+                                                                 }).OrderBy(a => a.Title).ToListAsync();
                 return productDetail;
             }
             catch (Exception ex)

@@ -9,6 +9,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads
 {
     public class RestoreDeletedLeadsCommand:IRequest
     {
+        public string Id { get; set; }
         public int LeadId { get; set; }
 
     }

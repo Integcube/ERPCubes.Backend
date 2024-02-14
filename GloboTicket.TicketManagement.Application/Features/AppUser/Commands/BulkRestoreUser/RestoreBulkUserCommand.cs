@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ERPCubes.Application.Features.AppUser.Commands.RestoreUser;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace ERPCubes.Application.Features.AppUser.Commands.BulkRestoreUser
 {
     public class RestoreBulkUserCommand : IRequest
     {
-        public int TenantId { get; set; } 
-        public List<string> UserId { get; set; }
+
+        public string Id { get; set; }
+        public RestoreBulkUserDto? User { get; set; }
+
     }
 }

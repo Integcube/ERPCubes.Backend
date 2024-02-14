@@ -8,9 +8,9 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads
 {
     public class GetDeletedLeadsVm
     {
-        public int LeadId { get; set; }
+        public int Id { get; set; }
         //public string Id { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         public string DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
     }

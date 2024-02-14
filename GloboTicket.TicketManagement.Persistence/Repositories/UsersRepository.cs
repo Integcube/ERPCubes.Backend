@@ -97,11 +97,11 @@ namespace ERPCubes.Persistence.Repositories
 
                              {
                                  Id= a.Id,
-                                 UserName = a.UserName,
+                                 Title = a.UserName,
                                  DeletedBy = b.FirstName + " " + b.LastName,
                                  DeletedDate = a.DeletedDate,
                              })
-                             .OrderBy(a => a.UserName)
+                             .OrderBy(a => a.Title)
                              .ToList();  
 
                 return users;
@@ -117,7 +117,7 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
-                var restoreUser = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == user.TenantId && a.Id == user.UserId)
+                var restoreUser = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == user.User.TenantId && a.Id == user.User.Id)
                                           select a).FirstOrDefaultAsync();
                 restoreUser.IsActive = 0;
 
@@ -134,19 +134,22 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
-                if (command.UserId == null)
+
+                foreach (var userId in command.User.Id)
                 {
-                    throw new BadRequestException("No user IDs provided for bulk restore.");
+                    var product = await _dbContextIdentity.ApplicationUsers
+                       .Where(p => p.Id == userId && p.IsActive == 1)
+                       .FirstOrDefaultAsync();
+
+                    if (product == null)
+                    {
+                        throw new NotFoundException(nameof(userId), userId);
+                    }
+
+                    product.IsActive = 0;
                 }
 
-                foreach (var userId in command.UserId)
-                {
-                    await RestoreUser(new RestoreUserCommand
-                    {
-                        TenantId = command.TenantId, 
-                        UserId = userId
-                    });
-                }
+                await _dbContextIdentity.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -155,33 +158,5 @@ namespace ERPCubes.Persistence.Repositories
         }
 
 
-
-
-
-        //public async Task RestoreBulkUser(RestoreBulkUserCommand user)
-        //{
-        //    try
-        //    {
-        //        foreach (var userId in user.UserId)
-        //        {
-        //            var userRestore = await (from a in _dbContextIdentity.ApplicationUsers.Where(a => a.TenantId == user.TenantId && a.Id == userId && a.IsActive == 1)
-        //                                     select a)
-        //                .FirstOrDefaultAsync();
-
-        //            if (userRestore == null)
-        //            {
-        //                throw new NotFoundException(nameof(userId), userId);
-        //            }
-
-        //            userRestore.IsActive = 0;
-        //        }
-
-        //        await _dbContext.SaveChangesAsync();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new BadRequestException(ex.Message);
-        //    }
-        //}
     }
 }

@@ -8,9 +8,9 @@ namespace ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductLis
 {
     public class GetDeletedProductVm
     {
-        public int ProductId { get; set; }
+        public int Id { get; set; }
         //public string Id { get; set; } = string.Empty;
-        public string ProductName { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         public string DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
     }

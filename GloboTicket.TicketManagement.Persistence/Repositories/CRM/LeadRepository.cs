@@ -448,15 +448,17 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var deleteProduct = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == request.LeadId)
+                var deleteLead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == request.LeadId)
                                            select a).FirstOrDefaultAsync();
-                if (deleteProduct == null)
+                if (deleteLead == null)
                 {
                     throw new NotFoundException("leadId", request);
                 }
                 else
                 {
-                    deleteProduct.IsDeleted = 0;
+                    deleteLead.DeletedBy = request.Id;
+
+                    deleteLead.IsDeleted = 0;
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -579,11 +581,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                 join user in _dbContext.AppUser on a.DeletedBy equals user.Id
                                                                 select new GetDeletedLeadsVm
                                                                 {
-                                                                    LeadId = a.LeadId,
-                                                                    FirstName = a.FirstName,
+                                                                    Id = a.LeadId,
+                                                                    Title = a.FirstName,
                                                                     DeletedBy = user.FirstName + " " + user.LastName,
                                                                     DeletedDate = a.DeletedDate,
-                                                                }).OrderBy(a => a.FirstName).ToListAsync();
+                                                                }).OrderBy(a => a.Title).ToListAsync();
                 return detail;
             }
             catch (Exception ex)
