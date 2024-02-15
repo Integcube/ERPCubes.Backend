@@ -9,6 +9,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
@@ -74,6 +75,14 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult<List<GetLeadVm>>> GetAllLeadSource(GetLeadSourceListQuery getLeadList)
         {
             var dtos = await _mediator.Send(getLeadList);
+            return Ok(dtos);
+        }
+        [Authorize]
+        [HttpPost("getLeadAttachments", Name = "GetLeadAttachments")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetLeadAttachmentsVm>>> GetLeadAttachments(GetLeadAttachmentsQuery getLeadAttachments)
+        {
+            var dtos = await _mediator.Send(getLeadAttachments);
             return Ok(dtos);
         }
         [Authorize]

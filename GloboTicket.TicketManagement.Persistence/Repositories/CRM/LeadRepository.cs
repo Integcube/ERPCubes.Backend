@@ -32,6 +32,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -334,7 +335,28 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
-
+        public async Task<List<GetLeadAttachmentsVm>> GetLeadAttachments(int TenantId, string Id, int LeadId, int ContactTypeId)
+        {
+            try
+            {
+                List<GetLeadAttachmentsVm> attachments = await (
+                    from a in _dbContext.DocumentLibrary
+                    .Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.ContactTypeId == ContactTypeId && a.Id == LeadId)
+                    select new GetLeadAttachmentsVm
+                    {
+                        Size = a.Size,
+                        Path = a.Path,
+                        FileName = a.FileName,
+                        Description = a.Description,
+                        Type = a.Type
+                    }).ToListAsync();
+                return attachments;
+            }
+            catch(Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
 
         public async Task SaveLead(string Id, int TenantId, SaveLeadDto Lead)
         {
@@ -709,6 +731,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new Exception(ex.Message);
             }
         }
+       
         public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
         {
             try

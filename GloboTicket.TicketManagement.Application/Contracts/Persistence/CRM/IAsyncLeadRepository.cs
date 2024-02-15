@@ -9,6 +9,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
@@ -39,6 +40,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetLeadStatusListVm>> GetAllLeadStatus(int TenantId, string Id);
         Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id);
         Task<List<GetLeadReportVm>> GetLeadReport(int TenantId, string Id, DateTime startDate, DateTime endDate, int prodId);
+        Task<List<GetLeadAttachmentsVm>> GetLeadAttachments(int TenantId, string Id, int LeadId, int ContactTypeId);
         Task DeleteLead(DeleteLeadCommand leadId);
         Task SaveLead(string Id, int TenantId, SaveLeadDto Lead);
         Task RestoreDeletedLeads(RestoreDeletedLeadsCommand request);
