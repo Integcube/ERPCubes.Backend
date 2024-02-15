@@ -14,7 +14,7 @@ namespace ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFormFields
         public int FieldType { get; set; }
         public string Placeholder { get; set; } = string.Empty;
         public string Values { get; set; } = string.Empty;
-        public string Result {  get; set; } = string.Empty;
+        //public string Result {  get; set; } = string.Empty;
         public Boolean IsFixed { get; set; }
         public int Order { get; set; }
         public Boolean DisplayLabel { get; set; }
