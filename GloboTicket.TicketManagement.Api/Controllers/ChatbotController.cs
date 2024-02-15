@@ -16,13 +16,11 @@ namespace ERPCubesApi.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IHubContext<TicketHub> _hubContext;
-        private readonly IHubContext<ChatHub> _chatHubContext;
 
-        public ChatbotController(IMediator mediator, IHubContext<TicketHub> hubContext, IHubContext<ChatHub> chatHubContext)
+        public ChatbotController(IMediator mediator, IHubContext<TicketHub> hubContext)
         {
             _mediator = mediator;
             _hubContext = hubContext;
-            _chatHubContext = chatHubContext;
         }
         [HttpPost("all", Name = "GetAllConversation")]
         [ProducesResponseType(StatusCodes.Status200OK)]

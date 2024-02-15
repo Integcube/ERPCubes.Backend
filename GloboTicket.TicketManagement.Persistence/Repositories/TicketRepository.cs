@@ -199,7 +199,7 @@ namespace ERPCubes.Persistence.Repositories
             {
                 Conversation message = new Conversation();
                 message.TicketId = request.LatestConversation.TicketId;
-                message.FromId = request.LatestConversation.FromId;
+                message.FromId = request.CustomerId;
                 message.ToId = request.LatestConversation.ToId;
                 message.Timestamp = DateTime.Now.ToUniversalTime();
                 message.MessageType = request.LatestConversation.MessageType;
