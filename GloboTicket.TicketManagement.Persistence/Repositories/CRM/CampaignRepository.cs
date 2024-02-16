@@ -1,9 +1,15 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Campaign.Commands.DeleteCampaign;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreBulkCampiagn;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaignSource;
+using ERPCubes.Application.Features.Crm.Campaign.Queries.GetDeletedCampaigns;
+using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using MediatR;
@@ -14,6 +20,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -171,6 +178,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     deleteCampaign.IsDeleted = 1;
+                    deleteCampaign.DeletedBy = campaign.Id;
+                    deleteCampaign.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -195,6 +204,75 @@ namespace ERPCubes.Persistence.Repositories.CRM
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<GetDeletedCampaignVm>> GetDeletedCampaigns(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedCampaignVm> campaignDetail = await(from a in _dbContext.CrmCampaign.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedCampaignVm
+                                                                {
+                                                                    Id = a.CampaignId,
+                                                                    Title = a.Title,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.Title).ToListAsync();
+                return campaignDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreCampaign(RestoreCampaignCommand campaign)
+        {
+            try
+            {
+                var restoreCampaign = await(from a in _dbContext.CrmCampaign.Where(a => a.CampaignId == campaign.CampaignId)
+                                           select a).FirstOrDefaultAsync();
+                if (restoreCampaign == null)
+                {
+                    throw new NotFoundException("campaign", campaign);
+                }
+                else
+                {
+                    restoreCampaign.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreBulkCampaign(RestoreBulkCampaignCommand campaign)
+        {
+            try
+            {
+                foreach (var campaignId in campaign.CampaignId)
+                {
+                    var campaignDetail = await _dbContext.CrmCampaign
+                        .Where(p => p.CampaignId == campaignId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (campaignDetail == null)
+                    {
+                        throw new NotFoundException(nameof(campaignId), campaignId);
+                    }
+
+                    campaignDetail.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
             }
         }
     }

@@ -1,7 +1,11 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Application.Features.Notes.Commands.DeleteNote;
+using ERPCubes.Application.Features.Notes.Commands.RestoreBulkNote;
+using ERPCubes.Application.Features.Notes.Commands.RestoreNotes;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
+using ERPCubes.Application.Features.Notes.Queries.GetDeletedNotes;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
 using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
@@ -10,6 +14,7 @@ using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -278,6 +283,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     note.IsDeleted = 1;
+                    note.DeletedBy = request.Id;
+                    note.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -287,5 +294,73 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<List<GetDeletedNoteVm>> GetDeletedNotes(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedNoteVm> noteDetail = await(from a in _dbContext.CrmNote.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedNoteVm
+                                                                {
+                                                                    Id = a.NoteId,
+                                                                    Title = a.NoteTitle,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.Title).ToListAsync();
+                return noteDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreNote(RestoreNoteCommand note)
+        {
+            try
+            {
+                var restoreNote = await(from a in _dbContext.CrmNote.Where(a => a.NoteId == note.NoteId)
+                                          select a).FirstOrDefaultAsync();
+                if (restoreNote == null)
+                {
+                    throw new NotFoundException("note", note);
+                }
+                else
+                {
+                    restoreNote.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreBulkNote(RestoreBulkNoteCommand note)
+        {
+            try
+            {
+                foreach (var noteId in note.NoteId)
+                {
+                    var noteDetail = await _dbContext.CrmNote
+                        .Where(p => p.NoteId == noteId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (noteDetail == null)
+                    {
+                        throw new NotFoundException(nameof(noteId), noteId);
+                    }
+
+                    noteDetail.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

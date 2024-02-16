@@ -1,7 +1,13 @@
 using ERPCubes.Application.Features.Crm.Campaign.Commands.DeleteCampaign;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreBulkCampiagn;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaignSource;
+using ERPCubes.Application.Features.Crm.Campaign.Queries.GetDeletedCampaigns;
+using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -54,6 +60,31 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> GetCampaignSources(GetCampaignSourceQuery getCampaignSource)
         {
             var dtos = await _mediator.Send(getCampaignSource);
+            return Ok(dtos);
+        }
+        [HttpPost("del", Name = "GetDeletedCampaigns")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedCampaignVm>>> GetDeletedCategories(GetDeletedCampaignQuery campaign)
+        {
+            var dtos = await _mediator.Send(campaign);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restore", Name = "RestoreCampaign")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreProduct(RestoreCampaignCommand campaign)
+        {
+            var dtos = await _mediator.Send(campaign);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restoreBulkCampaign", Name = "RestoreBulkCampaign")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkCampaign(RestoreBulkCampaignCommand campaign)
+        {
+            var dtos = await _mediator.Send(campaign);
             return Ok(dtos);
         }
     }

@@ -1,5 +1,11 @@
-﻿using ERPCubes.Application.Features.Crm.Project.Commands.DeleteProject;
+﻿using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
+using ERPCubes.Application.Features.Crm.Project.Commands.DeleteProject;
+using ERPCubes.Application.Features.Crm.Project.Commands.RestoreBulkProject;
+using ERPCubes.Application.Features.Crm.Project.Commands.RestoreProject;
 using ERPCubes.Application.Features.Crm.Project.Commands.SaveProject;
+using ERPCubes.Application.Features.Crm.Project.Queries.GetDeletedProjects;
 using ERPCubes.Application.Features.Crm.Project.Queries.GetProjects;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -43,6 +49,31 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> DeleteProject(DeleteProjectCommand deleteProject)
         {
             var dtos = await _mediator.Send(deleteProject);
+            return Ok(dtos);
+        }
+        [HttpPost("del", Name = "GetDeletedProjects")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedProjectVm>>> GetDeletedCategories(GetDeletedProjectQuery project)
+        {
+            var dtos = await _mediator.Send(project);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restore", Name = "RestoreProject")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreProduct(RestoreProjectCommand project)
+        {
+            var dtos = await _mediator.Send(project);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restoreBulk", Name = "RestoreBulkProject")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkProduct(RestoreBulkProjectCommand project)
+        {
+            var dtos = await _mediator.Send(project);
             return Ok(dtos);
         }
     }

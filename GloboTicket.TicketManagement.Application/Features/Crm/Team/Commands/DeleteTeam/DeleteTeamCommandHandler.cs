@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
+using ERPCubes.Application.Features.Product.Commands.DeleteProduct;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Crm.Team.Commands.DeleteTeam
 {
-    public class DeleteTeamCommandHandler
+    public class DeleteTeamCommandHandler : IRequestHandler<DeleteTeamCommand>
     {
         private readonly ILogger<DeleteTeamCommandHandler> _logger;
         private readonly IAsyncTeamRepository _crmteamRepository;
@@ -30,7 +31,7 @@ namespace ERPCubes.Application.Features.Crm.Team.Commands.DeleteTeam
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Deleting Team :{request.TeamName} failed due to an error : {ex.Message}");
+                _logger.LogError($"Deleting Team :{request.TeamId} failed due to an error : {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
         }

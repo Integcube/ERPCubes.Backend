@@ -1,8 +1,11 @@
 ﻿using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreBulkTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreTasks;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
+using ERPCubes.Application.Features.Crm.Task.Queries.GetDeletedTasks;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
@@ -24,6 +27,11 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task UpdateTaskStatus(UpdateTaskStatusCommand request);
         Task UpdateTaskOrder(List<UpdateTaskOrderDto> request);
         Task UpdateTaskPriority(UpdateTaskPriorityCommand request);
+        Task<List<GetDeletedTaskVm>> GetDeletedTask(int TenantId, string Id);
+        Task RestoreTask(RestoreTaskCommand task);
+        Task RestoreBulkTask(RestoreBulkTaskCommand note);
+
+
 
     }
 }

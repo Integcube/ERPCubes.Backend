@@ -6,6 +6,7 @@ namespace TicketingSystem.Services
     public class TicketingService
     {
         private static readonly Dictionary<string, Dictionary<string, string>> TenantUserConnections = new Dictionary<string, Dictionary<string, string>>();
+        private static readonly Dictionary<string, Dictionary<string, string>> BrowserUserConnections = new Dictionary<string, Dictionary<string, string>>();
 
         public bool AddUserToList(string tenantId, string userToAdd)
         {

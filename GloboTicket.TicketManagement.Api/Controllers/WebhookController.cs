@@ -30,7 +30,7 @@ namespace ERPCubesApi.Controllers
                                          [FromQuery(Name = "hub.challenge")] string challenge,
                                          [FromQuery(Name = "hub.verify_token")] string verifyToken)
         {
-            if (mode == "subscribe" && verifyToken == "BL090")
+            if (mode == "subscribe" && verifyToken == "BL090VB^IR%NGDR%$U&")
             {
                 return Ok(challenge);
             }

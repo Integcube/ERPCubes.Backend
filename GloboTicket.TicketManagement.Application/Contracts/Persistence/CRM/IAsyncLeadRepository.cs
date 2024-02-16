@@ -22,7 +22,6 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
-using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
 using ERPCubes.Domain.Entities;
 using MediatR;

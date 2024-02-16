@@ -2,16 +2,21 @@
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Call.Commands.Delete;
 using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
+using ERPCubes.Application.Features.Crm.FormBuilder.Commands.RestoreBulkForm;
+using ERPCubes.Application.Features.Crm.FormBuilder.Commands.RestoreForm;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveForm;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormFields;
 using ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormResult;
+using ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetDeletedForms;
 using ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFieldTypes;
 using ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFormFields;
 using ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetForms;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static Npgsql.PostgresTypes.PostgresCompositeType;
 
 namespace ERPCubes.Persistence.Repositories.CRM
@@ -249,19 +254,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
         }
 
 
-        public async Task Delete(DeleteCommand callId)
+        public async Task Delete(DeleteCommand formId)
         {
             try
             {
-                var deleteCall = await (from a in _dbContext.CrmForm.Where(a => a.FormId == callId.FormId)
+                var deleteFrom = await (from a in _dbContext.CrmForm.Where(a => a.FormId == formId.FormId)
                                         select a).FirstOrDefaultAsync();
-                if (deleteCall == null)
+                if (deleteFrom == null)
                 {
-                    throw new NotFoundException("callId", callId);
+                    throw new NotFoundException("formId", formId);
                 }
                 else
                 {
-                    deleteCall.IsDeleted = 1;
+                    deleteFrom.IsDeleted = 1;
+                    deleteFrom.DeletedBy = formId.Id;
+                    deleteFrom.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -271,5 +278,73 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<List<GetDeletedFormVm>> GetDeletedForms(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedFormVm> formDetail = await(from a in _dbContext.CrmForm.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedFormVm
+                                                                {
+                                                                    Id = a.FormId,
+                                                                    Title = a.Name,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.Title).ToListAsync();
+                return formDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreForm(RestoreFormCommand form)
+        {
+            try
+            {
+                var restoreForm = await(from a in _dbContext.CrmForm.Where(a => a.FormId == form.FormId)
+                                           select a).FirstOrDefaultAsync();
+                if (restoreForm == null)
+                {
+                    throw new NotFoundException("form", form);
+                }
+                else
+                {
+                    restoreForm.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreBulkForm(ResotreBulkFormCommand form)
+        {
+            try
+            {
+                foreach (var formId in form.FormId)
+                {
+                    var formDetails = await _dbContext.CrmForm
+                        .Where(p => p.FormId == formId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (formDetails == null)
+                    {
+                        throw new NotFoundException(nameof(formId), formId);
+                    }
+
+                    formDetails.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

@@ -16,5 +16,7 @@ namespace ERPCubes.Domain.Entities
         public string Description { get; set; } = string.Empty;
         public string Code {  get; set; } = string.Empty;
         public int TenantId { get; set; }
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }

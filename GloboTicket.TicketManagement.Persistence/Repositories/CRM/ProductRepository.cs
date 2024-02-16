@@ -125,6 +125,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     deleteProduct.IsDeleted = 1;
+                    deleteProduct.DeletedBy = productId.Id;
+                    deleteProduct.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -159,15 +161,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var deleteProduct = await (from a in _dbContext.CrmProduct.Where(a => a.ProductId == productId.ProductId)
+                var restoreProduct = await (from a in _dbContext.CrmProduct.Where(a => a.ProductId == productId.ProductId)
                                            select a).FirstOrDefaultAsync();
-                if (deleteProduct == null)
+                if (restoreProduct == null)
                 {
                     throw new NotFoundException("productId", productId);
                 }
                 else
                 {
-                    deleteProduct.IsDeleted = 0;
+                    restoreProduct.IsDeleted = 0;
                     await _dbContext.SaveChangesAsync();
                 }
             }
