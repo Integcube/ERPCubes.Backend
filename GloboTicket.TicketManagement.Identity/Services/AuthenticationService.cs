@@ -30,33 +30,36 @@ namespace ERPCubes.Identity.Services
 
         public async Task<AuthenticationResponse> AuthenticateAsync(AuthenticationRequest request)
         {
-            var user = await (from a in _userManager.Users.Where(u => (u.UserName.ToLower() == request.Email.ToLower() || u.Email.ToLower() == request.Email.ToLower()) && u.IsActive ==0)
-                              join t in _dbContext.Tenant.Where(a => a.Subdomain == request.Subdomain) on a.TenantId equals t.TenantId
-                              select a).FirstOrDefaultAsync();
-            //var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == request.Email || u.Email == request.Email);
+            var user = await (
+                       from u in _userManager.Users
+                       where (u.UserName == request.Email|| u.Email.ToLower() == request.Email.ToLower()) && u.IsActive == 0
+                       join t in _dbContext.Tenant on u.TenantId equals t.TenantId
+                       where t.Subdomain == request.Subdomain
+                      select new { User = u, Tenant = t }).FirstOrDefaultAsync();
 
             if (user == null)
             {
                 throw new Exception($"User with {request.Email} not found.");
             }
 
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, false, lockoutOnFailure: false);
+            var result = await _signInManager.PasswordSignInAsync(user.User.UserName, request.Password, false, lockoutOnFailure: false);
 
             if (!result.Succeeded)
             {
                 throw new Exception($"Credentials for '{request.Email} aren't valid'.");
             }
 
-            JwtSecurityToken jwtSecurityToken = await GenerateToken(user);
+            JwtSecurityToken jwtSecurityToken = await GenerateToken(user.User);
 
             AuthenticationResponse response = new AuthenticationResponse
             {
-                Id = user.Id,
+                Id = user.User.Id,
                 Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                Email = user.Email,
-                UserName = user.UserName,
-                Name = user.FirstName + " " + user.LastName,
-                TenantId = user.TenantId
+                Email = user.User.Email,
+                UserName = user.User.UserName,
+                Name = user.User.FirstName + " " + user.User.LastName,
+                TenantId = user.User.TenantId,
+                TenantGuid= user.Tenant.TenantGuid
             };
             
             return response;

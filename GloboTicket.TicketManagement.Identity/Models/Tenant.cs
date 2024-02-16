@@ -17,5 +17,6 @@ namespace ERPCubes.Identity.Models
         public DateTime? LastModifiedDate { get; set; }
         public int IsDeleted { get; set; }
         public string Owner { get; set; }
+        public Guid TenantGuid { get; set; }
     }
 }

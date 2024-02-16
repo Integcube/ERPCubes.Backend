@@ -98,13 +98,14 @@ namespace ERPCubes.Persistence.Repositories.CRM
         .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
         on a.CampaignId equals c.CampaignId into all4
     from cc in all4.DefaultIfEmpty()
-    join user in _dbContext.AppUser on a.LeadOwner equals user.Id
+    join user in _dbContext.AppUser on a.LeadOwner equals user.Id into userss
+    from us in userss.DefaultIfEmpty()
     join scro in _dbContext.CrmLeadScore on a.LeadId equals scro.LeadId into absc
     from sc in absc.DefaultIfEmpty()
     join ques in _dbContext.CrmIScoringQuestion on sc.QuestionId equals ques.QuestionId into QUS
     from question in QUS.DefaultIfEmpty()
     orderby a.LeadId descending
-    group new { a, s, ii, zz, pp, cc, user, sc, question } by a.LeadId into grouped
+    group new { a, s, ii, zz, pp, cc, us, sc, question } by a.LeadId into grouped
     select new GetLeadVm
     {
         LeadId = grouped.Key,
@@ -132,7 +133,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         CampaignTitle = grouped.First().cc.Title,
         CreatedDate = grouped.First().a.CreatedDate,
         ModifiedDate = grouped.First().a.LastModifiedDate,
-        LeadOwnerName = grouped.First().user.FirstName + " " + grouped.First().user.LastName,
+        LeadOwnerName = grouped.First().us.FirstName + " " + grouped.First().us.LastName,
         Rating = grouped.Sum(ls => ls.sc.Rating * ls.question.Weightage) / (grouped.Sum(ls => ls.question.Weightage) == 0 ? 1 : grouped.Sum(ls => ls.question.Weightage)),
 
     }
