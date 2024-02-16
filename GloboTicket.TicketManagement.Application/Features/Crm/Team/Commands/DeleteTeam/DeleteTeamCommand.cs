@@ -10,8 +10,8 @@ namespace ERPCubes.Application.Features.Crm.Team.Commands.DeleteTeam
     public class DeleteTeamCommand : IRequest
     {
         public int TeamId { get; set; }
-        public int TeamName { get; set; }
-        public int TenantId { get; set; }
         public string Id { get; set; } = string.Empty;
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }

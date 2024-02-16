@@ -75,6 +75,8 @@ namespace ERPCubes.Persistence.Repositories
                 existingUser.IsActive = 1;
                 existingUser.ModifiedOn= DateTime.Now.ToUniversalTime();
                 existingUser.ModifiedBy = cm.Id;
+                existingUser.DeletedBy= cm.Id;
+                existingUser.DeletedDate = DateTime.Now.ToUniversalTime();
 
                 await _dbContextIdentity.SaveChangesAsync();
 
@@ -97,7 +99,7 @@ namespace ERPCubes.Persistence.Repositories
 
                              {
                                  Id= a.Id,
-                                 Title = a.UserName,
+                                 Title = a.FirstName + " " + a.LastName,
                                  DeletedBy = b.FirstName + " " + b.LastName,
                                  DeletedDate = a.DeletedDate,
                              })

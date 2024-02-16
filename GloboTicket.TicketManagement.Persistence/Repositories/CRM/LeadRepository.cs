@@ -600,15 +600,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetDeletedLeadsVm> detail = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-                                                        join user in _dbContext.AppUser on a.DeletedBy equals user.Id
-                                                        select new GetDeletedLeadsVm
-                                                        {
-                                                            Id = a.LeadId,
-                                                            Title = a.FirstName,
-                                                            DeletedBy = user.FirstName + " " + user.LastName,
-                                                            DeletedDate = a.DeletedDate,
-                                                        }).OrderBy(a => a.Title).ToListAsync();
+                List<GetDeletedLeadsVm> detail = await(from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedLeadsVm
+                                                                {
+                                                                    Id = a.LeadId,
+                                                                    Title = a.FirstName + " " + a.LastName,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.Title).ToListAsync();
                 return detail;
             }
             catch (Exception ex)

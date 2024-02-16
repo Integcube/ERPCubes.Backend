@@ -1,12 +1,16 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreBulkTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreTasks;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
+using ERPCubes.Application.Features.Crm.Task.Queries.GetDeletedTasks;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
+using ERPCubes.Application.Features.Notes.Queries.GetDeletedNotes;
 using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
@@ -32,6 +36,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     task.IsDeleted = 1;
+                    task.DeletedBy = request.Id;
+                    task.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -283,6 +289,75 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.Priority = request.Priority;
                     await _dbContext.SaveChangesAsync();
                 }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetDeletedTaskVm>> GetDeletedTask(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedTaskVm> taskDetail = await(from a in _dbContext.CrmTask.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                          join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                          select new GetDeletedTaskVm
+                                                          {
+                                                              Id = a.TaskId,
+                                                              Title = a.Title,
+                                                              DeletedBy = user.FirstName + " " + user.LastName,
+                                                              DeletedDate = a.DeletedDate,
+                                                          }).OrderBy(a => a.Title).ToListAsync();
+                return taskDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreTask(RestoreTaskCommand task)
+        {
+            try
+            {
+                var restoreTask = await(from a in _dbContext.CrmTask.Where(a => a.TaskId == task.TaskId)
+                                        select a).FirstOrDefaultAsync();
+                if (restoreTask == null)
+                {
+                    throw new NotFoundException("task", task);
+                }
+                else
+                {
+                    restoreTask.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreBulkTask(RestoreBulkTaskCommand task)
+        {
+            try
+            {
+                foreach (var taskId in task.TaskId)
+                {
+                    var taskDetail = await _dbContext.CrmTask
+                        .Where(p => p.TaskId == taskId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (taskDetail == null)
+                    {
+                        throw new NotFoundException(nameof(task), task);
+                    }
+
+                    taskDetail.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
             }
             catch (Exception ex)
             {

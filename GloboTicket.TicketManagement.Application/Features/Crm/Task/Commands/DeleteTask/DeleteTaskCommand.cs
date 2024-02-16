@@ -13,5 +13,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask
         public string Id { get; set; }=String.Empty;
         public string TaskTitle { get; set; } = String.Empty;
         public int TaskId { get; set; }
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }

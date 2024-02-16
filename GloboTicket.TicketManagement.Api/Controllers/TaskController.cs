@@ -1,10 +1,16 @@
 ﻿using ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreBulkTask;
+using ERPCubes.Application.Features.Crm.Task.Commands.RestoreTasks;
 using ERPCubes.Application.Features.Crm.Task.Commands.SaveTask;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskOrder;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskStatus;
+using ERPCubes.Application.Features.Crm.Task.Queries.GetDeletedTasks;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskList;
 using ERPCubes.Application.Features.Crm.Task.Queries.GetTaskTagsList;
+using ERPCubes.Application.Features.Notes.Commands.RestoreBulkNote;
+using ERPCubes.Application.Features.Notes.Commands.RestoreNotes;
+using ERPCubes.Application.Features.Notes.Queries.GetDeletedNotes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,6 +79,29 @@ namespace ERPCubesApi.Controllers
         public async Task UpdateTaskPriority(UpdateTaskPriorityCommand updateTaskPriority)
         {
             var dtos = await _mediator.Send(updateTaskPriority);
+        }
+        [HttpPost("del", Name = "GetDeletedTasks")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedTaskVm>>> GetDeletedTask(GetDeletedTaskQuery task)
+        {
+            var dtos = await _mediator.Send(task);
+            return Ok(dtos);
+        }
+        [HttpPost("restore", Name = "RestoreTask")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreTask(RestoreTaskCommand task)
+        {
+            var dtos = await _mediator.Send(task);
+            return Ok(dtos);
+        }
+        [HttpPost("restoreBulk", Name = "RestoreBulkTask")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkTask(RestoreBulkTaskCommand task)
+        {
+            var dtos = await _mediator.Send(task);
+            return Ok(dtos);
         }
     }
 }

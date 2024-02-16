@@ -1,5 +1,11 @@
-﻿using ERPCubes.Application.Features.Notes.Commands.DeleteNote;
+﻿using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
+using ERPCubes.Application.Features.Notes.Commands.DeleteNote;
+using ERPCubes.Application.Features.Notes.Commands.RestoreBulkNote;
+using ERPCubes.Application.Features.Notes.Commands.RestoreNotes;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
+using ERPCubes.Application.Features.Notes.Queries.GetDeletedNotes;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteList;
 using ERPCubes.Application.Features.Notes.Queries.GetNotesWithTasks;
 using ERPCubes.Application.Features.Notes.Queries.GetNoteTags;
@@ -61,6 +67,29 @@ namespace ERPCubesApi.Controllers
         public async Task DeleteNote(DeleteNoteCommand deleteNote)
         {
             var dtos = await _mediator.Send(deleteNote);
+        }
+        [HttpPost("del", Name = "GetDeletedNotes")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedNoteVm>>> GetDeletedCategories(GetDeletedNotesQuery notes)
+        {
+            var dtos = await _mediator.Send(notes);
+            return Ok(dtos);
+        }
+        [HttpPost("restore", Name = "RestoreNote")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreNote(RestoreNoteCommand note)
+        {
+            var dtos = await _mediator.Send(note);
+            return Ok(dtos);
+        }
+        [HttpPost("restoreBulk", Name = "RestoreBulkNotes")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkNote(RestoreBulkNoteCommand note)
+        {
+            var dtos = await _mediator.Send(note);
+            return Ok(dtos);
         }
     }
 }

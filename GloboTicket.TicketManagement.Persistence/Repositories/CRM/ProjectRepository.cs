@@ -12,6 +12,11 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
+using ERPCubes.Application.Features.Crm.Project.Queries.GetDeletedProjects;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
+using ERPCubes.Application.Features.Crm.Project.Commands.RestoreProject;
+using ERPCubes.Application.Features.Crm.Project.Commands.RestoreBulkProject;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -94,16 +99,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                CrmProject? Project = await(
+                CrmProject? project = await(
                     from a in _dbContext.CrmProject.Where(a => a.ProjectId == deleteProject.ProjectId)
                     select a ).FirstOrDefaultAsync();
-                if (Project == null)
+                if (project == null)
                 {
                     throw new NotFoundException("Project Not Found: ", deleteProject.ProjectId);
                 }
                 else
                 {
-                    Project.IsDeleted = 1;
+                    project.IsDeleted = 1;
+                    project.DeletedBy = deleteProject.Id;
+                    project.DeletedDate = DateTime.Now.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
             }
@@ -113,5 +120,73 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<List<GetDeletedProjectVm>> GetDeletedProjects(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedProjectVm> projectDetail = await(from a in _dbContext.CrmProject.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                                select new GetDeletedProjectVm
+                                                                {
+                                                                    Id = a.ProjectId,
+                                                                    Title = a.Title,
+                                                                    DeletedBy = user.FirstName + " " + user.LastName,
+                                                                    DeletedDate = a.DeletedDate,
+                                                                }).OrderBy(a => a.Title).ToListAsync();
+                return projectDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreProject(RestoreProjectCommand project)
+        {
+            try
+            {
+                var restoreProject = await(from a in _dbContext.CrmProject.Where(a => a.ProjectId == project.ProjectId)
+                                           select a).FirstOrDefaultAsync();
+                if (restoreProject == null)
+                {
+                    throw new NotFoundException("project", project);
+                }
+                else
+                {
+                    restoreProject.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task RestoreBulkProject(RestoreBulkProjectCommand project)
+        {
+            try
+            {
+                foreach (var projectId in project.ProjectId)
+                {
+                    var projectDetail = await _dbContext.CrmProject
+                        .Where(p => p.ProjectId == projectId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
+
+                    if (projectDetail == null)
+                    {
+                        throw new NotFoundException(nameof(projectId), projectId);
+                    }
+
+                    projectDetail.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

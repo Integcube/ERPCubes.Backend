@@ -1,7 +1,10 @@
 ﻿using ERPCubes.Application.Features.Crm.Campaign.Commands.DeleteCampaign;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreBulkCampiagn;
+using ERPCubes.Application.Features.Crm.Campaign.Commands.RestoreCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaign;
 using ERPCubes.Application.Features.Crm.Campaign.Queries.GetCampaignSource;
+using ERPCubes.Application.Features.Crm.Campaign.Queries.GetDeletedCampaigns;
 using ERPCubes.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,6 +22,9 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetCampaignVm>> GetCampaign(GetCampaignQuery campaigns);
         Task DeleteCampaign(DeleteCampaignCommand campaigns);
         Task<List<GetCampaignSourceVm>> GetCampaignSource(GetCampaignSourceQuery campaignSource);
+        Task<List<GetDeletedCampaignVm>> GetDeletedCampaigns(int TenantId, string Id);
+        Task RestoreCampaign(RestoreCampaignCommand campaign);
+        Task RestoreBulkCampaign(RestoreBulkCampaignCommand campaign);
 
     }
 }

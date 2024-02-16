@@ -24,7 +24,9 @@ namespace ERPCubes.Domain.Entities
         public int Order { get; set; }
         public int ContactTypeId { get; set; }
         public int TaskTypeId { get; set; }
-        
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
+
 
     }
 }
