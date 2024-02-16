@@ -1,6 +1,7 @@
 ﻿
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddDocument;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddLeadFile;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.DeleteDocument;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
@@ -38,6 +39,7 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(getDocument);
             return Ok(dtos);
         }
+
         [HttpPost("saveFile")]
         public async Task<IActionResult> SaveFile([FromForm] SaveFileDto saveFileDto)
         {
@@ -105,7 +107,75 @@ namespace ERPCubesApi.Controllers
             }
         }
 
+        [HttpPost("addLeadFile")]
+        public async Task<IActionResult> AddLeadFile([FromForm] AddLeadFileDto addLeadFileDto)
+        {
+            try
+            {
+                if (addLeadFileDto.File == null || addLeadFileDto.File.Length == 0)
+                {
+                    return BadRequest("Invalid file");
+                }
 
+                using (var memoryStream = new MemoryStream())
+                {
+                    await addLeadFileDto.File.CopyToAsync(memoryStream);
+                    byte[] fileBytes = memoryStream.ToArray();
+
+                    var directApiBaseUrl = _configuration["AppSettings:FileServerUrl"];
+                    if (directApiBaseUrl == null)
+                    {
+                        _logger.LogError("AppSettings:FileServerUrl is not configured.");
+                        return BadRequest("Internal server error.");
+                    }
+
+                    var saveFileUrl = $"{directApiBaseUrl}/api/FileManagment/savefile?tenantId={int.Parse(addLeadFileDto.TenantId)}";
+
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        using (var formData = new MultipartFormDataContent())
+                        {
+                            var fileContent = new ByteArrayContent(fileBytes);
+                            formData.Add(fileContent, "file", addLeadFileDto.File.FileName);
+                            var saveFileResponse = await httpClient.PostAsync(saveFileUrl, formData);
+                            saveFileResponse.EnsureSuccessStatusCode();
+                            var responseContent = await saveFileResponse.Content.ReadAsStringAsync();
+                            dynamic responseObject = JsonConvert.DeserializeObject(responseContent);
+                            string extension = responseObject.extension;
+                            extension = extension.TrimStart('.').ToUpper();
+                            AddLeadFileCommand vm = new AddLeadFileCommand
+                            {
+                                Id = addLeadFileDto.Id,
+                                TenantId = int.Parse(addLeadFileDto.TenantId),
+                                LeadId = int.Parse(addLeadFileDto.LeadId),
+                                ContactTypeId = int.Parse(addLeadFileDto.ContactTypeId),
+                                File = new AddLeadFileVm
+                                {
+                                    FileId = -1,
+                                    FileName = responseObject.originalFileName,
+                                    Description = "",
+                                    Type = extension,
+                                    Path = responseObject.withoutExtension,
+                                    ParentId = int.Parse(addLeadFileDto.ParentId),
+                                    Size = responseObject.fileSize,
+                                    Id = int.Parse(addLeadFileDto.LeadId),
+                                    ContactTypeId = int.Parse(addLeadFileDto.ContactTypeId),
+                                    CreatedDate = DateTime.UtcNow,
+                                    CreatedBy = addLeadFileDto.Id
+                                },
+                            };
+                            var dtos = await _mediator.Send(vm);
+                            return Ok(dtos);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error during file upload: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
 
         [HttpGet("getfile")]

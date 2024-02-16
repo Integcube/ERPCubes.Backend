@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile
+namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddLeadFile
 {
-    public class AddFileCommand:IRequest<AddLeadFileCommandVm>
+    public class AddLeadFileCommand: IRequest
     {
         public string Id { get; set; }
         public int TenantId { get; set; }
-        public string FileName { get; set; }
+        public AddLeadFileVm File { get; set; }
         public int ParentId { get; set; }
-        public string Description { get; set; }
+        public int ContactTypeId { get; set; }
+        public int LeadId { get; set; }
     }
 }

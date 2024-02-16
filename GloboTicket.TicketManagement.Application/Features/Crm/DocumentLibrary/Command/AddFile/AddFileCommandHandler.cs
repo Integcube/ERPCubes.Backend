@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile
 {
-    public class AddFileCommandHandler : IRequestHandler<AddFileCommand, AddFileCommandVm>
+    public class AddFileCommandHandler : IRequestHandler<AddFileCommand, AddLeadFileCommandVm>
     {
         private readonly ILogger<AddFileCommandHandler> _logger;
         private readonly IAsyncDocumentLibraryRepository _documentRepository;
@@ -20,7 +20,7 @@ namespace ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile
             _logger = logger;
             _documentRepository = documentRepository;
         }
-        public async Task<AddFileCommandVm> Handle(AddFileCommand request, CancellationToken cancellationToken)
+        public async Task<AddLeadFileCommandVm> Handle(AddFileCommand request, CancellationToken cancellationToken)
         {
             try
             {

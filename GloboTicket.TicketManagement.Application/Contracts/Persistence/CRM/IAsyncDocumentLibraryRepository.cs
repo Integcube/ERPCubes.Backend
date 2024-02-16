@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddDocument;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddFile;
+using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.AddLeadFile;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Command.UpdateDocumentCommand;
 using ERPCubes.Application.Features.Crm.DocumentLibrary.Queries.GetDocumentLibrary;
 using ERPCubes.Domain.Entities;
@@ -21,6 +22,10 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task UpdateDocument(UpdateDocumentCommand request);
         Task<AddDocumentCommandVm> AddDocument(AddDocumentCommand request);
 
-        Task<AddFileCommandVm> AddFile(AddFileCommand request);
+        Task<AddLeadFileCommandVm> AddFile(AddFileCommand request);
+
+        Task AddLeadFile(AddLeadFileCommand request);
+
+        public DocumentLibrary addToDocument(string fileName, string description, string type, int parentId, int leadId, string userId, int tenantId, int contactTypeId, string path, decimal size);
     }
 }
