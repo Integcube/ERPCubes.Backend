@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
@@ -220,5 +221,14 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(obj);
             return Ok(dtos);
         }
+
+        [HttpPost("saveCopyQuestion", Name = "SaveCopyQuestion")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> SaveCopyQuestion(SaveCopyQuestionCommand obj)
+        {
+            var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
     }
 }

@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
@@ -63,5 +64,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId);
         Task SaveLeadScoreQuestion(SaveLeadScoreQuestionCommand request);
         Task DeleteLeadScoreQuestion(int TenantId, int QuestionId);
+        Task SaveCopyQuestion(SaveCopyQuestionCommand request);
     }
 }

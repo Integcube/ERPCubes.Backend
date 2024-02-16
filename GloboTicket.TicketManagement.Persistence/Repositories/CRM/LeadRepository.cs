@@ -33,6 +33,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -48,7 +49,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 DateTime localDateTime = DateTime.Now;
                 var deleteLead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == leadId.LeadId)
-                                           select a).FirstOrDefaultAsync();
+                                        select a).FirstOrDefaultAsync();
                 if (deleteLead == null)
                 {
                     throw new NotFoundException("leadId", leadId);
@@ -68,7 +69,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        
+
         public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id)
         {
             try
@@ -144,7 +145,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        
+
         public async Task<List<GetLeadSourceListVm>> GetAllLeadSource(int TenantId, string Id)
         {
             try
@@ -471,7 +472,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 var deleteLead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == request.LeadId)
-                                           select a).FirstOrDefaultAsync();
+                                        select a).FirstOrDefaultAsync();
                 if (deleteLead == null)
                 {
                     throw new NotFoundException("leadId", request);
@@ -599,15 +600,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetDeletedLeadsVm> detail = await(from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
-                                                                select new GetDeletedLeadsVm
-                                                                {
-                                                                    Id = a.LeadId,
-                                                                    Title = a.FirstName,
-                                                                    DeletedBy = user.FirstName + " " + user.LastName,
-                                                                    DeletedDate = a.DeletedDate,
-                                                                }).OrderBy(a => a.Title).ToListAsync();
+                List<GetDeletedLeadsVm> detail = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                        join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                        select new GetDeletedLeadsVm
+                                                        {
+                                                            Id = a.LeadId,
+                                                            Title = a.FirstName,
+                                                            DeletedBy = user.FirstName + " " + user.LastName,
+                                                            DeletedDate = a.DeletedDate,
+                                                        }).OrderBy(a => a.Title).ToListAsync();
                 return detail;
             }
             catch (Exception ex)
@@ -736,7 +737,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var questions = await(
+                var questions = await (
                     from a in _dbContext.CrmIScoringQuestion.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.ProductId == ProductId)
                     select new GetLeadScoreQuestionsVm
                     {
@@ -748,10 +749,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         Weightage = a.Weightage,
                         CreatedDate = a.CreatedDate,
                         TenantId = a.TenantId,
-                    }).OrderBy(a=>a.CreatedDate).ToListAsync();
+                        IsChecked = true,
+                    }).OrderBy(a => a.CreatedDate).ToListAsync();
                 return questions;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
@@ -762,7 +764,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 DateTime localDateTime = DateTime.Now;
-                if(request.Question.QuestionId == -1)
+                if (request.Question.QuestionId == -1)
                 {
                     CrmIScoringQuestion NewQuestion = new CrmIScoringQuestion();
                     NewQuestion.TenantId = request.TenantId;
@@ -778,7 +780,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 else
                 {
-                    CrmIScoringQuestion existingQuestion = await(
+                    CrmIScoringQuestion existingQuestion = await (
                         from q in _dbContext.CrmIScoringQuestion.Where(q => q.TenantId == request.TenantId && q.QuestionId == request.Question.QuestionId)
                         select q).FirstOrDefaultAsync();
                     existingQuestion.Title = request.Question.Title;
@@ -790,12 +792,43 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     await _dbContext.SaveChangesAsync();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
         }
 
+
+
+        public async Task SaveCopyQuestion(SaveCopyQuestionCommand request)
+        {
+            try
+            {
+                DateTime localDateTime = DateTime.Now;
+                foreach (var questionDto in request.Questions)
+                {
+                    if (questionDto.IsChecked == true)
+                    {
+                        CrmIScoringQuestion newQuestion = new CrmIScoringQuestion();
+                        newQuestion.TenantId = request.TenantId;
+                        newQuestion.Title = questionDto.Title;
+                        newQuestion.Code = questionDto.Code;
+                        newQuestion.Order = questionDto.Order;
+                        newQuestion.ProductId = request.ProductId;
+                        newQuestion.Weightage = questionDto.Weightage;
+                        newQuestion.CreatedBy = request.Id;
+                        newQuestion.CreatedDate = localDateTime.ToUniversalTime();
+                        await _dbContext.AddAsync(newQuestion);
+                    }
+                    await _dbContext.SaveChangesAsync();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
         public async Task DeleteLeadScoreQuestion(int TenantId, int QuestionId)
         {
             try

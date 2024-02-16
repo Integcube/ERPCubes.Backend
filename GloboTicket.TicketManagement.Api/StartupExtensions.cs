@@ -36,12 +36,13 @@ namespace ERPCubes.Api
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Open", builder => builder
-        .SetIsOriginAllowed(_ => true)
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials());
+                    .AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    );
             });
-
+           
+      
             builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
 
             return builder.Build();

@@ -4,18 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions
+namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion
 {
-    public class GetLeadScoreQuestionsVm
+    public class SaveCopyQuestionDto
     {
         public int QuestionId { get; set; }
         public string Code { get; set; }
         public string Title { get; set; }
         public int Order { get; set; }
-        public int ProductId { get; set; }
         public decimal Weightage { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
         public int TenantId { get; set; }
         public bool IsChecked { get; set; }
+        
     }
 }
