@@ -18,5 +18,7 @@ namespace ERPCubes.Identity.Models
         public int IsDeleted { get; set; }
         public string Owner { get; set; }
         public Guid TenantGuid { get; set; }
+        public int IsDocumentAcces { get; set; }
+        
     }
 }

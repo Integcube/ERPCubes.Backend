@@ -59,7 +59,8 @@ namespace ERPCubes.Identity.Services
                 UserName = user.User.UserName,
                 Name = user.User.FirstName + " " + user.User.LastName,
                 TenantId = user.User.TenantId,
-                TenantGuid= user.Tenant.TenantGuid
+                TenantGuid= user.Tenant.TenantGuid,
+                IsDocumentAcces= user.Tenant.IsDocumentAcces
             };
             
             return response;
