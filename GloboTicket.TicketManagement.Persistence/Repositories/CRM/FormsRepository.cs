@@ -120,8 +120,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     newForm.TenantId = request.TenantId;
                     await _dbContext.AddAsync(newForm);
                     await _dbContext.SaveChangesAsync();
-                    string[] stringArray = { "First Name", "Last Name", "Email" };
-                    for (int i = 1; i < 4; i++)
+                    string[] stringArray = { "First Name", "Last Name", "Email", "Phone" };
+                    for (int i = 1; i <= stringArray.Length; i++)
                     {
                         CrmFormFields newField = new CrmFormFields();
                         newField.FormId = newForm.FormId;

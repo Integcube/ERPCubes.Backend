@@ -346,6 +346,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     .Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.ContactTypeId == ContactTypeId && a.Id == LeadId)
                     select new GetLeadAttachmentsVm
                     {
+                        FileId = a.FileId,
                         Size = a.Size,
                         Path = a.Path,
                         FileName = a.FileName,
