@@ -224,19 +224,23 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     if (result.FieldLabel == "Email")
                     {
                         newLead.Email = result.Result;
-                    }
-                    ;
+                    };
+
+                    if (result.FieldLabel == "Phone")
+                    {
+                        newLead.Mobile = result.Result;
+                    };
                 }
                 newLead.Status = 1;
                 newLead.LeadOwner = "-1";
-                newLead.Mobile = "-1";
-                newLead.Work = "-1";
-                newLead.Address = "-1";
-                newLead.Street = "-1";
-                newLead.City = "-1";
-                newLead.Zip = "-1";
-                newLead.State = "-1";
-                newLead.Country = "-1";
+            
+                newLead.Work = "";
+                newLead.Address = "";
+                newLead.Street = "";
+                newLead.City = "";
+                newLead.Zip = "";
+                newLead.State = "";
+                newLead.Country = "";
                 newLead.SourceId = -1;
                 newLead.IndustryId = -1;
                 newLead.ProductId = -1;
