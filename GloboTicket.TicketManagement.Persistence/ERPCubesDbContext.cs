@@ -85,6 +85,7 @@ namespace ERPCubes.Persistence
         public DbSet<CrmLeadScore> CrmLeadScore { get; set; }
 
         public DbSet<CrmIScoringQuestion> CrmIScoringQuestion { get; set; }
-
+        public DbSet<CrmChatbotSetting> CrmChatbotSetting { get; set; }
+        
     }
 }

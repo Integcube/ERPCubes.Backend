@@ -50,6 +50,8 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncDocumentLibraryRepository, DocumentLibraryRepository>();
             services.AddScoped<IAsyncTenantRepository, TenantRepository>();
             services.AddScoped<IAsyncChatbotRepository, ChatbotRepository>();
+            services.AddScoped<IAsyncCrmSettingRepository, CrmSettingRepository>();
+
             return services;    
         }
     }
