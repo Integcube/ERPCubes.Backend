@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Features.Social.Webhooks.Instagram.Commands;
+using ERPCubes.Application.Features.Social.Webhooks.Whatsapp.Commands;
 using ERPCubes.Domain.Entities;
 using ERPCubesApi.Hubs;
 using ERPCubesApi.Models;
@@ -40,7 +41,7 @@ namespace ERPCubesApi.Controllers
             }
         }
         [HttpPost("instagram")]
-        public async Task<IActionResult> HandleInstagramWebhook([FromQuery(Name = "tenantId")] string tenantId)
+        public async Task<IActionResult> HandleInstagramWebhook([FromQuery(Name = "key")] string key)
         {
             try
             {
@@ -50,7 +51,7 @@ namespace ERPCubesApi.Controllers
                     InstagramWebhook instagramWebhook = JsonConvert.DeserializeObject<InstagramWebhook>(body);
                     InstagramWebhookCommand data = new InstagramWebhookCommand
                     {
-                        TenantId = tenantId,
+                        TenantId = key,
                         Data = instagramWebhook
                     };
                     InstagramWebhookVm dtos = await _mediator.Send(data);
@@ -66,7 +67,7 @@ namespace ERPCubesApi.Controllers
             }
         }
         [HttpPost("whatsapp")]
-        public async Task<IActionResult> HandleWhatsAppWebhook([FromQuery(Name = "tenantId")] string tenantId)
+        public async Task<IActionResult> HandleWhatsAppWebhook([FromQuery(Name = "key")] string key)
         {
             try
             {
@@ -75,9 +76,17 @@ namespace ERPCubesApi.Controllers
                     string body = await reader.ReadToEndAsync();
                     WhatsAppWebhook whatsappWebhook = JsonConvert.DeserializeObject<WhatsAppWebhook>(body);
 
+                    WhatsappWebhookCommand data = new WhatsappWebhookCommand
+                    {
+                        TenantId = key,
+                        Data = whatsappWebhook
+                    };
 
+                    WhatsappWebhookVm dtos = await _mediator.Send(data);
 
-                    return Ok();
+                    // Add your custom logic here, if needed
+
+                    return Ok(dtos);
                 }
             }
             catch (Exception ex)
@@ -86,5 +95,6 @@ namespace ERPCubesApi.Controllers
                 return StatusCode(500, "An error occurred while processing the WhatsApp webhook");
             }
         }
+
     }
 }
