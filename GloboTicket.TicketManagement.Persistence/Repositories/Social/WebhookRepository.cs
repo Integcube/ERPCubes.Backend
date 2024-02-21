@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.Social.Webhooks;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Social.Webhooks.Instagram.Commands;
+using ERPCubes.Application.Features.Social.Webhooks.Whatsapp.Commands;
 using ERPCubes.Application.Features.Tickets.Queries.GetAllTickets;
 using ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation;
 using ERPCubes.Domain.Entities;
@@ -28,6 +29,7 @@ namespace ERPCubes.Persistence.Repositories.Social
          
                 try
                 {
+                var test = Convert.ToInt32(message.TenantId);
                     Ticket tik = await (from a in _dbContext.Ticket.Where(a => a.CustomerId == message.Data.Entry[0].Messaging[0].Sender.Id)
                                         select a).FirstOrDefaultAsync();
                     if (tik == null)
@@ -38,12 +40,12 @@ namespace ERPCubes.Persistence.Repositories.Social
                         {
                             SocialMediaPlatform = "Instagram",
                             CustomerId = message.Data.Entry[0].Messaging[0].Sender.Id,
-                            Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(message.Data.Entry[0].Time).UtcDateTime,
+                            Timestamp = DateTime.Now.ToUniversalTime(),
                             Status = -1,
                             AssigneeId = "-1",
                             Priority = -1,
                             Type = -1,
-                            Category = "General",
+                            Category = "General",   
                             ResolutionStatus = null,
                             DueDate = DateTime.Now.ToUniversalTime(),
                             Notes = null,
@@ -53,7 +55,7 @@ namespace ERPCubes.Persistence.Repositories.Social
                             LastModifiedDate = null,
                             RecentlyActive = DateTime.Now.ToUniversalTime(),
                             IsDeleted = 0,
-                            TenantId = int.Parse(message.TenantId),
+                            TenantId = Convert.ToInt32(message.TenantId),
                         };
                         _dbContext.Add(ticket);
                         _dbContext.SaveChanges();
@@ -87,7 +89,7 @@ namespace ERPCubes.Persistence.Repositories.Social
                         return obj;
 
                     }
-                }
+                }   
                 catch (Exception ex)
                 {
                     throw new BadRequestException(ex.Message);
@@ -153,12 +155,113 @@ namespace ERPCubes.Persistence.Repositories.Social
                 MessageStatus = null,
                 EventType = null,
                 CustomerFeedback = null,
-                TenantId = int.Parse(message.TenantId),
+                TenantId = Convert.ToInt32(message.TenantId),
                 CreatedBy = "InstagramWebhook",
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedBy = null,
                 LastModifiedDate = null,
             };
+        }
+
+        private Conversation BuildConversationObjectt(Ticket ticket, WhatsappWebhookCommand message)
+        {
+            var firstMessage = message.Data.Entry[0].Changes[0].Value.Messages[0];
+
+            return new Conversation
+            {
+                TicketId = ticket.TicketId,
+                FromId = firstMessage.From,
+                ToId = firstMessage.Id,
+                Timestamp = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(firstMessage.Timestamp)).UtcDateTime,
+                MessageType = "Text",
+                MessageBody = firstMessage.Text.Body,
+                MediaType = null,
+                ReadStatus = false,
+                Reaction = null,
+                ForwardedStatus = false,
+                Location = null,
+                MessageStatus = null,
+                EventType = null,
+                CustomerFeedback = null,
+                TenantId = Convert.ToInt32(message.TenantId),
+                CreatedBy = "WhatsAppWebhook",
+                CreatedDate = DateTime.UtcNow,
+                LastModifiedBy = null,
+                LastModifiedDate = null,
+            };
+        }
+
+        public async Task<WhatsappWebhookVm> SaveWhatsappMessage(WhatsappWebhookCommand message)
+        {
+            try
+            {
+                var test = Convert.ToInt32(message.TenantId);
+                var firstMessage = message.Data.Entry[0].Changes[0].Value.Messages[0];
+                Ticket tik = await _dbContext.Ticket
+                .Where(a => a.CustomerId == firstMessage.From)
+                .FirstOrDefaultAsync();
+                if (tik == null)
+                {
+                    using (var transactionScope = new TransactionScope())
+                    {
+                        Ticket ticket = new Ticket
+                        {
+                            SocialMediaPlatform = "WhatsApp",
+                            CustomerId = firstMessage.From,
+                            Timestamp = DateTime.Now.ToUniversalTime(),
+                            Status = -1,
+                            AssigneeId = "-1",
+                            Priority = -1,
+                            Type = -1,
+                            Category = "General",
+                            ResolutionStatus = null,
+                            DueDate = DateTime.Now.ToUniversalTime(),
+                            Notes = null,
+                            CreatedBy = "InstagramWebhook",
+                            CreatedDate = DateTime.Now.ToUniversalTime(),
+                            LastModifiedBy = null,
+                            LastModifiedDate = null,
+                            RecentlyActive = DateTime.Now.ToUniversalTime(),
+                            IsDeleted = 0,
+                            TenantId = Convert.ToInt32(message.TenantId),
+                        };
+                        _dbContext.Add(ticket);
+                        _dbContext.SaveChanges();
+
+                        Conversation conversation = BuildConversationObjectt(ticket, message);
+                        _dbContext.Add(conversation);
+                        _dbContext.SaveChanges();
+                        transactionScope.Complete();
+                        GetAllTicketsVm returnTicket = BuildTicketObject(ticket, conversation);
+                        var obj = new WhatsappWebhookVm
+                        {
+                            Ticket = returnTicket,
+                            Conversation = conversation
+                        };
+                        return obj;
+                    }
+                }
+                else
+                {
+                    tik.RecentlyActive = DateTime.Now.ToUniversalTime();
+                    Conversation conversation = BuildConversationObjectt(tik, message);
+                    _dbContext.Add(conversation);
+                    _dbContext.SaveChanges();
+                    GetAllTicketsVm returnTicket = BuildTicketObject(tik, conversation);
+
+                    var obj = new WhatsappWebhookVm
+                    {
+                        Ticket = returnTicket,
+                        Conversation = conversation
+                    };
+                    return obj;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
     }
 }
