@@ -48,17 +48,25 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetCalenderListVm> calenderDetail = await (from a in _dbContext.CrmCalenderEvents.Where(a => (a.TenantId == TenantId) && (a.IsDeleted == 0) && (a.UserId == Id) && (a.CreatedBy == Id))
-                                                                select new GetCalenderListVm
-                                                                {
-                                                                    Id = a.EventId,
-                                                                    UserId = a.UserId,
-                                                                    Title = a.Description,
-                                                                    Type = a.Type,
-                                                                    End = a.EndTime,
-                                                                    Start = a.StartTime,
-                                                                    AllDay = a.AllDay,
-                                                                }).OrderByDescending(a => a.Id).ToListAsync();
+                List<GetCalenderListVm> calenderDetail = await (
+            from a in _dbContext.CrmCalenderEvents
+                .Where(a => (a.TenantId == TenantId) && (a.IsDeleted == 0) && (a.UserId == Id) && (a.CreatedBy == Id))
+            join lead in _dbContext.CrmLead
+                .Where(l => l.TenantId == TenantId && l.IsDeleted == 0)
+                on a.Id equals lead.LeadId into leadJoin
+            from leadData in leadJoin.DefaultIfEmpty()
+            select new GetCalenderListVm
+            {
+                Id = a.EventId,
+                UserId = a.UserId,
+                Title = a.Description,
+                Type = a.Type,
+                End = a.EndTime,
+                Start = a.StartTime,
+                AllDay = a.AllDay,
+                FirstName = leadData.FirstName, 
+                LastName = leadData.LastName,
+            }).OrderByDescending(a => a.Id).ToListAsync();
                 return calenderDetail;
             }
             catch(Exception ex)
