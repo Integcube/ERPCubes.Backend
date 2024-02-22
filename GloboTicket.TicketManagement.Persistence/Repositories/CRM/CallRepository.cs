@@ -131,6 +131,24 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         await _dbContext.AddAsync(task);
                         await _dbContext.SaveChangesAsync();
 
+
+                        CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
+                        CalenderObj.UserId = task.CreatedBy;
+                        CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
+                        //CalenderObj.Type = task.TaskTypeId = call.Task.TaskTypeId;
+                        CalenderObj.CreatedBy = task.CreatedBy;
+                        CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();
+                        CalenderObj.StartTime = call.DueDate != null ? call.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
+                        CalenderObj.EndTime = (call.DueDate != null ? call.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime());
+                        CalenderObj.TenantId = task.TenantId;
+                        CalenderObj.AllDay = false;
+                        CalenderObj.ContactTypeId = call.ContactTypeId;
+                        CalenderObj.Id = call.ContactId;
+                        CalenderObj.ActivityId = task.TaskId;
+
+                        await _dbContext.CrmCalenderEvents.AddAsync(CalenderObj);
+                        await _dbContext.SaveChangesAsync();
+
                         var result = _dbContext.Database.ExecuteSqlRaw(
                                "CALL public.InsertCrmUserActivityLog({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8},{9})",
                                   call.Id, (int)CrmEnum.UserActivityEnum.Task, 1, call.Subject, call.Id, call.TenantId, call.ContactTypeId, call.TaskId, "Insertion", call.ContactId);
