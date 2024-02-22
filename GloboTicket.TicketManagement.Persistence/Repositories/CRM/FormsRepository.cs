@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Contracts.Persistence.CRM;
+﻿using AutoMapper;
+using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Call.Commands.Delete;
 using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
@@ -22,7 +23,7 @@ using static Npgsql.PostgresTypes.PostgresCompositeType;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
-    public class FormsRepository: BaseRepository<CrmForm>, IAsyncFormsRepository
+    public class FormsRepository : BaseRepository<CrmForm>, IAsyncFormsRepository
     {
         public FormsRepository(
             ERPCubesDbContext _dbContext,
@@ -58,7 +59,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 List<GetFormsListVm> obj = await (
                             from a in _dbContext.CrmForm
-                            .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId)                              
+                            .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId)
                             select new GetFormsListVm
                             {
                                 FormId = a.FormId,
@@ -75,7 +76,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
-        } 
+        }
         public async Task<List<GetFormFieldsVm>> GetFormFields(int FormId, int TenantId)
         {
             try
@@ -85,7 +86,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 List<GetFormFieldsVm> obj = await (
                             from a in _dbContext.CrmFormFields
                             .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && a.FormId == FormId)
-                            select new GetFormFieldsVm 
+                            select new GetFormFieldsVm
                             {
                                 FormId = a.FormId,
                                 FieldId = a.FieldId,
@@ -110,7 +111,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             DateTime localDateTime = DateTime.Now;
             try
             {
-                if(request.FormId == -1)
+                if (request.FormId == -1)
                 {
                     CrmForm newForm = new CrmForm();
                     newForm.Name = request.Name;
@@ -126,7 +127,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     {
                         CrmFormFields newField = new CrmFormFields();
                         newField.FormId = newForm.FormId;
-                        newField.FieldLabel = stringArray[i-1];
+                        newField.FieldLabel = stringArray[i - 1];
                         newField.FieldType = 1;
                         newField.Placeholder = "";
                         newField.Values = null;
@@ -138,7 +139,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         newField.CreatedDate = localDateTime.ToUniversalTime();
                         newField.TenantId = request.TenantId;
                         await _dbContext.CrmFormFields.AddAsync(newField);
-                        
+
                     }
                     await _dbContext.SaveChangesAsync();
                 }
@@ -146,7 +147,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     var existingForm = await (
                         from a in _dbContext.CrmForm
-                        .Where(id => id.TenantId == request.TenantId && id.FormId == request.FormId) 
+                        .Where(id => id.TenantId == request.TenantId && id.FormId == request.FormId)
                         select a).FirstOrDefaultAsync();
                     existingForm.Name = request.Name;
                     existingForm.Description = request.Description;
@@ -155,9 +156,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     existingForm.LastModifiedDate = localDateTime.ToUniversalTime();
                     await _dbContext.SaveChangesAsync();
                 }
-                
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
@@ -174,26 +175,26 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 foreach (var field in request.FormFields)
                 {
-                        CrmFormFields newField = new CrmFormFields();
-                        newField.FormId = field.FormId;
-                        newField.FieldLabel = field.FieldLabel;
-                        newField.FieldType = field.FieldType;
-                        newField.Placeholder = field.Placeholder;
-                        newField.Values = field.Values;
-                        newField.IsFixed = field.IsFixed;
-                        newField.Order = field.Order;
-                        newField.DisplayLabel = field.DisplayLabel;
-                        newField.CSS = field.CSS;
-                        newField.CreatedBy = request.Id;
-                        newField.CreatedDate = localDateTime.ToUniversalTime();
-                        newField.TenantId = request.TenantId;
-                        await _dbContext.AddAsync(newField);                        
+                    CrmFormFields newField = new CrmFormFields();
+                    newField.FormId = field.FormId;
+                    newField.FieldLabel = field.FieldLabel;
+                    newField.FieldType = field.FieldType;
+                    newField.Placeholder = field.Placeholder;
+                    newField.Values = field.Values;
+                    newField.IsFixed = field.IsFixed;
+                    newField.Order = field.Order;
+                    newField.DisplayLabel = field.DisplayLabel;
+                    newField.CSS = field.CSS;
+                    newField.CreatedBy = request.Id;
+                    newField.CreatedDate = localDateTime.ToUniversalTime();
+                    newField.TenantId = request.TenantId;
+                    await _dbContext.AddAsync(newField);
                     await _dbContext.SaveChangesAsync();
                 }
 
-               
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
@@ -211,7 +212,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     newResult.FormId = result.FormId;
                     newResult.FieldId = result.FieldId;
                     newResult.Result = result.Result;
-                    //newField.CreatedBy = request.Id;
                     newResult.CreatedDate = localDateTime.ToUniversalTime();
                     newResult.TenantId = request.TenantId;
                     await _dbContext.AddAsync(newResult);
@@ -221,13 +221,14 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     }
                     else
                     {
-                        // Handle new input fields
-                        remarksBuilder.AppendLine($"{result.FieldLabel}: {result.Result}");
+                        if (result != null && !string.IsNullOrEmpty(result.Result))
+                        {
+                            remarksBuilder.AppendLine($"{result.FieldLabel}: {result.Result}");
+                        }
                     }
                 }
                 newLead.Status = 1;
                 newLead.LeadOwner = "-1";
-            
                 newLead.Work = "";
                 newLead.Address = "";
                 newLead.Street = "";
@@ -235,7 +236,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 newLead.Zip = "";
                 newLead.State = "";
                 newLead.Country = "";
-                newLead.SourceId = -1;
+                newLead.SourceId = 1; //defulat webiste
                 newLead.IndustryId = -1;
                 newLead.ProductId = -1;
                 newLead.CreatedBy = "-1";
@@ -253,8 +254,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
         }
         private bool IsFixedField(string fieldLabel)
         {
-            // Add logic to check if the field is a fixed field (e.g., first name, last name, email, phone)
-            // Return true if it's a fixed field, false otherwise
             switch (fieldLabel)
             {
                 case "First Name":
@@ -269,7 +268,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         private void HandleFixedField(CrmLead newLead, SaveFormResultDto result)
         {
-            // Handle fixed fields (e.g., first name, last name, email, phone)
+           
             switch (result.FieldLabel)
             {
                 case "First Name":
@@ -284,7 +283,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 case "Phone":
                     newLead.Mobile = result.Result;
                     break;
-                    // Add more conditions for other fixed fields
             }
         }
 
@@ -316,15 +314,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetDeletedFormVm> formDetail = await(from a in _dbContext.CrmForm.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
-                                                                select new GetDeletedFormVm
-                                                                {
-                                                                    Id = a.FormId,
-                                                                    Title = a.Name,
-                                                                    DeletedBy = user.FirstName + " " + user.LastName,
-                                                                    DeletedDate = a.DeletedDate,
-                                                                }).OrderBy(a => a.Title).ToListAsync();
+                List<GetDeletedFormVm> formDetail = await (from a in _dbContext.CrmForm.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                           join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                           select new GetDeletedFormVm
+                                                           {
+                                                               Id = a.FormId,
+                                                               Title = a.Name,
+                                                               DeletedBy = user.FirstName + " " + user.LastName,
+                                                               DeletedDate = a.DeletedDate,
+                                                           }).OrderBy(a => a.Title).ToListAsync();
                 return formDetail;
             }
             catch (Exception ex)
@@ -337,8 +335,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var restoreForm = await(from a in _dbContext.CrmForm.Where(a => a.FormId == form.FormId)
-                                           select a).FirstOrDefaultAsync();
+                var restoreForm = await (from a in _dbContext.CrmForm.Where(a => a.FormId == form.FormId)
+                                         select a).FirstOrDefaultAsync();
                 if (restoreForm == null)
                 {
                     throw new NotFoundException("form", form);
