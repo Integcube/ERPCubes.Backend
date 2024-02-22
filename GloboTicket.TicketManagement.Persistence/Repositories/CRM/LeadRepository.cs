@@ -135,7 +135,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         ModifiedDate = grouped.First().a.LastModifiedDate,
         LeadOwnerName = grouped.First().us.FirstName + " " + grouped.First().us.LastName,
         Rating = grouped.Sum(ls => ls.sc.Rating * ls.question.Weightage) / (grouped.Sum(ls => ls.question.Weightage) == 0 ? 1 : grouped.Sum(ls => ls.question.Weightage)),
-
+        Remarks= grouped.First().a.Remarks
     }
 ).ToListAsync();
                 return Leads;
@@ -395,6 +395,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         LeadObj.CampaignId = Lead.CampaignId;
                         LeadObj.LastModifiedBy = Id;
                         LeadObj.LastModifiedDate = localDateTime.ToUniversalTime();
+                        LeadObj.Remarks = Lead.Remarks;
+                        
                         await _dbContext.SaveChangesAsync();
                     }
 
@@ -423,6 +425,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.CreatedDate = localDateTime.ToUniversalTime();
                     LeadObj.IsDeleted = 0;
                     LeadObj.TenantId = TenantId;
+                    LeadObj.Remarks = Lead.Remarks;
                     await _dbContext.AddAsync(LeadObj);
                     await _dbContext.SaveChangesAsync();
 

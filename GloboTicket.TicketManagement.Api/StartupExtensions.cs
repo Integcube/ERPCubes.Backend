@@ -8,6 +8,7 @@ using ERPCubes.Infrastructure;
 using ERPCubes.Persistence;
 using ERPCubesApi.Hubs;
 using ERPCubesApi.Services;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Text.Json;
 //using Serilog;
@@ -33,16 +34,28 @@ namespace ERPCubes.Api
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
+
+        //    builder.Services.AddCors(options =>
+        //    {
+        //        options.AddPolicy("Open", builder => builder
+        //                .SetIsOriginAllowed(_ => true)
+        //.AllowAnyHeader()
+        //.AllowAnyMethod()
+        //.AllowCredentials());
+        //         });
+
+
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("Open", builder => builder
                     .AllowAnyOrigin()
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    );
+                );
             });
-           
-      
+
+
+
             builder.Services.AddSignalR(o => o.EnableDetailedErrors = true);
 
             return builder.Build();
@@ -60,10 +73,10 @@ namespace ERPCubes.Api
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ERPCubes API");
                 });
             }
-
+            app.UseCors("Open");
             app.UseHttpsRedirection();
 
-            app.UseCors("Open");
+          
             app.UseAuthentication();
 
             app.UseCustomExceptionHandler();

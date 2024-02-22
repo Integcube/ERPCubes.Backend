@@ -29,6 +29,7 @@
         public DateTime? ModifiedDate { get; set; }
         public string LeadOwnerName { get; set; }
         public decimal Rating { get; set; }
+        public string Remarks { get; set; }
         
     }
 }

@@ -31,5 +31,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead
         public string ProductTitle { get; set; } 
         public string CampaignId { get; set; } 
         public DateTime CreatedDate { get; set; }
+        public string Remarks { get; set; }
+        
     }
 }

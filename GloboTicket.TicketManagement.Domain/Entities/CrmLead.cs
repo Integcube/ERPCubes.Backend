@@ -33,5 +33,7 @@ namespace ERPCubes.Domain.Entities
         public string CampaignId { get; set; } = string.Empty;
         public string DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
+        public string Remarks { get; set; }
+        
     }
 }
