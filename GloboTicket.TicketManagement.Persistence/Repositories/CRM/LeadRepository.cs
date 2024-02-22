@@ -451,6 +451,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.Status = 1;
                     LeadObj.LeadOwner = request.Id;
                     LeadObj.City = Lead.City;
+                    LeadObj.Mobile= Lead.Mobile;
                     LeadObj.Address = Lead.Address;
                     LeadObj.Country = Lead.Country;
                     LeadObj.Street = Lead.Street;
