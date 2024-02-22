@@ -16,6 +16,7 @@ using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static Npgsql.PostgresTypes.PostgresCompositeType;
 
@@ -203,6 +204,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 DateTime localDateTime = DateTime.Now;
                 CrmLead newLead = new CrmLead();
+                StringBuilder remarksBuilder = new StringBuilder();
                 foreach (var result in request.FormResult)
                 {
                     CrmFormResults newResult = new CrmFormResults();
@@ -213,23 +215,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     newResult.CreatedDate = localDateTime.ToUniversalTime();
                     newResult.TenantId = request.TenantId;
                     await _dbContext.AddAsync(newResult);
-                    if (result.FieldLabel == "First Name")
+                    if (IsFixedField(result.FieldLabel))
                     {
-                        newLead.FirstName = result.Result;
+                        HandleFixedField(newLead, result);
                     }
-                    if (result.FieldLabel == "Last Name")
+                    else
                     {
-                        newLead.LastName = result.Result;
+                        // Handle new input fields
+                        remarksBuilder.AppendLine($"{result.FieldLabel}: {result.Result}");
                     }
-                    if (result.FieldLabel == "Email")
-                    {
-                        newLead.Email = result.Result;
-                    };
-
-                    if (result.FieldLabel == "Phone")
-                    {
-                        newLead.Mobile = result.Result;
-                    };
                 }
                 newLead.Status = 1;
                 newLead.LeadOwner = "-1";
@@ -248,6 +242,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 newLead.CreatedDate = localDateTime.ToUniversalTime();
                 newLead.IsDeleted = 0;
                 newLead.TenantId = request.TenantId;
+                newLead.Remarks = remarksBuilder.ToString();
                 await _dbContext.CrmLead.AddAsync(newLead);
                 await _dbContext.SaveChangesAsync();
             }
@@ -256,7 +251,42 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+        private bool IsFixedField(string fieldLabel)
+        {
+            // Add logic to check if the field is a fixed field (e.g., first name, last name, email, phone)
+            // Return true if it's a fixed field, false otherwise
+            switch (fieldLabel)
+            {
+                case "First Name":
+                case "Last Name":
+                case "Email":
+                case "Phone":
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
+        private void HandleFixedField(CrmLead newLead, SaveFormResultDto result)
+        {
+            // Handle fixed fields (e.g., first name, last name, email, phone)
+            switch (result.FieldLabel)
+            {
+                case "First Name":
+                    newLead.FirstName = result.Result;
+                    break;
+                case "Last Name":
+                    newLead.LastName = result.Result;
+                    break;
+                case "Email":
+                    newLead.Email = result.Result;
+                    break;
+                case "Phone":
+                    newLead.Mobile = result.Result;
+                    break;
+                    // Add more conditions for other fixed fields
+            }
+        }
 
         public async Task Delete(DeleteCommand formId)
         {
