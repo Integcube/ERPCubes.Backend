@@ -55,6 +55,19 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     deleteCall.IsDeleted = 1;
                     await _dbContext.SaveChangesAsync();
+
+                    var calendarEvent = await _dbContext.CrmCalenderEvents
+                        .Where(e => e.TenantId == deleteCall.TenantId
+                            && e.ActivityId == deleteCall.TaskId
+                            && e.ContactTypeId == deleteCall.ContactTypeId
+                            )
+                        .FirstOrDefaultAsync();
+
+                    if (calendarEvent != null)
+                    {
+                        _dbContext.CrmCalenderEvents.Remove(calendarEvent);
+                        await _dbContext.SaveChangesAsync();
+                    }
                 }
             }
             catch (Exception ex)

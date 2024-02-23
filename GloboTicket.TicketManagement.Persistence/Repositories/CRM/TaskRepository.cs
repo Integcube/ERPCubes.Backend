@@ -27,8 +27,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var task = await (from a in _dbContext.CrmTask.Where(a => a.TaskId == request.TaskId)
-                                  select a).FirstOrDefaultAsync();
+                var task = await _dbContext.CrmTask
+                    .Where(a => a.TaskId == request.TaskId)
+                    .FirstOrDefaultAsync();
+
                 if (task == null)
                 {
                     throw new NotFoundException(request.TaskTitle, request.TaskId);
@@ -38,7 +40,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.IsDeleted = 1;
                     task.DeletedBy = request.Id;
                     task.DeletedDate = DateTime.Now.ToUniversalTime();
+
                     await _dbContext.SaveChangesAsync();
+
+                    var calendarEvent = await _dbContext.CrmCalenderEvents
+                        .Where(e => e.TenantId == task.TenantId
+                            && e.ActivityId == task.TaskId
+                            && e.ContactTypeId == task.ContactTypeId
+                            )
+                        .FirstOrDefaultAsync();
+
+                    if (calendarEvent != null)
+                    {
+                        _dbContext.CrmCalenderEvents.Remove(calendarEvent);
+                        await _dbContext.SaveChangesAsync();
+                    }
                 }
             }
             catch (Exception ex)
@@ -46,6 +62,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
         public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int ContactTypeId, int ContactId)
         {
             try
