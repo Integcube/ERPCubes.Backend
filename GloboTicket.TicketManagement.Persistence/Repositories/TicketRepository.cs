@@ -31,6 +31,10 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
+
+                DateTime resultDate = GetDateFromCurrentMinusDays(request.Days);
+
+
                 List<GetAllTicketsVm> tickets = await (from a in _dbContext.Ticket.Where(a => a.IsDeleted == 0 && a.TenantId == request.TenantId)
                                                        select new GetAllTicketsVm
                                                        {
@@ -241,5 +245,14 @@ namespace ERPCubes.Persistence.Repositories
                 throw new BadRequestException(ex.Message);
             }
         }
+
+        static DateTime GetDateFromCurrentMinusDays(int numberOfDays)
+        {
+            DateTime currentDate = DateTime.Now;
+            DateTime resultDate = currentDate.AddDays(-numberOfDays);
+
+            return resultDate;
+        }
+
     }
 }

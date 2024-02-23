@@ -139,7 +139,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         CalenderObj.CreatedBy = task.CreatedBy;
                         CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();
                         CalenderObj.StartTime = call.DueDate != null ? call.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
-                        CalenderObj.EndTime = (call.DueDate != null ? call.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime());
+                        CalenderObj.EndTime = (call.DueDate != null ? call.DueDate.Value.ToUniversalTime().AddHours(1) : DateTime.Now.ToUniversalTime().AddHours(1));
                         CalenderObj.TenantId = task.TenantId;
                         CalenderObj.AllDay = false;
                         CalenderObj.ContactTypeId = call.ContactTypeId;
