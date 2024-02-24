@@ -21,43 +21,43 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetOpportunityVm> Opportunity = await (from a in _dbContext.CrmOpportunity.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0
-                                               //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.OpportunityOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
-                                               )
-                                                            join s in _dbContext.CrmOpportunityStatus.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.StatusId equals s.StatusId
-                                                            join i in _dbContext.CrmIndustry.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
-                                                            from ii in all.DefaultIfEmpty()
-                                                            join z in _dbContext.CrmOpportunitySource.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.SourceId equals z.SourceId into all2
-                                                            from zz in all2.DefaultIfEmpty()
-                                                            join p in _dbContext.CrmProduct.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
-                                                            from pp in all3.DefaultIfEmpty()
-                                                            select new GetOpportunityVm
-                                                            {
-                                                                OpportunityId = a.OpportunityId,
-                                                                FirstName = a.FirstName,
-                                                                LastName = a.LastName,
-                                                                Email = a.Email,
-                                                                StatusId = a.StatusId,
-                                                                StatusTitle = s.StatusTitle,
-                                                                OpportunityOwner = a.OpportunityOwner,
-                                                                Mobile = a.Mobile,
-                                                                Work = a.Work,
-                                                                Address = a.Address,
-                                                                Street = a.Street,
-                                                                City = a.City,
-                                                                Zip = a.Zip,
-                                                                State = a.State,
-                                                                Country = a.Country,
-                                                                SourceId = a.SourceId,
-                                                                SourceTitle = zz.SourceTitle,
-                                                                IndustryId = a.IndustryId,
-                                                                IndustryTitle = ii.IndustryTitle,
-                                                                ProductId = a.ProductId,
-                                                                ProductTitle = pp.ProductName,
-                                                                CreatedDate = a.CreatedDate,
-                                                                ModifiedDate = a.LastModifiedDate,
-                                                            }
-                                              ).OrderByDescending(a => a.OpportunityId).ToListAsync();
+                List<GetOpportunityVm> Opportunity = await (
+                    from a in _dbContext.CrmOpportunity.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0)
+                    //&& (CreatedDate == null || a.CreatedDate >= CreatedDate) && (ModifiedDate == null || a.LastModifiedDate >= ModifiedDate) && ((OwnerIds.Count == 0) || OwnerIds.Contains(a.OpportunityOwner)) && ((StatusIds.Count == 0) || StatusIds.Contains((int)a.Status))
+                    join s in _dbContext.CrmOpportunityStatus.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.StatusId equals s.StatusId
+                    join i in _dbContext.CrmIndustry.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.IndustryId equals i.IndustryId into all
+                    from ii in all.DefaultIfEmpty()
+                    join z in _dbContext.CrmLeadSource.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.SourceId equals z.SourceId into all2
+                    from zz in all2.DefaultIfEmpty()
+                    join p in _dbContext.CrmProduct.Where(a => a.TenantId == request.TenantId || a.TenantId == -1 && a.IsDeleted == 0) on a.ProductId equals p.ProductId into all3
+                    from pp in all3.DefaultIfEmpty()
+                    select new GetOpportunityVm
+                    {
+                        OpportunityId = a.OpportunityId,
+                        FirstName = a.FirstName,
+                        LastName = a.LastName,
+                        Email = a.Email,
+                        StatusId = a.StatusId,
+                        StatusTitle = s.StatusTitle,
+                        OpportunityOwner = a.OpportunityOwner,
+                        Mobile = a.Mobile,
+                        Work = a.Work,
+                        Address = a.Address,
+                        Street = a.Street,
+                        City = a.City,
+                        Zip = a.Zip,
+                        State = a.State,
+                        Country = a.Country,
+                        SourceId = a.SourceId,
+                        SourceTitle = zz.SourceTitle,
+                        IndustryId = a.IndustryId,
+                        IndustryTitle = ii.IndustryTitle,
+                        ProductId = a.ProductId,
+                        ProductTitle = pp.ProductName,
+                        CreatedDate = a.CreatedDate,
+                        ModifiedDate = a.LastModifiedDate,
+                    }
+                    ).OrderByDescending(a => a.OpportunityId).ToListAsync();
 
                 if (Opportunity == null)
                 {
@@ -78,7 +78,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetOpportunitySourceVm> OpportunitySource = await (
-                    from a in _dbContext.CrmOpportunitySource.Where(a => a.IsDeleted == 0)
+                    from a in _dbContext.CrmLeadSource.Where(a => a.IsDeleted == 0)
                     select new GetOpportunitySourceVm
                     {
                         SourceId = a.SourceId,
@@ -103,13 +103,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetOpportunityStatusVm> OpportunityStatus = await (from a in _dbContext.CrmOpportunityStatus.Where(a => a.TenantId == -1 || a.TenantId == request.TenantId && a.IsDeleted == 0)
-                                                              select new GetOpportunityStatusVm
-                                                              {
-                                                                  StatusId = a.StatusId,
-                                                                  StatusTitle = a.StatusTitle,
-                                                                  IsDeletable = a.IsDeletable,
-                                                                  Order = a.Order,
-                                                              }
+                                                                        select new GetOpportunityStatusVm
+                                                                        {
+                                                                            StatusId = a.StatusId,
+                                                                            StatusTitle = a.StatusTitle,
+                                                                            IsDeletable = a.IsDeletable,
+                                                                            Order = a.Order,
+                                                                        }
                                            ).ToListAsync();
                 return OpportunityStatus;
             }
