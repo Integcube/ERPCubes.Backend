@@ -31,11 +31,13 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
+                DateTime resultDate = request.Days != -1 ? GetDateFromCurrentMinusDays(request.Days) : DateTime.MinValue;
+                List<GetAllTicketsVm> tickets = await (from a in _dbContext.Ticket.Where(a => a.IsDeleted == 0 && a.TenantId == request.TenantId
+                                                     && (request.Days == -1 || a.CreatedDate.Date >= resultDate.ToUniversalTime().Date)
+                                                     && (request.Channel == "All channel" || a.SocialMediaPlatform.ToLower() == request.Channel.ToLower())
+                                                     && (request.Status == -1 || a.Status == request.Status)
 
-                DateTime resultDate = GetDateFromCurrentMinusDays(request.Days);
-
-
-                List<GetAllTicketsVm> tickets = await (from a in _dbContext.Ticket.Where(a => a.IsDeleted == 0 && a.TenantId == request.TenantId)
+                                                     )
                                                        select new GetAllTicketsVm
                                                        {
                                                            TicketId = a.TicketId,
@@ -79,7 +81,7 @@ namespace ERPCubes.Persistence.Repositories
                                                                }
                                                            ).FirstOrDefault()
                                                        }
-                                                    ).OrderByDescending(a => a.RecentlyActive).ToListAsync();
+                                                    ).Where(a => a.LatestConversation.ReadStatus == Convert.ToBoolean(request.Isread) || request.Isread == -1).OrderByDescending(a => a.RecentlyActive).ToListAsync();
                 return tickets;
             }
             catch (Exception ex)
@@ -127,12 +129,12 @@ namespace ERPCubes.Persistence.Repositories
             try
             {
 
-                List<GetTicketPriorityListVm> priority= await(from a in _dbContext.TicketPriority.Where(a=>a.IsDeleted == 0)
-                                                      select new GetTicketPriorityListVm
-                                                      {
-                                                          TicketPriorityId = a.TicketPriorityId,
-                                                          PriorityName = a.PriorityName,
-                                                      }).ToListAsync();
+                List<GetTicketPriorityListVm> priority = await (from a in _dbContext.TicketPriority.Where(a => a.IsDeleted == 0)
+                                                                select new GetTicketPriorityListVm
+                                                                {
+                                                                    TicketPriorityId = a.TicketPriorityId,
+                                                                    PriorityName = a.PriorityName,
+                                                                }).ToListAsync();
                 return priority;
 
             }
@@ -147,11 +149,11 @@ namespace ERPCubes.Persistence.Repositories
             try
             {
                 List<GetTicketStatusListVm> priority = await (from a in _dbContext.TicketStatus.Where(a => a.IsDeleted == 0)
-                                                                select new GetTicketStatusListVm
-                                                                {
-                                                                    TicketStatusId = a.TicketStatusId,
-                                                                    StatusName = a.StatusName,
-                                                                }).ToListAsync();
+                                                              select new GetTicketStatusListVm
+                                                              {
+                                                                  TicketStatusId = a.TicketStatusId,
+                                                                  StatusName = a.StatusName,
+                                                              }).ToListAsync();
                 return priority;
             }
             catch (Exception ex)
@@ -164,12 +166,12 @@ namespace ERPCubes.Persistence.Repositories
         {
             try
             {
-                List<GetTicketTypeListVm> priority = await(from a in _dbContext.TicketType.Where(a => a.IsDeleted == 0)
-                                                               select new GetTicketTypeListVm
-                                                               {
-                                                                   TicketTypeId = a.TicketTypeId,
-                                                                   TypeName = a.TypeName,
-                                                               }).ToListAsync();
+                List<GetTicketTypeListVm> priority = await (from a in _dbContext.TicketType.Where(a => a.IsDeleted == 0)
+                                                            select new GetTicketTypeListVm
+                                                            {
+                                                                TicketTypeId = a.TicketTypeId,
+                                                                TypeName = a.TypeName,
+                                                            }).ToListAsync();
                 return priority;
             }
             catch (Exception ex)

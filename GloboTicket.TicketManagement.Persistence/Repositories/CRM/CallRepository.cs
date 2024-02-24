@@ -147,7 +147,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                         CrmCalenderEvents CalenderObj = new CrmCalenderEvents();
                         CalenderObj.UserId = task.CreatedBy;
-                        CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
+                        CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ 
+                            task.Title;
                         //CalenderObj.Type = task.TaskTypeId = call.Task.TaskTypeId;
                         CalenderObj.CreatedBy = task.CreatedBy;
                         CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();
