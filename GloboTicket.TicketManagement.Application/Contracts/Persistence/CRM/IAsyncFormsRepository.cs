@@ -16,7 +16,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetFieldTypesVm>> GetAllFieldTypes();
         Task<List<GetFormsListVm>> GetAllForms(int TenantId);
-        Task<List<GetFormFieldsVm>> GetFormFields(int FormId, int TenantId);
+        Task<List<GetFormFieldsVm>> GetFormFields(int FormId, string TenantGuid);
         Task SaveForm(SaveFormCommand request);
         Task SaveFormFields(SaveFormFieldsCommand request);
         Task SaveFormResult(SaveFormResultCommand request);

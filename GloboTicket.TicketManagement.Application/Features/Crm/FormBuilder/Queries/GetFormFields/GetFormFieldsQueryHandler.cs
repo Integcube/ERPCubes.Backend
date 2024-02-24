@@ -24,7 +24,7 @@ namespace ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFormFields
             List<GetFormFieldsVm> formFields = new List<GetFormFieldsVm>();
             try
             {
-                formFields = await _formsRepository.GetFormFields(request.FormId, request.TenantId);
+                formFields = await _formsRepository.GetFormFields(request.FormId, request.TenantGuid);
 
             }
             catch (Exception ex)

@@ -77,12 +77,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task<List<GetFormFieldsVm>> GetFormFields(int FormId, int TenantId)
+        public async Task<List<GetFormFieldsVm>> GetFormFields(int FormId, string TenantGuid)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
-
+                Guid id = Guid.Parse(TenantGuid);
+                var TenantId = await (
+                    from a in _dbContextIdentity.Tenant.Where(a => a.TenantGuid == id && a.IsDeleted == 0)
+                    select a.TenantId).FirstOrDefaultAsync();
                 List<GetFormFieldsVm> obj = await (
                             from a in _dbContext.CrmFormFields
                             .Where(a => a.IsDeleted == 0 && a.TenantId == TenantId && a.FormId == FormId)
@@ -128,7 +131,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         CrmFormFields newField = new CrmFormFields();
                         newField.FormId = newForm.FormId;
                         newField.FieldLabel = stringArray[i - 1];
-                        newField.FieldType = 1;
+                        newField.FieldType = i == 4 ? 3 : 1;
                         newField.Placeholder = "";
                         newField.Values = null;
                         newField.IsFixed = true;
@@ -204,6 +207,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 DateTime localDateTime = DateTime.Now;
+                Guid id = Guid.Parse(request.TenantGuid);
+                var TenantId = await(
+                    from a in _dbContextIdentity.Tenant.Where(a => a.TenantGuid == id && a.IsDeleted == 0) 
+                    select a.TenantId).FirstOrDefaultAsync();
                 CrmLead newLead = new CrmLead();
                 StringBuilder remarksBuilder = new StringBuilder();
                 foreach (var result in request.FormResult)
@@ -213,7 +220,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     newResult.FieldId = result.FieldId;
                     newResult.Result = result.Result;
                     newResult.CreatedDate = localDateTime.ToUniversalTime();
-                    newResult.TenantId = request.TenantId;
+                    newResult.TenantId = TenantId;
                     await _dbContext.AddAsync(newResult);
                     if (IsFixedField(result.FieldLabel))
                     {
@@ -242,7 +249,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 newLead.CreatedBy = "-1";
                 newLead.CreatedDate = localDateTime.ToUniversalTime();
                 newLead.IsDeleted = 0;
-                newLead.TenantId = request.TenantId;
+                newLead.TenantId = TenantId;
                 newLead.Remarks = remarksBuilder.ToString();
                 await _dbContext.CrmLead.AddAsync(newLead);
                 await _dbContext.SaveChangesAsync();

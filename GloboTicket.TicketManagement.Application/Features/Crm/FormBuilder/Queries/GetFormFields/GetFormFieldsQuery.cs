@@ -10,7 +10,7 @@ namespace ERPCubes.Application.Features.Crm.FormBuilder.Queries.GetFormFields
     public class GetFormFieldsQuery: IRequest<List<GetFormFieldsVm>>
     {
         public int FormId { get; set; }
-        public int TenantId { get; set; }
+        public string TenantGuid { get; set; } = string.Empty;
        // public string Id { get; set; } = string.Empty;
     }
 }

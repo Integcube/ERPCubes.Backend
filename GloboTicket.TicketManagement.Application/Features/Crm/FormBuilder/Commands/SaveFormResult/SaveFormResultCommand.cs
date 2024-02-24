@@ -9,7 +9,7 @@ namespace ERPCubes.Application.Features.Crm.FormBuilder.Commands.SaveFormResult
 {
     public class SaveFormResultCommand: IRequest
     {
-        public int TenantId { get; set; }
+        public string TenantGuid { get; set; }
         public List<SaveFormResultDto> FormResult { get; set; } = new List<SaveFormResultDto>();
     }
 }
