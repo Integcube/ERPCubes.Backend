@@ -27,8 +27,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var task = await (from a in _dbContext.CrmTask.Where(a => a.TaskId == request.TaskId)
-                                  select a).FirstOrDefaultAsync();
+                var task = await _dbContext.CrmTask
+                    .Where(a => a.TaskId == request.TaskId)
+                    .FirstOrDefaultAsync();
+
                 if (task == null)
                 {
                     throw new NotFoundException(request.TaskTitle, request.TaskId);
@@ -38,7 +40,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     task.IsDeleted = 1;
                     task.DeletedBy = request.Id;
                     task.DeletedDate = DateTime.Now.ToUniversalTime();
+
                     await _dbContext.SaveChangesAsync();
+
+                    var calendarEvent = await _dbContext.CrmCalenderEvents
+                        .Where(e => e.TenantId == task.TenantId
+                            && e.ActivityId == task.TaskId
+                            && e.ContactTypeId == task.ContactTypeId
+                            )
+                        .FirstOrDefaultAsync();
+
+                    if (calendarEvent != null)
+                    {
+                        _dbContext.CrmCalenderEvents.Remove(calendarEvent);
+                        await _dbContext.SaveChangesAsync();
+                    }
                 }
             }
             catch (Exception ex)
@@ -46,6 +62,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
         public async Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int ContactTypeId, int ContactId)
         {
             try
@@ -219,10 +236,17 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                  && a.Id == request.Task.ContactId)
                                                  select a).FirstOrDefaultAsync();
 
-                        CalenderObj.Description = /*GetNameById(request.Task.TaskTypeId) + */task.Title;
+                        CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
                         CalenderObj.Type = task.TaskTypeId = request.Task.TaskTypeId;
-                        CalenderObj.StartTime = request.Task.DueDate ?? DateTime.Now.ToUniversalTime();
-                        CalenderObj.EndTime = (request.Task.DueDate ?? DateTime.Now.ToUniversalTime()).AddDays(1);
+                        CalenderObj.CreatedBy = task.CreatedBy;
+                        CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();
+                        CalenderObj.StartTime = request.Task.DueDate != null ? request.Task.DueDate.Value.ToUniversalTime() : DateTime.Now.ToUniversalTime();
+                        CalenderObj.EndTime = (request.Task.DueDate != null ? request.Task.DueDate.Value.ToUniversalTime().AddHours(1) : DateTime.Now.ToUniversalTime().AddHours(1));
+                        CalenderObj.TenantId = task.TenantId;
+                        CalenderObj.AllDay = false;
+                        CalenderObj.ContactTypeId = request.Task.ContactTypeId;
+                        CalenderObj.Id = request.Task.ContactId;
+                        CalenderObj.ActivityId = task.TaskId;
                         await _dbContext.SaveChangesAsync();
                     }
                 }
