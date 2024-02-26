@@ -55,7 +55,7 @@ namespace ERPCubesApi.Controllers
 
                     WhatsappWebhookVm dtos = await _mediator.Send(data);
 
-                    // Add your custom logic here, if needed
+                    await _hubContext.Clients.All.SendAsync("ReceiveNewTicket", dtos.Ticket);
 
                     return Ok(dtos);
                 }
