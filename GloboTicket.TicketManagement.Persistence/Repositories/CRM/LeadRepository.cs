@@ -34,6 +34,8 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
+using System.Net.NetworkInformation;
+using System.Globalization;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -191,39 +193,60 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                int.TryParse(Year, out int year);
-                DateTime localStartDateTime = new DateTime(year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                DateTime localEndDateTime = new DateTime(year, 12, 31, 23, 59, 59, DateTimeKind.Utc);
-                var groupedLeads = await (
-                    from a in _dbContext.CrmLead.Where(lead => (ProductId == -1 || lead.ProductId == ProductId) && (SourceId == -1 || lead.SourceId == SourceId) && (UserId == "-1" || lead.LeadOwner == UserId) && (lead.CreatedDate > localStartDateTime) && (lead.CreatedDate < localEndDateTime))
-                    where (a.TenantId == -1 || a.TenantId == TenantId) && a.IsDeleted == 0
-                    group a by new { a.CreatedDate.Month } into g
-                    select new GetLeadByMonthListVm
-                    {
-                        Year = year,
-                        Month = g.Key.Month,
-                        TotalLeads = g.Count(),
-                        LeadStatusList = new List<GetLeadStatusListVm>()
-                    }
-                ).ToListAsync();
-
-                foreach (var leadByMonth in groupedLeads)
+                int year = Convert.ToInt32(Year);
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
                 {
-                    leadByMonth.LeadStatusList = await (
-                        from l in _dbContext.CrmLeadStatus
-                        where l.TenantId == -1 || l.TenantId == TenantId && l.IsDeleted == 0
-                        select new GetLeadStatusListVm
-                        {
-                            StatusId = l.StatusId,
-                            StatusTitle = l.StatusTitle,
-                            IsDeletable = l.IsDeletable,
-                            Order = l.Order,
-                            Count = _dbContext.CrmLead.Count(lead => lead.Status == l.StatusId && lead.CreatedDate.Month == leadByMonth.Month && (ProductId == -1 || lead.ProductId == ProductId) && (SourceId == -1 || lead.SourceId == SourceId) && (UserId == "-1" || lead.LeadOwner == UserId) && (lead.CreatedDate > localStartDateTime) && (lead.CreatedDate < localEndDateTime))
-                        }
-                    ).ToListAsync();
-                }
+                    Value = TenantId
+                };
+                var productidPrm = new Npgsql.NpgsqlParameter("@p_productid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = ProductId
+                };
+                var p_sourceIdPrm = new Npgsql.NpgsqlParameter("@p_sourceId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = SourceId
+                };
+                var p_userIdPrm = new Npgsql.NpgsqlParameter("@p_userId", NpgsqlTypes.NpgsqlDbType.Varchar)
+                {
+                    Value = UserId
+                };
+                var p_yearPrm = new Npgsql.NpgsqlParameter("@p_year", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = year
+                };
+       
+                var results = await _dbContext.GetLeadByMonthListVm.FromSqlRaw(
+                    "SELECT * FROM public.\"CRMLeadMonthlyStatusWise\" ({0},{1},{2},{3},{4})", tenantIdPrm, productidPrm, p_sourceIdPrm, p_userIdPrm, p_yearPrm)
+                    .ToListAsync();
 
-                return groupedLeads;
+
+
+
+                var MonthTotal = results.GroupBy(a => new { a.Month}).Select(s => new GetLeadByMonthListVm
+                {
+                    Month= s.FirstOrDefault().Month,
+                    LeadStatusTitle="Total Leads",
+                    LeadStatusId = 99999,
+                    Count = s.Sum(rr => rr.Count)
+                }).ToList();
+           
+                results.AddRange(MonthTotal);
+
+
+                var YearTotal = results.GroupBy(a => new { a.LeadStatusId }).Select(s => new GetLeadByMonthListVm
+                {
+                    Month = 99999,
+                    MonthName = "Total",
+                    LeadStatusTitle = s.FirstOrDefault().LeadStatusTitle,
+                    LeadStatusId = s.FirstOrDefault().LeadStatusId,
+                    Count = s.Sum(rr => rr.Count)
+                }).ToList();
+
+
+                results.AddRange(YearTotal);
+
+                return results;
+
             }
             catch (Exception ex)
             {
@@ -231,7 +254,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
 
         }
+        public static string GetMonthName(int monthNumber)
+        {
+            if (monthNumber < 1 || monthNumber > 12)
+            {
+                return "Total";
+            }
 
+            CultureInfo culture = CultureInfo.CurrentCulture;
+            string monthName = culture.DateTimeFormat.GetMonthName(monthNumber);
+
+            return monthName;
+        }
         public async Task<List<GetLeadOwnerWiseVm>> GetLeadOwnerWise(int TenantId, string Id, DateTime startDate, DateTime endDate, string leadOwner, int sourceId, int status)
         {
             try

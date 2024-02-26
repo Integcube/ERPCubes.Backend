@@ -9,9 +9,11 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth
 {
     public class GetLeadByMonthListVm
     {
-        public int Year { get; set; }
+        public int LeadStatusId { get; set; }
+        public string LeadStatusTitle { get; set; }
+        public int Count { get; set; }
         public int Month { get; set; }
-        public int TotalLeads { get; set; }
-        public List<GetLeadStatusListVm> LeadStatusList { get; set; }
+        public string MonthName { get; set; }
+        
     }
 }

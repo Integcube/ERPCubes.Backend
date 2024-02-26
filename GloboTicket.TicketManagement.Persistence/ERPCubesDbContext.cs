@@ -1,10 +1,12 @@
 using ERPCubes.Application.Contracts;
 using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
 using ERPCubes.Application.Features.Crm.Reports.Queries.GetCampaigWiseReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
@@ -29,6 +31,7 @@ namespace ERPCubes.Persistence
             modelBuilder.Entity<GetUserActivityReportVm>().HasNoKey().ToView("calculateleadevent");
             modelBuilder.Entity<GetLeadOwnerWiseVm>().HasNoKey().ToView("crmleadownerwiserpt");
             modelBuilder.Entity<GetCampaigWiseReportQueryVm>().HasNoKey().ToView("crmcampaignwiserpt");
+            modelBuilder.Entity<GetLeadByMonthListVm>().HasNoKey().ToView("CRMLeadMonthlyStatusWise");
             
             base.OnModelCreating(modelBuilder);
         }
@@ -86,6 +89,6 @@ namespace ERPCubes.Persistence
 
         public DbSet<CrmIScoringQuestion> CrmIScoringQuestion { get; set; }
         public DbSet<CrmChatbotSetting> CrmChatbotSetting { get; set; }
-        
+        public DbSet<GetLeadByMonthListVm> GetLeadByMonthListVm { get; set; }
     }
 }
