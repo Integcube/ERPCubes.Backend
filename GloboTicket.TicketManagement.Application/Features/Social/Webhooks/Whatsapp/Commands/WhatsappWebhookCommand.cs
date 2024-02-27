@@ -11,7 +11,7 @@ namespace ERPCubes.Application.Features.Social.Webhooks.Whatsapp.Commands
 {
     public class WhatsappWebhookCommand:IRequest<WhatsappWebhookVm>
     {
-        public string TenantId { get; set; }
+        public string TenantGuid { get; set; }
         public WhatsAppWebhook Data { get; set; }
     }
 }

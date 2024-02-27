@@ -10,7 +10,7 @@ namespace ERPCubes.Application.Features.Social.Webhooks.Instagram.Commands
 {
     public class InstagramWebhookCommand:IRequest<InstagramWebhookVm>
     {
-        public string TenantId { get; set; }
+        public string TenantGuid { get; set; }
         public InstagramWebhook Data { get; set; }
     }
 }

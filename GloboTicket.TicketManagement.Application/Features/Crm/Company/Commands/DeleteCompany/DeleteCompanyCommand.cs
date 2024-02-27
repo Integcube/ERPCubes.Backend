@@ -9,9 +9,9 @@ namespace ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany
 {
     public class DeleteCompanyCommand : IRequest
     {
-        public int TenantId { get; set; }
-        public string Id { get; set; } = string.Empty;
         public int CompanyId { get; set; }
-        public string Name { get; set;} = string.Empty;
+        public string Id { get; set; } = string.Empty;
+        public string DeletedBy { get; set; }
+        public DateTime? DeletedDate { get; set; }
     }
 }

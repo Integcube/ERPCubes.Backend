@@ -51,7 +51,7 @@ namespace ERPCubesApi.Controllers
                     InstagramWebhook instagramWebhook = JsonConvert.DeserializeObject<InstagramWebhook>(body);
                     InstagramWebhookCommand data = new InstagramWebhookCommand
                     {
-                        TenantId = key,
+                        TenantGuid = key,
                         Data = instagramWebhook
                     };
                     InstagramWebhookVm dtos = await _mediator.Send(data);
@@ -78,7 +78,7 @@ namespace ERPCubesApi.Controllers
 
                     WhatsappWebhookCommand data = new WhatsappWebhookCommand
                     {
-                        TenantId = key,
+                        TenantGuid = key,
                         Data = whatsappWebhook
                     };
 

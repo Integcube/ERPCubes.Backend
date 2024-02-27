@@ -6,6 +6,8 @@ using ERPCubes.Application.Features.Tickets.Queries.GetAllTickets;
 using ERPCubes.Application.Features.Tickets.Queries.GetSelectedConversation;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
+using ERPCubes.Identity.Models;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System;
@@ -29,8 +31,10 @@ namespace ERPCubes.Persistence.Repositories.Social
          
                 try
                 {
-                var test = Convert.ToInt32(message.TenantId);
-                    Ticket tik = await (from a in _dbContext.Ticket.Where(a => a.CustomerId == message.Data.Entry[0].Messaging[0].Sender.Id)
+                int tenant = await (from a in _dbContextIdentity.Tenant.Where(a => a.TenantGuid == Guid.Parse(message.TenantGuid))
+                                    select a.TenantId).FirstOrDefaultAsync();
+
+                Ticket tik = await (from a in _dbContext.Ticket.Where(a => a.CustomerId == message.Data.Entry[0].Messaging[0].Sender.Id)
                                         select a).FirstOrDefaultAsync();
                     if (tik == null)
                     {
@@ -55,16 +59,16 @@ namespace ERPCubes.Persistence.Repositories.Social
                             LastModifiedDate = null,
                             RecentlyActive = DateTime.Now.ToUniversalTime(),
                             IsDeleted = 0,
-                            TenantId = Convert.ToInt32(message.TenantId),
+                            TenantId = tenant,
                         };
                         _dbContext.Add(ticket);
                         _dbContext.SaveChanges();
 
-                        Conversation conversation = BuildConversationObject(ticket, message);
+                        Conversation conversation = BuildConversationObject(ticket, message, tenant);
                         _dbContext.Add(conversation);
                         _dbContext.SaveChanges();
                         transactionScope.Complete();
-                        GetAllTicketsVm returnTicket = BuildTicketObject(ticket, conversation);
+                        GetAllTicketsVm returnTicket = BuildTicketObject(ticket, conversation, tenant);
                         var obj = new InstagramWebhookVm
                         {
                             Ticket = returnTicket,
@@ -76,10 +80,10 @@ namespace ERPCubes.Persistence.Repositories.Social
                     else
                     {
                     tik.RecentlyActive = DateTime.Now.ToUniversalTime();
-                    Conversation conversation = BuildConversationObject(tik, message);
+                    Conversation conversation = BuildConversationObject(tik, message, tenant);
                     _dbContext.Add(conversation);
                     _dbContext.SaveChanges();
-                    GetAllTicketsVm returnTicket = BuildTicketObject(tik, conversation);
+                    GetAllTicketsVm returnTicket = BuildTicketObject(tik, conversation, tenant);
 
                     var obj = new InstagramWebhookVm
                         {
@@ -96,7 +100,7 @@ namespace ERPCubes.Persistence.Repositories.Social
                 }
             
         }
-        private GetAllTicketsVm BuildTicketObject (Ticket ticket, Conversation conversation)
+        private GetAllTicketsVm BuildTicketObject (Ticket ticket, Conversation conversation, int tenant)
         {
 
             return new GetAllTicketsVm
@@ -137,7 +141,7 @@ namespace ERPCubes.Persistence.Repositories.Social
             };
         }
 
-        private Conversation BuildConversationObject(Ticket ticket, InstagramWebhookCommand message)
+        private Conversation BuildConversationObject(Ticket ticket, InstagramWebhookCommand message, int tenant)
         {
             return new Conversation
             {
@@ -155,7 +159,7 @@ namespace ERPCubes.Persistence.Repositories.Social
                 MessageStatus = null,
                 EventType = null,
                 CustomerFeedback = null,
-                TenantId = Convert.ToInt32(message.TenantId),
+                TenantId = tenant,
                 CreatedBy = "InstagramWebhook",
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedBy = null,
@@ -163,7 +167,7 @@ namespace ERPCubes.Persistence.Repositories.Social
             };
         }
 
-        private Conversation BuildConversationObjectt(Ticket ticket, WhatsappWebhookCommand message)
+        private Conversation BuildConversationObjectt(Ticket ticket, WhatsappWebhookCommand message, int tenant)
         {
             var firstMessage = message.Data.Entry[0].Changes[0].Value.Messages[0];
 
@@ -183,7 +187,7 @@ namespace ERPCubes.Persistence.Repositories.Social
                 MessageStatus = null,
                 EventType = null,
                 CustomerFeedback = null,
-                TenantId = Convert.ToInt32(message.TenantId),
+                TenantId = tenant,
                 CreatedBy = "WhatsAppWebhook",
                 CreatedDate = DateTime.UtcNow,
                 LastModifiedBy = null,
@@ -195,7 +199,9 @@ namespace ERPCubes.Persistence.Repositories.Social
         {
             try
             {
-                var test = Convert.ToInt32(message.TenantId);
+                int tenant = await (from a in _dbContextIdentity.Tenant.Where(a => a.TenantGuid == Guid.Parse(message.TenantGuid))
+                                    select a.TenantId).FirstOrDefaultAsync();
+
                 var firstMessage = message.Data.Entry[0].Changes[0].Value.Messages[0];
                 Ticket tik = await _dbContext.Ticket
                 .Where(a => a.CustomerId == firstMessage.From)
@@ -223,16 +229,16 @@ namespace ERPCubes.Persistence.Repositories.Social
                             LastModifiedDate = null,
                             RecentlyActive = DateTime.Now.ToUniversalTime(),
                             IsDeleted = 0,
-                            TenantId = Convert.ToInt32(message.TenantId),
+                            TenantId = tenant,
                         };
                         _dbContext.Add(ticket);
                         _dbContext.SaveChanges();
 
-                        Conversation conversation = BuildConversationObjectt(ticket, message);
+                        Conversation conversation = BuildConversationObjectt(ticket, message, tenant);
                         _dbContext.Add(conversation);
                         _dbContext.SaveChanges();
                         transactionScope.Complete();
-                        GetAllTicketsVm returnTicket = BuildTicketObject(ticket, conversation);
+                        GetAllTicketsVm returnTicket = BuildTicketObject(ticket, conversation, tenant);
                         var obj = new WhatsappWebhookVm
                         {
                             Ticket = returnTicket,
@@ -244,10 +250,10 @@ namespace ERPCubes.Persistence.Repositories.Social
                 else
                 {
                     tik.RecentlyActive = DateTime.Now.ToUniversalTime();
-                    Conversation conversation = BuildConversationObjectt(tik, message);
+                    Conversation conversation = BuildConversationObjectt(tik, message, tenant);
                     _dbContext.Add(conversation);
                     _dbContext.SaveChanges();
-                    GetAllTicketsVm returnTicket = BuildTicketObject(tik, conversation);
+                    GetAllTicketsVm returnTicket = BuildTicketObject(tik, conversation, tenant);
 
                     var obj = new WhatsappWebhookVm
                     {

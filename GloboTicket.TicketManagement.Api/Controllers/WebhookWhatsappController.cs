@@ -49,7 +49,7 @@ namespace ERPCubesApi.Controllers
 
                     WhatsappWebhookCommand data = new WhatsappWebhookCommand
                     {
-                        TenantId = key,
+                        TenantGuid = key,
                         Data = whatsappWebhook
                     };
 

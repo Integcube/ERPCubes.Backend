@@ -23,12 +23,12 @@ namespace ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany
         {
             try
             {
-                await _companyRepository.DeleteCompany(request.Id, request.TenantId, request.CompanyId);
+                await _companyRepository.DeleteCompany(request);
             }
             catch (Exception ex)
             {
 
-                _logger.LogError($"Deleting CompanyId :{request.Name} failed due to an error : {ex.Message}");
+                _logger.LogError($"Deleting CompanyId :{request.CompanyId} failed due to an error : {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
             return Unit.Value;

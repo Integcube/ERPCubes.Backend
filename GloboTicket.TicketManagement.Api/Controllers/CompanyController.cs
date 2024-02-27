@@ -1,6 +1,12 @@
 ﻿using ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.RestoreBulkCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.RestoreCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
 using ERPCubes.Application.Features.Crm.Company.Queries.GetCompanyList;
+using ERPCubes.Application.Features.Crm.Company.Queries.GetDeletedCompanyList;
+using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
+using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -41,6 +47,31 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult<List<ActionResult>>> DeleteComapny(DeleteCompanyCommand deleteCompany)
         {
             var dtos = await _mediator.Send(deleteCompany);
+            return Ok(dtos);
+        }
+        [HttpPost("del", Name = "GetDeletedCompanies")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetDeletedCompanyVm>>> GetDeletedCategories(GetDeletedCompanyListQuery company)
+        {
+            var dtos = await _mediator.Send(company);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restore", Name = "RestoreCompany")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreCompany(RestoreCompanyCommand restoreCompany)
+        {
+            var dtos = await _mediator.Send(restoreCompany);
+            return Ok(dtos);
+        }
+
+        [HttpPost("restoreBulk", Name = "RestoreBulkCompany")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> RestoreBulkCompany(RestoreBulkCompanyCommand restoreCompany)
+        {
+            var dtos = await _mediator.Send(restoreCompany);
             return Ok(dtos);
         }
     }

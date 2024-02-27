@@ -194,7 +194,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     else
                     {
                         task.Title = request.Task.TaskTitle;
-                        task.DueDate = (DateTime)(request.Task.DueDate);
+                        task.DueDate = request.Task.DueDate.Value.ToUniversalTime();
                         task.Priority = (int)(request.Task.PriorityId != null ? request.Task.PriorityId : -1);
                         task.Status = (int)(request.Task.StatusId != null ? request.Task.StatusId : -1);
                         task.TaskOwner = request.Task.TaskOwner;
