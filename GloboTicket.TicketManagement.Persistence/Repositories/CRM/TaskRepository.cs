@@ -23,7 +23,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public TaskRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity)
             : base(dbContext, dbContextIdentity) { }
 
-        public async Task DeletTask(DeleteTaskCommand request)
+        public async Task DeleteTask(DeleteTaskCommand request)
         {
             try
             {
@@ -236,7 +236,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                  && a.Id == request.Task.ContactId)
                                                  select a).FirstOrDefaultAsync();
 
-                        CalenderObj.Description =/* GetNameById(request.Task.TaskTypeId) +*/ task.Title;
+                        CalenderObj.Description = task.Title; /* GetNameById(request.Task.TaskTypeId) +*/
                         CalenderObj.Type = task.TaskTypeId = request.Task.TaskTypeId;
                         CalenderObj.CreatedBy = task.CreatedBy;
                         CalenderObj.CreatedDate = task.CreatedDate.ToUniversalTime();

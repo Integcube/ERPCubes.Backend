@@ -1,7 +1,9 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Opportunity.Commands.RestoreBulkOpportunity;
+using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetDeletedOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Commands.DeleteOpportunity;
+using ERPCubes.Application.Features.Crm.Opportunity.Commands.RestoreOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Commands.SaveOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunity;
 using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunityStatus;
@@ -9,6 +11,8 @@ using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportuntiySource
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.EntityFrameworkCore;
+using ERPCubes.Application.Features.Crm.Opportunity.Queries.GetOpportunityAttachments;
+using ERPCubes.Application.Features.Crm.Opportunity.Commands.ChangeOpportunityStatus;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -50,9 +54,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         Country = a.Country,
                         SourceId = a.SourceId,
                         SourceTitle = zz.SourceTitle,
-                        IndustryId = a.IndustryId,
+                        IndustryId = (int)a.IndustryId,
                         IndustryTitle = ii.IndustryTitle,
-                        ProductId = a.ProductId,
+                        ProductId = (int)a.ProductId,
                         ProductTitle = pp.ProductName,
                         CreatedDate = a.CreatedDate,
                         ModifiedDate = a.LastModifiedDate,
@@ -188,11 +192,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
-        public async Task DeleteOpportunity(DeleteOpportunityCommand request)
+        public async Task DeleteOpportunity(DeleteOpportunityCommand command)
         {
             try
             {
-                CrmOpportunity? Opportunity = await (from a in _dbContext.CrmOpportunity.Where(a => a.OpportunityId == request.OpportunityId)
+                CrmOpportunity? Opportunity = await (from a in _dbContext.CrmOpportunity.Where(a => a.OpportunityId == command.OpportunityId)
                                                      select a).FirstOrDefaultAsync();
 
                 if (Opportunity == null)
@@ -201,6 +205,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 else
                 {
+                    DateTime localDateTime = DateTime.Now;
+                    Opportunity.DeletedBy = command.Id;
+                    Opportunity.DeletedDate = localDateTime.ToUniversalTime();
                     Opportunity.IsDeleted = 1;
                     await _dbContext.SaveChangesAsync();
                 }
@@ -210,6 +217,126 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+        public async Task RestoreOpportunity(RestoreOpportunityCommand query)
+        {
+            try
+            {
+                var deletedOpportunity = await (
+                    from a in _dbContext.CrmOpportunity.Where(a => a.OpportunityId == query.OpportunityId)
+                    select a).FirstOrDefaultAsync();
+                if (deletedOpportunity == null)
+                {
+                    throw new NotFoundException("OpportunityId", query);
+                }
+                else
+                {
+                    deletedOpportunity.DeletedBy = query.Id;
+                    deletedOpportunity.IsDeleted = 0;
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+        public async Task<List<GetDeletedOpportunityVm>> GetDeletedOpportunity(int TenantId, string Id)
+        {
+            try
+            {
+                List<GetDeletedOpportunityVm> detail = await (from a in _dbContext.CrmOpportunity.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                        join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                        select new GetDeletedOpportunityVm
+                                                        {
+                                                            Id = a.OpportunityId,
+                                                            Title = a.FirstName + " " + a.LastName,
+                                                            DeletedBy = user.FirstName + " " + user.LastName,
+                                                            DeletedDate = a.DeletedDate,
+                                                        }).OrderBy(a => a.Title).ToListAsync();
+                return detail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+        public async Task RestoreBulkOpportunity(RestoreBulkOpportunityCommand command)
+        {
+            try
+            {
+                foreach (var opportunityId in command.OpportunityId)
+                {
+                    var opportunity = await _dbContext.CrmOpportunity
+                        .Where(p => p.OpportunityId == opportunityId && p.IsDeleted == 1)
+                        .FirstOrDefaultAsync();
 
+                    if (opportunity == null)
+                    {
+                        throw new NotFoundException(nameof(opportunityId), opportunityId);
+                    }
+
+                    opportunity.IsDeleted = 0;
+                }
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public async Task<List<GetOpportunityAttachmentsVm>> GetOpportunityAttachments(GetOpportunityAttachmentsQuery query)
+        {
+            try
+            {
+                List<GetOpportunityAttachmentsVm> attachments = await (
+                    from a in _dbContext.DocumentLibrary
+                    .Where(a => a.TenantId == query.TenantId && a.IsDeleted == 0 && a.ContactTypeId == query.ContactTypeId && a.Id == query.OpportunityId)
+                    select new GetOpportunityAttachmentsVm
+                    {
+                        FileId = a.FileId,
+                        Size = a.Size,
+                        Path = a.Path,
+                        FileName = a.FileName,
+                        Description = a.Description,
+                        Type = a.Type
+                    }).ToListAsync();
+                return attachments;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+        public async Task ChangeOpportunityStatus(ChangeOpportunityStatusCommand obj)
+        {
+            try
+            {
+                CrmOpportunity? Opportunity = await (from a in _dbContext.CrmOpportunity.Where(a => a.OpportunityId == obj.OpportunityId) select a).FirstOrDefaultAsync();
+                if (Opportunity == null)
+                {
+                    throw new NotFoundException("", obj.OpportunityId);
+                }
+                else
+                {
+                    Opportunity.StatusId = obj.StatusId;
+                    Opportunity.LastModifiedBy = obj.UserId;
+                    Opportunity.LastModifiedDate = DateTime.Now.ToUniversalTime();
+                    await _dbContext.SaveChangesAsync();
+                }
+                int typeId = (int)CrmEnum.ContactEnum.Opportunity;
+                string statusTitle = "Status Changed to " + obj.StausTitle;
+                string details = "Opportunity Status Changed to " + obj.StausTitle;
+                var result = _dbContext.Database.ExecuteSqlRaw(
+                    "CALL public.insertstatuslog({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                     details, typeId, statusTitle, obj.UserId, obj.OpportunityId, obj.TenantId, obj.StatusId);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

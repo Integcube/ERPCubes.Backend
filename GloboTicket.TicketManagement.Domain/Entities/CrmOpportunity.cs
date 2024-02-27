@@ -27,7 +27,9 @@ namespace ERPCubes.Domain.Entities
         public string State { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
         public int SourceId { get; set; }
-        public int IndustryId { get; set; }
-        public int ProductId { get; set; }
+        public int? IndustryId { get; set; }
+        public int? ProductId { get; set; }
+        public string? DeletedBy {  get; set; } = string.Empty;
+        public DateTime? DeletedDate { get; set; }
     }
 }

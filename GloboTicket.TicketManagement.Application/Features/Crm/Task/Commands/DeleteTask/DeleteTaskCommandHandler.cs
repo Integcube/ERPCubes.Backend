@@ -24,7 +24,7 @@ namespace ERPCubes.Application.Features.Crm.Task.Commands.DeleteTask
         {
             try
             {
-                await _taskRepository.DeletTask(request);
+                await _taskRepository.DeleteTask(request);
                 return Unit.Value;
             }
             catch (Exception ex)

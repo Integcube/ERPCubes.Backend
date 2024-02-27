@@ -22,7 +22,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetCrmTaskListVm>> GetAllTasks(int TenantId, string Id, int ContactTypeId, int ContactId);
         Task<List<GetTaskTagsListVm>> GetAllTaskTags(int TenantId, string Id, int TaskId);
-        Task DeletTask(DeleteTaskCommand request);
+        Task DeleteTask(DeleteTaskCommand request);
         Task SaveTask(SaveTaskCommand request);
         Task UpdateTaskStatus(UpdateTaskStatusCommand request);
         Task UpdateTaskOrder(List<UpdateTaskOrderDto> request);
