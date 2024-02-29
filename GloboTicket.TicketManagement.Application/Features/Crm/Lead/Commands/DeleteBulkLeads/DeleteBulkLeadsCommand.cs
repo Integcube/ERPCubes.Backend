@@ -12,12 +12,8 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.DeleteBulkLeads
         public string Id { get; set; }
         public int TenantId { get; set; }
         
-        public List<LeadIds> Leads { get; set;}
+        public List<LeadIdsvm> Leads { get; set;}
     }
 
-    public class LeadIds : IRequest
-    {
-        public int LeadId { get; set; }
-    }
 
 }

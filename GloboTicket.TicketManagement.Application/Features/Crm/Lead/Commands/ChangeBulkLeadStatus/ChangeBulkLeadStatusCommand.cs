@@ -1,3 +1,4 @@
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteBulkLeads;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,8 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.ChangeBulkLeadStatus
         public string userId { get; set; }
         public int statusId { get; set; }
         public string StausTitle { get; set; }
-        public List<Leads> Leads { get; set; }
-    }
-    public class Leads
-    {
-        public int LeadId { get; set; }
+        public List<LeadIdsvm> Leads { get; set; }
+ 
     }
 
 }
