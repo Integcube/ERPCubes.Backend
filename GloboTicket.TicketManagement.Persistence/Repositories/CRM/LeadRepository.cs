@@ -36,6 +36,13 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 using System.Net.NetworkInformation;
 using System.Globalization;
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteBulkLeads;
+using System.Text;
+using ERPCubes.Identity.Models;
+using System.Data.SqlClient;
+using Npgsql;
+using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeBulkLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkAssignLeads;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -883,6 +890,115 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public async Task DeleteBulkLead(DeleteBulkLeadsCommand leadIdss)
+        {
+
+            try
+            {
+                var leadIds = string.Join(", ", Enumerable.Range(0, leadIdss.Leads.Count).Select(i => $"@LeadId{i}"));
+
+                var updateSqlBuilder = new StringBuilder();
+                updateSqlBuilder.Append("UPDATE \"CrmLead\" ");
+                updateSqlBuilder.Append("SET \"DeletedBy\" = @DeletedBy, ");
+                updateSqlBuilder.Append("\"DeletedDate\" = @DeletedDate, ");
+                updateSqlBuilder.Append("\"IsDeleted\" = @IsDeleted ");
+                updateSqlBuilder.Append("WHERE \"LeadId\" IN (");
+                updateSqlBuilder.Append(leadIds);
+                updateSqlBuilder.Append(") AND \"TenantId\" = @TenantId");
+
+                var updateSql = updateSqlBuilder.ToString();
+
+  
+                var parameters = new List<NpgsqlParameter>();
+                for (int i = 0; i < leadIdss.Leads.Count; i++)
+                {
+                    parameters.Add(new NpgsqlParameter($"@LeadId{i}", leadIdss.Leads[i].LeadId));
+                }
+
+            
+                parameters.Add(new NpgsqlParameter("@DeletedBy", leadIdss.Id));
+                parameters.Add(new NpgsqlParameter("@DeletedDate", DateTime.Now.ToUniversalTime()));
+                parameters.Add(new NpgsqlParameter("@IsDeleted", 1));
+                parameters.Add(new NpgsqlParameter("@TenantId", leadIdss.TenantId));
+
+                await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task ChangeBulkLeadStatus(ChangeBulkLeadStatusCommand oj)
+        {
+            try
+            {
+
+                var leadIds = string.Join(", ", Enumerable.Range(0, oj.Leads.Count).Select(i => $"@LeadId{i}"));
+
+                var updateSqlBuilder = new StringBuilder();
+                updateSqlBuilder.Append("UPDATE \"CrmLead\" ");
+                updateSqlBuilder.Append("SET \"LastModifiedBy\" = @LastModifiedBy, ");
+                updateSqlBuilder.Append("\"LastModifiedDate\" = @LastModifiedDate, ");
+                updateSqlBuilder.Append("\"Status\" = @Status ");
+                updateSqlBuilder.Append("WHERE \"LeadId\" IN (");
+                updateSqlBuilder.Append(leadIds);
+                updateSqlBuilder.Append(") AND \"TenantId\" = @TenantId");
+                var updateSql = updateSqlBuilder.ToString();
+                var parameters = new List<NpgsqlParameter>();
+                for (int i = 0; i < oj.Leads.Count; i++)
+                {
+                    parameters.Add(new NpgsqlParameter($"@LeadId{i}", oj.Leads[i].LeadId));
+                }
+                parameters.Add(new NpgsqlParameter("@LastModifiedBy", oj.userId));
+                parameters.Add(new NpgsqlParameter("@LastModifiedDate", DateTime.Now.ToUniversalTime()));
+                parameters.Add(new NpgsqlParameter("@Status", oj.statusId));
+                parameters.Add(new NpgsqlParameter("@TenantId", oj.TenantId));
+
+                await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
+
+                //int typeId = (int)CrmEnum.ContactEnum.Lead;
+                //string statusTitle = "Status Changed to " + obj.StausTitle;
+                //string details = "Lead Status Changed to " + obj.StausTitle;
+                //var result = _dbContext.Database.ExecuteSqlRaw(
+                //    "CALL public.insertstatuslog({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                //     details, typeId, statusTitle, obj.userId, obj.LeadId, obj.TenantId, obj.statusId);
+
+                await _dbContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task BulkAssignLeads(BulkAssignLeadsCommand oj)
+        {
+
+            var leadIds = string.Join(", ", Enumerable.Range(0, oj.Leads.Count).Select(i => $"@LeadId{i}"));
+
+            var updateSqlBuilder = new StringBuilder();
+            updateSqlBuilder.Append("UPDATE \"CrmLead\" ");
+            updateSqlBuilder.Append("SET \"LastModifiedBy\" = @LastModifiedBy, ");
+            updateSqlBuilder.Append("\"LastModifiedDate\" = @LastModifiedDate, ");
+            updateSqlBuilder.Append("\"LeadOwner\" = @LeadOwner ");
+            updateSqlBuilder.Append("WHERE \"LeadId\" IN (");
+            updateSqlBuilder.Append(leadIds);
+            updateSqlBuilder.Append(") AND \"TenantId\" = @TenantId");
+            var updateSql = updateSqlBuilder.ToString();
+            var parameters = new List<NpgsqlParameter>();
+            for (int i = 0; i < oj.Leads.Count; i++)
+            {
+                parameters.Add(new NpgsqlParameter($"@LeadId{i}", oj.Leads[i].LeadId));
+            }
+            parameters.Add(new NpgsqlParameter("@LastModifiedBy", oj.userId));
+            parameters.Add(new NpgsqlParameter("@LastModifiedDate", DateTime.Now.ToUniversalTime()));
+            parameters.Add(new NpgsqlParameter("@LeadOwner", oj.LeadOwner));
+            parameters.Add(new NpgsqlParameter("@TenantId", oj.TenantId));
+            await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
+
         }
     }
 }

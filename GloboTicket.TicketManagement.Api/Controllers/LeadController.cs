@@ -1,6 +1,9 @@
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkAssignLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeBulkLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteBulkLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.DeleteLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.RestoreDeletedLeads;
@@ -54,6 +57,9 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(getDeletedLeadsList);
             return Ok(dtos);
         }
+
+
+
         [Authorize]
         [HttpPost("restore", Name = "RestoreDeletedLeads")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -227,6 +233,36 @@ namespace ERPCubesApi.Controllers
         public async Task<ActionResult> SaveCopyQuestion(SaveCopyQuestionCommand obj)
         {
             var dtos = await _mediator.Send(obj);
+            return Ok(dtos);
+        }
+
+        [Authorize]
+        [HttpPost("bulkdelete", Name = "Bulkdelete")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteBulkLeads(DeleteBulkLeadsCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
+            return Ok(dtos);
+        }
+
+        [Authorize]
+        [HttpPost("bulkchangestatus", Name = "BulkChangeStatus")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> BulkChangeStatus(ChangeBulkLeadStatusCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
+            return Ok(dtos);
+        }
+
+        [Authorize]
+        [HttpPost("bulkassignleads", Name = "BulkAssignLeads")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> BulkAssignLeads(BulkAssignLeadsCommand leadCommand)
+        {
+            var dtos = await _mediator.Send(leadCommand);
             return Ok(dtos);
         }
 
