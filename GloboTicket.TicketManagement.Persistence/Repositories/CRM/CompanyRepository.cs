@@ -1,5 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Company.Commands.BulkAssignCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.DeleteBulkCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.RestoreBulkCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.RestoreCompany;
@@ -10,7 +12,9 @@ using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using System.Linq.Expressions;
+using System.Text;
 using System.Xml.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
@@ -20,6 +24,69 @@ namespace ERPCubes.Persistence.Repositories.CRM
     {
 
         public CompanyRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity) { }
+
+        public async Task BulkAssignCompany(BulkAssignCompanyCommand oj)
+        {
+            var companyIds = string.Join(", ", Enumerable.Range(0, oj.Companies.Count).Select(i => $"@CompanyId{i}"));
+
+            var updateSqlBuilder = new StringBuilder();
+            updateSqlBuilder.Append("UPDATE \"CrmCompany\" ");
+            updateSqlBuilder.Append("SET \"LastModifiedBy\" = @LastModifiedBy, ");
+            updateSqlBuilder.Append("\"LastModifiedDate\" = @LastModifiedDate, ");
+            updateSqlBuilder.Append("\"CompanyOwner\" = @CompanyOwner ");
+            updateSqlBuilder.Append("WHERE \"CompanyId\" IN (");
+            updateSqlBuilder.Append(companyIds);
+            updateSqlBuilder.Append(") AND \"TenantId\" = @TenantId");
+            var updateSql = updateSqlBuilder.ToString();
+            var parameters = new List<NpgsqlParameter>();
+            for (int i = 0; i < oj.Companies.Count; i++)
+            {
+                parameters.Add(new NpgsqlParameter($"@CompanyId{i}", oj.Companies[i].CompanyId));
+            }
+            parameters.Add(new NpgsqlParameter("@LastModifiedBy", oj.userId));
+            parameters.Add(new NpgsqlParameter("@LastModifiedDate", DateTime.Now.ToUniversalTime()));
+            parameters.Add(new NpgsqlParameter("@CompanyOwner", oj.CompanyOwner));
+            parameters.Add(new NpgsqlParameter("@TenantId", oj.TenantId));
+            await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
+        }
+
+        public async Task DeleteBulkCompany(DeleteBulkCompanyCommand companyIdss)
+        {
+            try
+            {
+                var companyIds = string.Join(", ", Enumerable.Range(0, companyIdss.Companies.Count).Select(i => $"@CompanyId{i}"));
+
+                var updateSqlBuilder = new StringBuilder();
+                updateSqlBuilder.Append("UPDATE \"CrmCompany\" ");
+                updateSqlBuilder.Append("SET \"DeletedBy\" = @DeletedBy, ");
+                updateSqlBuilder.Append("\"DeletedDate\" = @DeletedDate, ");
+                updateSqlBuilder.Append("\"IsDeleted\" = @IsDeleted ");
+                updateSqlBuilder.Append("WHERE \"CompanyId\" IN (");
+                updateSqlBuilder.Append(companyIds);
+                updateSqlBuilder.Append(") AND \"TenantId\" = @TenantId");
+
+                var updateSql = updateSqlBuilder.ToString();
+
+
+                var parameters = new List<NpgsqlParameter>();
+                for (int i = 0; i < companyIdss.Companies.Count; i++)
+                {
+                    parameters.Add(new NpgsqlParameter($"@CompanyId{i}", companyIdss.Companies[i].CompanyId));
+                }
+
+
+                parameters.Add(new NpgsqlParameter("@DeletedBy", companyIdss.Id));
+                parameters.Add(new NpgsqlParameter("@DeletedDate", DateTime.Now.ToUniversalTime()));
+                parameters.Add(new NpgsqlParameter("@IsDeleted", 1));
+                parameters.Add(new NpgsqlParameter("@TenantId", companyIdss.TenantId));
+
+                await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         public async Task DeleteCompany(DeleteCompanyCommand companyId)
         {

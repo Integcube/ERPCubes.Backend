@@ -1,4 +1,6 @@
-﻿using ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany;
+﻿using ERPCubes.Application.Features.Crm.Company.Commands.BulkAssignCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.DeleteBulkCompany;
+using ERPCubes.Application.Features.Crm.Company.Commands.DeleteCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.RestoreBulkCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.RestoreCompany;
 using ERPCubes.Application.Features.Crm.Company.Commands.SaveCompany;
@@ -21,6 +23,10 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<List<GetDeletedCompanyVm>> GetDeletedCompanies(int TenantId, string Id);
         Task RestoreCompany(RestoreCompanyCommand companyId);
         Task RestoreBulkCompany(RestoreBulkCompanyCommand companyId);
+        Task DeleteBulkCompany(DeleteBulkCompanyCommand companyIds);
+        Task BulkAssignCompany(BulkAssignCompanyCommand oj);
+
+
     }
 
 }
