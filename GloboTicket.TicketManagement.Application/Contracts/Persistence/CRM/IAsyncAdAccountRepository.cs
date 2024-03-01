@@ -12,6 +12,6 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     public interface IAsyncAdAccountRepository : IAsyncRepository<CrmAdAccount>
     {
         Task SaveAdAccount(SaveAdAccountCommand ad);
-        Task SaveAdAccountBulk(List<SaveBulkAdAccountCommand> ad);
+        Task SaveAdAccountBulk(SaveBulkAdAccountCommand ad);
     }
 }

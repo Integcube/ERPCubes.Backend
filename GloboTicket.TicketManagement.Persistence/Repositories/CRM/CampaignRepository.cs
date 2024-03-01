@@ -31,13 +31,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
         public CampaignRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
         }
-        public async Task SaveBulkCampaigns(List<SaveBulkCampaignCommand> campaigns)
+        public async Task SaveBulkCampaigns(SaveBulkCampaignCommand campaigns)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
 
-                foreach (var campaign in campaigns)
+                foreach (var campaign in campaigns.Campaign)
                 {
                     if (campaign.CampaignId == "-1")
                     {

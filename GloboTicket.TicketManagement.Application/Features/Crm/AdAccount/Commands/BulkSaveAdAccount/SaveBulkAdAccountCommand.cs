@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +10,9 @@ namespace ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount
 {
     public class SaveBulkAdAccountCommand : IRequest
     {
-        public string AccountId { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public int IsSelected { get; set; }
-        public string SocialId { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
         public int TenantId { get; set; }
+        public string Id { get; set; } = String.Empty;
+        public List<SaveBulkAdAccountDto> AdAccount { get; set; } = new List<SaveBulkAdAccountDto>();
 
     }
 }

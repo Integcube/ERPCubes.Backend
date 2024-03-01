@@ -25,11 +25,11 @@ namespace ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount
         {
             try
             {
-                await _adRepository.SaveAdAccountBulk(new List<SaveBulkAdAccountCommand> { request });
+                await _adRepository.SaveAdAccountBulk( request );
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Saving ad {request.AccountId} failed due to : {ex.Message}");
+                _logger.LogError($"Saving ad {request.AdAccount} failed due to : {ex.Message}");
                 throw new BadRequestException(ex.Message);
 
             }

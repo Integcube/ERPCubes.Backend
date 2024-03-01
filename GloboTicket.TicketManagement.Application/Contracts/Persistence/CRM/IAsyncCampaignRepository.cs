@@ -18,7 +18,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task SaveCampaign(SaveCampaignCommand campaign);
         //Task SaveCampaigns(List<SaveCampaignCommand> campaigns);
-        Task SaveBulkCampaigns(List<SaveBulkCampaignCommand> campaigns);
+        Task SaveBulkCampaigns(SaveBulkCampaignCommand campaigns);
         Task<List<GetCampaignVm>> GetCampaign(GetCampaignQuery campaigns);
         Task DeleteCampaign(DeleteCampaignCommand campaigns);
         Task<List<GetCampaignSourceVm>> GetCampaignSource(GetCampaignSourceQuery campaignSource);

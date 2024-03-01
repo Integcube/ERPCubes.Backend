@@ -28,6 +28,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 if (ad.AccountId == "-1")
                 {
                     CrmAdAccount addAccount = new CrmAdAccount();
+                    addAccount.AccountId = $"{new Random().Next(1_000_000_000):000000000}{new Random().Next(1_000_000_000):000000000}";
                     addAccount.Title = ad.Title;
                     addAccount.SocialId = ad.SocialId;
                     addAccount.IsSelected = ad.IsSelected;
@@ -71,48 +72,49 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task SaveAdAccountBulk(List<SaveBulkAdAccountCommand> ad)
+        public async Task SaveAdAccountBulk(SaveBulkAdAccountCommand ad)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
 
-                foreach (var ads in ad)
+                foreach (var adAccount in ad.AdAccount)
                 {
-                    if (ads.AccountId == "-1")
+                    if (adAccount.AccountId == "-1")
                     {
                         CrmAdAccount addAccount = new CrmAdAccount();
-                        addAccount.Title = ads.Title;
-                        addAccount.SocialId = ads.SocialId;
-                        addAccount.IsSelected = ads.IsSelected;
+                        addAccount.AccountId = $"{new Random().Next(1_000_000_000):000000000}{new Random().Next(1_000_000_000):000000000}";
+                        addAccount.Title = adAccount.Title;
+                        addAccount.SocialId = adAccount.SocialId;
+                        addAccount.IsSelected = adAccount.IsSelected;
                         addAccount.CreatedDate = localDateTime.ToUniversalTime();
-                        addAccount.TenantId = ads.TenantId;
+                        addAccount.TenantId = adAccount.TenantId;
                         addAccount.IsDeleted = 0;
-                        addAccount.CreatedBy = ads.Id;
+                        addAccount.CreatedBy = adAccount.Id;
                         await _dbContext.AddAsync(addAccount);
                         await _dbContext.SaveChangesAsync();
 
                     }
                     else
                     {
-                        var existingAccount = await (from a in _dbContext.CrmAdAccount.Where(a => a.AccountId == ads.AccountId)
+                        var existingAccount = await (from a in _dbContext.CrmAdAccount.Where(a => a.AccountId == adAccount.AccountId)
                                                      select a).FirstAsync();
                         if (existingAccount == null)
                         {
-                            throw new NotFoundException(ads.Title, ads.AccountId);
+                            throw new NotFoundException(adAccount.Title, adAccount.AccountId);
                         }
                         else
                         {
-                            existingAccount.Title = ads.Title;
-                            existingAccount.SocialId = ads.SocialId;
+                            existingAccount.Title = adAccount.Title;
+                            existingAccount.SocialId = adAccount.SocialId;
 
-                            existingAccount.IsSelected = ads.IsSelected;
+                            existingAccount.IsSelected = adAccount.IsSelected;
 
                             //addAccount.CreatedBy = ad.Id;
                             //existingAccount.CreatedDate = localDateTime.ToUniversalTime();
-                            existingAccount.TenantId = ads.TenantId;
+                            existingAccount.TenantId = adAccount.TenantId;
                             existingAccount.IsDeleted = 0;
-                            existingAccount.LastModifiedBy = ads.Id;
+                            existingAccount.LastModifiedBy = adAccount.Id;
                             existingAccount.LastModifiedDate = localDateTime.ToUniversalTime();
                             await _dbContext.SaveChangesAsync();
                         }

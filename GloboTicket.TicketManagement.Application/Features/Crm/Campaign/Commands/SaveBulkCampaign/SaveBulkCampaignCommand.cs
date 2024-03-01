@@ -1,4 +1,6 @@
-﻿using MediatR;
+﻿using ERPCubes.Application.Features.Crm.Campaign.Commands.SaveBulkCampaign;
+using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +11,8 @@ namespace ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign
 {
     public class SaveBulkCampaignCommand : IRequest
     {
-        public string Id { get; set; } = string.Empty;
-        public string CampaignId { get; set; } = string.Empty;
-        public string AdAccountId { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public int ProductId { get; set; }
-        public int SourceId {  get; set; }
-        public decimal Budget {  get; set; }
         public int TenantId { get; set; }
+        public string Id { get; set; } = String.Empty;
+        public List<SaveBulkCampaignDto> Campaign { get; set; } = new List<SaveBulkCampaignDto>();
     }
 }

@@ -24,11 +24,11 @@ namespace ERPCubes.Application.Features.Crm.Campaign.Commands.SaveCampaign
         {
             try
             {
-                await _campaignRepository.SaveBulkCampaigns(new List<SaveBulkCampaignCommand> { request });
+                await _campaignRepository.SaveBulkCampaigns( request );
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Saving campaign {request.CampaignId} failed due to: {ex.Message}");
+                _logger.LogError($"Saving campaign {request.Campaign} failed due to: {ex.Message}");
                 throw new BadRequestException(ex.Message);
             }
 
