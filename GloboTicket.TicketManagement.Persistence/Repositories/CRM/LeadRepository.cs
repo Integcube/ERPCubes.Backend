@@ -43,6 +43,15 @@ using System.Data.SqlClient;
 using Npgsql;
 using ERPCubes.Application.Features.Crm.Lead.Commands.ChangeBulkLeadStatus;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkAssignLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByOwner;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByMonth;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -999,6 +1008,186 @@ namespace ERPCubes.Persistence.Repositories.CRM
             parameters.Add(new NpgsqlParameter("@TenantId", oj.TenantId));
             await _dbContext.Database.ExecuteSqlRawAsync(updateSql, parameters.ToArray());
 
+        }
+
+        public async Task<List<GetLeadCountByOwnerVm>> GetLeadCountByOwner(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };              
+                var results = await _dbContext.GetLeadCountByOwner.FromSqlRaw(
+                    "SELECT * FROM public.crmleadcountbyowner({0})", tenantIdPrm)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetLeadCountByMonthVm>> GetLeadCountByMonth(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetLeadCountByMonth.FromSqlRaw(
+                    "SELECT * FROM public.crmleadbymonthcount({0})", tenantIdPrm)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetLeadSourceByCountVm>> GetLeadSourceByCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetLeadSourceByCount.FromSqlRaw(
+                    "SELECT * FROM public.crmleadsourcecount({0})", tenantIdPrm)
+                    .ToListAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetTotalLeadCountVm> GetTotalLeadCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetTotalLeadCount
+            .FromSqlRaw("SELECT * FROM public.crmtotalleadcount({0})", tenantIdPrm)
+            .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetNewLeadCountVm> GetNewLeadCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetNewLeadCount.FromSqlRaw(
+                    "SELECT * FROM public.crmnewleadcount({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetTotalQualifiedCountVm> GetQualifiedLeadCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetQualifiedLeadCount.FromSqlRaw(
+                    "SELECT * FROM public.crmqualifiedleadcount({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetTotalLostCountVm> GetLostLeadCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetLostLeadCount.FromSqlRaw(
+                    "SELECT * FROM public.crmlostleadcount({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetTotalWonCountVm> GetWonLeadCount(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetWonLeadCount.FromSqlRaw(
+                    "SELECT * FROM public.crmwonleadcount({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetLeadCountSummaryVm> GetLeadCountSummary(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var results = await _dbContext.GetLeadCountSummary.FromSqlRaw(
+                    "SELECT * FROM public.crmtotalleadsummary({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
     }
 }

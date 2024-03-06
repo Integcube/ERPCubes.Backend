@@ -15,16 +15,25 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByMonth;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByOwner;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
 using ERPCubes.Domain.Entities;
 using MediatR;
@@ -67,5 +76,17 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task SaveLeadScoreQuestion(SaveLeadScoreQuestionCommand request);
         Task DeleteLeadScoreQuestion(int TenantId, int QuestionId);
         Task SaveCopyQuestion(SaveCopyQuestionCommand request);
+        Task<List<GetLeadCountByOwnerVm>> GetLeadCountByOwner(int TenantId);
+        Task<List<GetLeadCountByMonthVm>> GetLeadCountByMonth(int TenantId);
+        Task<List<GetLeadSourceByCountVm>> GetLeadSourceByCount(int TenantId);
+        Task<GetTotalLeadCountVm> GetTotalLeadCount(int TenantId);
+        Task<GetNewLeadCountVm> GetNewLeadCount(int TenantId);
+        Task<GetTotalQualifiedCountVm> GetQualifiedLeadCount(int TenantId);
+        Task<GetTotalLostCountVm> GetLostLeadCount(int TenantId);
+        Task<GetTotalWonCountVm> GetWonLeadCount(int TenantId);
+        Task<GetLeadCountSummaryVm> GetLeadCountSummary(int TenantId);
+
+
+
     }
 }

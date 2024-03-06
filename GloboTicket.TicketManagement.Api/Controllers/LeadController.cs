@@ -15,16 +15,25 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByMonth;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByOwner;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadOwnerWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadScoreQuestions;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -265,6 +274,68 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(leadCommand);
             return Ok(dtos);
         }
-
+        [HttpPost("leadCountByOwner", Name = "GetLeadCountByOwner")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadCountByOwner(GetLeadCountByOwnerQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByMonth", Name = "GetLeadCountByMonth")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadCountByMonth(GetLeadCountByMonthQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountBySource", Name = "GetLeadCountBySource")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadCountBySource(GetLeadSourceByCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByTotal", Name = "GetLeadCountByTotal")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadCountByTotal(GetTotalLeadCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByNew", Name = "GetLeadCountByNew")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLeadCountByNew(GetNewLeadCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByQualified", Name = "GetLeadCountByQualified")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetQualifiedCount(GetTotalQualifiedCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByLost", Name = "GetLeadCountByLost")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetLostCount(GetTotalLostCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountByWon", Name = "GetLeadCountByWon")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetWonCount(GetTotalWonCountQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
+        [HttpPost("leadCountSummary", Name = "GetLeadCountBySummary")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetSummaryCount(GetLeadCountSummaryQuery lead)
+        {
+            var dtos = await _mediator.Send(lead);
+            return Ok(dtos);
+        }
     }
 }
