@@ -4,6 +4,7 @@ using ERPCubes.Application.Features.AppUser.Commands.RestoreUser;
 using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
+using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
@@ -23,13 +24,23 @@ namespace ERPCubesApi.Controllers
         {
             _mediator = mediator;
         }
-        [HttpPost("all", Name = "GetAllUsers")]
+        [HttpPost("lazyall", Name = "LazyGetAllUsers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<GetUserListVm>>> GetAllUsers(GetUserListQuery getUserList)
+        public async Task<ActionResult<LazyGetUserListVm>> LazyGetAllUsers (LazyGetUserListQuery getUserList)
         {
             var dto = await _mediator.Send(getUserList);
             return Ok(dto);
         }
+
+        [HttpPost("all", Name = "GetAllUsers")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetUserListVm>> GetAllUsers(GetUserListQuery getUserList)
+        {
+            var dto = await _mediator.Send(getUserList);
+            return Ok(dto);
+        }
+
+
         [HttpPost("update", Name = "UpdateAllUsers")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -8,24 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.AppUser.Queries.GetUserList
+namespace ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList
 {
-    public class GetUserListQueryHandler : IRequestHandler<GetUserListQuery, List<GetUserListVm>>
+    public class LazyGetUserListQueryHandler : IRequestHandler<LazyGetUserListQuery, LazyGetUserListVm>
     {
         private readonly IAsyncUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
-        public GetUserListQueryHandler(IAsyncUserRepository userRepository, IMapper mapper)
+        public LazyGetUserListQueryHandler(IAsyncUserRepository userRepository, IMapper mapper)
         {
             _userRepository = userRepository;
             _mapper = mapper;
         }
-        public async Task<List<GetUserListVm>> Handle(GetUserListQuery request, CancellationToken cancellationToken)
-        {
-            List<GetUserListVm> Users = new List<GetUserListVm>();
+           public async Task<LazyGetUserListVm> Handle(LazyGetUserListQuery request, CancellationToken cancellationToken)
+            {
+            LazyGetUserListVm Users = new LazyGetUserListVm();
             try
             {
-                Users = await _userRepository.GetUserList(request);
+                Users = await _userRepository.LazyGetUserList(request);
             }
             catch (Exception ex)
             {

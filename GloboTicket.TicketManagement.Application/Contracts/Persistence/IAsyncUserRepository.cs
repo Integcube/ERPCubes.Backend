@@ -3,6 +3,7 @@ using ERPCubes.Application.Features.AppUser.Commands.DeleteUser;
 using ERPCubes.Application.Features.AppUser.Commands.RestoreUser;
 using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
+using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
@@ -17,13 +18,12 @@ namespace ERPCubes.Application.Contracts.Persistence
 {
     public interface IAsyncUserRepository:IAsyncRepository<GetUserListVm>
     {
-        Task<List<GetUserListVm>> GetUserList(int TenantId, string Id);
+        Task<LazyGetUserListVm> LazyGetUserList(LazyGetUserListQuery request);
+        Task<List<GetUserListVm>> GetUserList(GetUserListQuery request);
         Task UpdateUser(UpdateUserCommand updateUser);
         Task DeleteUser(DeleteUserCommand cm);
         Task<List<GetDeletedUserListVm>> GetDeletedUsers(int TenantId, string Id);
         Task RestoreUser(RestoreUserCommand user);
         Task RestoreBulkUser(RestoreBulkUserCommand user);
-
-
     }
 }
