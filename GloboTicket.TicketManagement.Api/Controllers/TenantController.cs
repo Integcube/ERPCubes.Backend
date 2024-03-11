@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Features.Crm.Team.Queries.GetTeams;
+using ERPCubes.Application.Features.Crm.Tenant.Commands.SaveTenant;
 using ERPCubes.Application.Features.TenantChecker;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -23,5 +24,14 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(checker);
             return Ok(dtos);
         }
+
+        [HttpPost("newTenant")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> NewTenant(SaveTenantCommand checker)
+        {
+            var dtos = await _mediator.Send(checker);
+            return Ok(dtos);
+        }
+
     }
 }

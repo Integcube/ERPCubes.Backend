@@ -1,6 +1,16 @@
-﻿namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
+﻿using ERPCubes.Domain.Common;
+
+namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
 {
+
     public class GetLeadVm
+    {
+        public List<Leads> LeadsList { get; set; }
+        public PaginationVm PaginationVm { get; set; }
+
+    }
+
+    public class Leads
     {
         public int LeadId { get; set; }
         public string FirstName { get; set; } = string.Empty;
@@ -30,6 +40,7 @@
         public string LeadOwnerName { get; set; }
         public decimal Rating { get; set; }
         public string Remarks { get; set; }
-        
+
     }
+    
 }

@@ -52,6 +52,8 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
+using ERPCubes.Domain.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -88,75 +90,119 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetLeadVm>> GetAllLeads(int TenantId, string Id)
+        public async Task<GetLeadVm> GetAllLeads(GetLeadListQuery obj)
         {
             try
 
             {
 
-                List<GetLeadVm> Leads = await (
-    from a in _dbContext.CrmLead
-        .Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
-    join s in _dbContext.CrmLeadStatus
-        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
-        on a.Status equals s.StatusId
-    join i in _dbContext.CrmIndustry
-        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
-        on a.IndustryId equals i.IndustryId into all
-    from ii in all.DefaultIfEmpty()
-    join z in _dbContext.CrmLeadSource
-        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
-        on a.SourceId equals z.SourceId into all2
-    from zz in all2.DefaultIfEmpty()
-    join p in _dbContext.CrmProduct
-        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
-        on a.ProductId equals p.ProductId into all3
-    from pp in all3.DefaultIfEmpty()
-    join c in _dbContext.CrmCampaign
-        .Where(a => a.TenantId == TenantId || a.TenantId == -1 && a.IsDeleted == 0)
-        on a.CampaignId equals c.CampaignId into all4
-    from cc in all4.DefaultIfEmpty()
-    join user in _dbContext.AppUser on a.LeadOwner equals user.Id into userss
-    from us in userss.DefaultIfEmpty()
-    join scro in _dbContext.CrmLeadScore on a.LeadId equals scro.LeadId into absc
-    from sc in absc.DefaultIfEmpty()
-    join ques in _dbContext.CrmIScoringQuestion on sc.QuestionId equals ques.QuestionId into QUS
-    from question in QUS.DefaultIfEmpty()
-    orderby a.LeadId descending
-    group new { a, s, ii, zz, pp, cc, us, sc, question } by a.LeadId into grouped
-    select new GetLeadVm
-    {
-        LeadId = grouped.Key,
-        FirstName = grouped.First().a.FirstName,
-        LastName = grouped.First().a.LastName,
-        Email = grouped.First().a.Email,
-        Status = grouped.First().a.Status,
-        StatusTitle = grouped.First().s.StatusTitle,
-        LeadOwner = grouped.First().a.LeadOwner,
-        Mobile = grouped.First().a.Mobile,
-        Work = grouped.First().a.Work,
-        Address = grouped.First().a.Address,
-        Street = grouped.First().a.Street,
-        City = grouped.First().a.City,
-        Zip = grouped.First().a.Zip,
-        State = grouped.First().a.State,
-        Country = grouped.First().a.Country,
-        SourceId = grouped.First().a.SourceId,
-        SourceTitle = grouped.First().zz.SourceTitle,
-        IndustryId = grouped.First().a.IndustryId,
-        IndustryTitle = grouped.First().ii.IndustryTitle,
-        ProductId = grouped.First().a.ProductId,
-        ProductTitle = grouped.First().pp.ProductName,
-        CampaignId = grouped.First().a.CampaignId,
-        CampaignTitle = grouped.First().cc.Title,
-        CreatedDate = grouped.First().a.CreatedDate,
-        ModifiedDate = grouped.First().a.LastModifiedDate,
-        LeadOwnerName = grouped.First().us.FirstName + " " + grouped.First().us.LastName,
-        Rating = grouped.Sum(ls => ls.sc.Rating * ls.question.Weightage) / (grouped.Sum(ls => ls.question.Weightage) == 0 ? 1 : grouped.Sum(ls => ls.question.Weightage)),
-        Remarks= grouped.First().a.Remarks
-    }
-).ToListAsync();
-                return Leads;
+                var Leads = await ( from a in _dbContext.CrmLead
+               .Where(a => (a.TenantId == obj.TenantId) 
+                 && (a.IsDeleted == 0) && (obj.LeadOwner.Count() ==0 || obj.LeadOwner.Contains(a.LeadOwner))
+                && (obj.LeadStatus.Count()== 0|| obj.LeadStatus.Contains(a.Status))
+                && (!obj.CreatedDate.HasValue || a.CreatedDate >= obj.CreatedDate)
+                && (!obj.ModifiedDate.HasValue || a.LastModifiedDate >= obj.ModifiedDate))
+               
+                  join s in _dbContext.CrmLeadStatus.Where(a => a.TenantId == obj.TenantId || a.TenantId == -1) on a.Status equals s.StatusId
+                  join i in _dbContext.CrmIndustry.Where(a => a.TenantId == obj.TenantId || a.TenantId == -1 ) on a.IndustryId equals i.IndustryId into all
+                  from ii in all.DefaultIfEmpty()
+                  join z in _dbContext.CrmLeadSource.Where(a => a.TenantId == obj.TenantId || a.TenantId == -1 ) on a.SourceId equals z.SourceId into all2
+                  from zz in all2.DefaultIfEmpty()
+                  join p in _dbContext.CrmProduct.Where(a => a.TenantId == obj.TenantId || a.TenantId == -1 )on a.ProductId equals p.ProductId into all3
+                  from pp in all3.DefaultIfEmpty()
+                  join c in _dbContext.CrmCampaign.Where(a => a.TenantId == obj.TenantId || a.TenantId == -1 )on a.CampaignId equals c.CampaignId into all4
+                  from cc in all4.DefaultIfEmpty()
+                  join user in _dbContext.AppUser on a.LeadOwner equals user.Id into userss
+                  from us in userss.DefaultIfEmpty()
+                  join scro in _dbContext.CrmLeadScore on a.LeadId equals scro.LeadId into absc
+                  from sc in absc.DefaultIfEmpty()
+                  join ques in _dbContext.CrmIScoringQuestion on sc.QuestionId equals ques.QuestionId into QUS
+                  from question in QUS.DefaultIfEmpty()
+                  orderby a.LeadId descending
+                  group new { a, s, ii, zz, pp, cc, us, sc, question } by a.LeadId into grouped
+                  select new Leads
+                  {
+                      LeadId = grouped.Key,
+                      FirstName = grouped.First().a.FirstName,
+                      LastName = grouped.First().a.LastName,
+                      Email = grouped.First().a.Email,
+                      Status = grouped.First().a.Status,
+                      StatusTitle = grouped.First().s.StatusTitle,
+                      LeadOwner = grouped.First().a.LeadOwner,
+                      Mobile = grouped.First().a.Mobile,
+                      Work = grouped.First().a.Work,
+                      Address = grouped.First().a.Address,
+                      Street = grouped.First().a.Street,
+                      City = grouped.First().a.City,
+                      Zip = grouped.First().a.Zip,
+                      State = grouped.First().a.State,
+                      Country = grouped.First().a.Country,
+                      SourceId = grouped.First().a.SourceId,
+                      SourceTitle = grouped.First().zz.SourceTitle,
+                      IndustryId = grouped.First().a.IndustryId,
+                      IndustryTitle = grouped.First().ii.IndustryTitle,
+                      ProductId = grouped.First().a.ProductId,
+                      ProductTitle = grouped.First().pp.ProductName,
+                      CampaignId = grouped.First().a.CampaignId,
+                      CampaignTitle = grouped.First().cc.Title,
+                      CreatedDate = grouped.First().a.CreatedDate,
+                      ModifiedDate = grouped.First().a.LastModifiedDate,
+                      LeadOwnerName = grouped.First().us.FirstName + " " + grouped.First().us.LastName,
+                      Rating = grouped.Sum(ls => ls.sc.Rating * ls.question.Weightage) / (grouped.Sum(ls => ls.question.Weightage) == 0 ? 1 : grouped.Sum(ls => ls.question.Weightage)),
+                      Remarks = grouped.First().a.Remarks
+                  }  ).ToListAsync();
+
+                //if (string.IsNullOrEmpty(obj.Sort))
+                //{
+                //    Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.CreatedDate) : Leads.OrderBy(a => a.CreatedDate);
+                //}
+                //else
+                //{
+                //    switch (obj.Sort.ToLower())
+                //    {
+                //        case "firstname":
+                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.FirstName) : Leads.OrderBy(a => a.FirstName);
+                //            break;
+                //        case "lastname":
+                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.LastName) : Leads.OrderBy(a => a.LastName);
+                //            break;
+                //        case "email":
+                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.Email) : Leads.OrderBy(a => a.Email);
+                //            break;
+                //        case "username":
+                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.UserName) : Leads.OrderBy(a => a.UserName);
+                //            break;
+                //        case "phonenumber":
+                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.PhoneNumber) : Leads.OrderBy(a => a.PhoneNumber);
+                //            break;
+                //    }
+                //}
+                int leadLength = Leads.Count;
+
+                int begin = obj.Page * obj.Size;
+                int end = Math.Min((obj.Size * (obj.Page + 1)), leadLength);
+                int lastPage = Math.Max((int)Math.Ceiling((double)leadLength / obj.Size), 1);
+
+                List<Leads> paginatedLeads = Leads.Skip(begin).Take(end - begin).ToList();
+
+                PaginationVm pagination = new PaginationVm
+                {
+                    Length = leadLength,
+                    Size = obj.Size,
+                    Page = obj.Page,
+                    LastPage = lastPage,
+                    StartIndex = begin,
+                    EndIndex = end - 1
+                };
+
+
+                GetLeadVm response = new GetLeadVm
+                {
+                    LeadsList = paginatedLeads,
+                    PaginationVm = pagination
+                };
+
+                return response;
 
             }
             catch (Exception ex)
@@ -230,7 +276,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     Value = year
                 };
-       
+
                 var results = await _dbContext.GetLeadByMonthListVm.FromSqlRaw(
                     "SELECT * FROM public.\"CRMLeadMonthlyStatusWise\" ({0},{1},{2},{3},{4})", tenantIdPrm, productidPrm, p_sourceIdPrm, p_userIdPrm, p_yearPrm)
                     .ToListAsync();
@@ -238,14 +284,14 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
 
 
-                var MonthTotal = results.GroupBy(a => new { a.Month}).Select(s => new GetLeadByMonthListVm
+                var MonthTotal = results.GroupBy(a => new { a.Month }).Select(s => new GetLeadByMonthListVm
                 {
-                    Month= s.FirstOrDefault().Month,
-                    LeadStatusTitle="Total Leads",
+                    Month = s.FirstOrDefault().Month,
+                    LeadStatusTitle = "Total Leads",
                     LeadStatusId = 99999,
                     Count = s.Sum(rr => rr.Count)
                 }).ToList();
-           
+
                 results.AddRange(MonthTotal);
 
 
@@ -405,7 +451,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     }).ToListAsync();
                 return attachments;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
@@ -446,7 +492,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         LeadObj.LastModifiedBy = Id;
                         LeadObj.LastModifiedDate = localDateTime.ToUniversalTime();
                         LeadObj.Remarks = Lead.Remarks;
-                        
+
                         await _dbContext.SaveChangesAsync();
                     }
 
@@ -501,7 +547,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.Status = 1;
                     LeadObj.LeadOwner = request.Id;
                     LeadObj.City = Lead.City;
-                    LeadObj.Mobile= Lead.Mobile;
+                    LeadObj.Mobile = Lead.Mobile;
                     LeadObj.Address = Lead.Address;
                     LeadObj.Country = Lead.Country;
                     LeadObj.Street = Lead.Street;
@@ -656,15 +702,15 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetDeletedLeadsVm> detail = await(from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
-                                                                join user in _dbContext.AppUser on a.DeletedBy equals user.Id
-                                                                select new GetDeletedLeadsVm
-                                                                {
-                                                                    Id = a.LeadId,
-                                                                    Title = a.FirstName + " " + a.LastName,
-                                                                    DeletedBy = user.FirstName + " " + user.LastName,
-                                                                    DeletedDate = a.DeletedDate,
-                                                                }).OrderBy(a => a.Title).ToListAsync();
+                List<GetDeletedLeadsVm> detail = await (from a in _dbContext.CrmLead.Where(a => a.TenantId == TenantId && a.IsDeleted == 1)
+                                                        join user in _dbContext.AppUser on a.DeletedBy equals user.Id
+                                                        select new GetDeletedLeadsVm
+                                                        {
+                                                            Id = a.LeadId,
+                                                            Title = a.FirstName + " " + a.LastName,
+                                                            DeletedBy = user.FirstName + " " + user.LastName,
+                                                            DeletedDate = a.DeletedDate,
+                                                        }).OrderBy(a => a.Title).ToListAsync();
                 return detail;
             }
             catch (Exception ex)
@@ -788,7 +834,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new Exception(ex.Message);
             }
         }
-       
+
         public async Task<List<GetLeadScoreQuestionsVm>> GetLeadScoreQuestions(int TenantId, int ProductId)
         {
             try
@@ -919,14 +965,14 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                 var updateSql = updateSqlBuilder.ToString();
 
-  
+
                 var parameters = new List<NpgsqlParameter>();
                 for (int i = 0; i < leadIdss.Leads.Count; i++)
                 {
                     parameters.Add(new NpgsqlParameter($"@LeadId{i}", leadIdss.Leads[i].LeadId));
                 }
 
-            
+
                 parameters.Add(new NpgsqlParameter("@DeletedBy", leadIdss.Id));
                 parameters.Add(new NpgsqlParameter("@DeletedDate", DateTime.Now.ToUniversalTime()));
                 parameters.Add(new NpgsqlParameter("@IsDeleted", 1));
@@ -1017,7 +1063,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
                 {
                     Value = TenantId
-                };              
+                };
                 var results = await _dbContext.GetLeadCountByOwner.FromSqlRaw(
                     "SELECT * FROM public.crmleadcountbyowner({0})", tenantIdPrm)
                     .ToListAsync();

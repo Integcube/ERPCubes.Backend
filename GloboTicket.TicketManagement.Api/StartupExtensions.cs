@@ -3,8 +3,10 @@ using ERPCubes.Api.Services;
 using ERPCubes.Api.Utility;
 using ERPCubes.Application;
 using ERPCubes.Application.Contracts;
+using ERPCubes.Application.Contracts.Persistence.Infrastructure;
 using ERPCubes.Identity;
 using ERPCubes.Infrastructure;
+using ERPCubes.Infrastructure.Mail;
 using ERPCubes.Persistence;
 using ERPCubesApi.Hubs;
 using ERPCubesApi.Services;
@@ -26,24 +28,12 @@ namespace ERPCubes.Api
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
             builder.Services.AddIdentityServices(builder.Configuration);
-
             builder.Services.AddScoped<ILoggedInUserService, LoggedInUserService>();
-            //builder.Services.AddScoped<FileServerService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             });
-
-        //    builder.Services.AddCors(options =>
-        //    {
-        //        options.AddPolicy("Open", builder => builder
-        //                .SetIsOriginAllowed(_ => true)
-        //.AllowAnyHeader()
-        //.AllowAnyMethod()
-        //.AllowCredentials());
-        //         });
-
 
             builder.Services.AddCors(options =>
             {

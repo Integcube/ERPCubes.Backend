@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
 {
-    public class GetLeadListQueryHandler : IRequestHandler<GetLeadListQuery, List<GetLeadVm>>
+    public class GetLeadListQueryHandler : IRequestHandler<GetLeadListQuery, GetLeadVm>
     {
         private readonly IMapper _mapper;
         private readonly IAsyncLeadRepository _leadRepository;
@@ -26,14 +26,12 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList
             _leadRepository = leadRepository;
             _logger = logger;
         }
-        public async Task<List<GetLeadVm>> Handle(GetLeadListQuery request, CancellationToken cancellationToken)
+        public async Task<GetLeadVm> Handle(GetLeadListQuery request, CancellationToken cancellationToken)
         {
-            List<GetLeadVm> leads = new List<GetLeadVm>();
+            GetLeadVm leads = new GetLeadVm();
             try
             {
-                leads = await _leadRepository.GetAllLeads(request.TenantId, request.Id
-                    //, request.CreatedDate, request.ModifiedDate, request.LeadOwner, request.LeadStatus
-                    );
+                leads = await _leadRepository.GetAllLeads(request);
             }
             catch (Exception ex)
             {

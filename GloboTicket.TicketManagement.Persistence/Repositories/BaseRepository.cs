@@ -8,7 +8,7 @@ namespace ERPCubes.Persistence.Repositories
     {
         protected readonly ERPCubesDbContext _dbContext;
         protected readonly ERPCubesIdentityDbContext _dbContextIdentity;
-        public BaseRepository(ERPCubesDbContext dbContext, Identity.ERPCubesIdentityDbContext dbContextIdentity)
+        public BaseRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity)
         {
             _dbContext = dbContext;
             _dbContextIdentity = dbContextIdentity;

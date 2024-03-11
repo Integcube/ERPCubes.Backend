@@ -1,5 +1,8 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.Identity;
+using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.Crm.Tenant.Commands.SaveTenant;
 using ERPCubes.Application.Models.Authentication;
+using ERPCubes.Application.Models.Mail;
 using ERPCubes.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -60,7 +63,7 @@ namespace ERPCubes.Identity.Services
                 Name = user.User.FirstName + " " + user.User.LastName,
                 TenantId = user.User.TenantId,
                 TenantGuid= user.Tenant.TenantGuid,
-                IsDocumentAcces= user.Tenant.IsDocumentAcces
+                IsDocumentAcces = user.Tenant.IsDocumentAcces
             };
             
             return response;
@@ -84,6 +87,8 @@ namespace ERPCubes.Identity.Services
                 PhoneNumber = request.PhoneNumber,
                 EmailConfirmed = true,
                 TenantId = request.TenantId,
+                CreatedOn= DateTime.UtcNow,
+
             };
 
             var existingEmail = await _userManager.FindByEmailAsync(request.Email);
@@ -117,6 +122,7 @@ namespace ERPCubes.Identity.Services
         {
             try
             {
+                DateTime TodayDate = DateTime.Now.ToUniversalTime();
                 // Find the existing user by user ID
                 var existingUser = await _userManager.FindByIdAsync(request.UserId);
 
@@ -130,8 +136,10 @@ namespace ERPCubes.Identity.Services
                 existingUser.FirstName = request.FirstName;
                 existingUser.LastName = request.LastName;
                 existingUser.UserName = request.UserName;
-                existingUser.PhoneNumber = request.LastName; 
-
+                existingUser.PhoneNumber = request.LastName;
+                existingUser.ModifiedBy = request.UserId;
+                existingUser.ModifiedOn = TodayDate;
+               
                 // Check if the email is being changed
                 if (!string.Equals(existingUser.NormalizedEmail, request.Email, StringComparison.OrdinalIgnoreCase))
                 {
@@ -185,7 +193,54 @@ namespace ERPCubes.Identity.Services
 
 
 
+        public async  Task<bool> SaveTenant(SaveTenantCommand obj)
+        {
+            using (var transaction = await _dbContext.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    Tenant NewObj = new Tenant();
 
+                    NewObj.Name = obj.Company;
+                    NewObj.Subdomain = obj.Domain;
+                    NewObj.IsDocumentAcces = 1;
+                    NewObj.IsDeleted = 0;
+                    NewObj.Owner = obj.FirstName;
+                    NewObj.CreatedBy = obj.FirstName;
+                    NewObj.CreatedDate = DateTime.UtcNow; ;
+                    NewObj.TenantGuid = Guid.NewGuid();
+
+                    _dbContext.Add(NewObj);
+                    _dbContext.SaveChanges();
+
+
+                    var user = new ApplicationUser();
+
+                    user.FirstName = obj.FirstName;
+                    user.LastName = obj.LastName;
+                    user.UserName = obj.FirstName.ToLower() + "01";
+                    user.PhoneNumber = "";
+                    user.EmailConfirmed = true;
+                    user.TenantId = NewObj.TenantId;
+
+                    var result = await _userManager.CreateAsync(user, obj.Password);
+
+                    var ob = await _dbContext.Tenant.FirstOrDefaultAsync(a => a.TenantId == NewObj.TenantId);
+                    ob.Owner = user.Id;
+                    _dbContext.SaveChanges();
+                    await transaction.CommitAsync();
+
+                    return true;
+                }
+
+                catch (Exception e)
+                {
+                    await transaction.RollbackAsync();
+                    throw new BadRequestException(e.Message);
+
+                }
+            }
+        }
 
 
         private async Task<JwtSecurityToken> GenerateToken(ApplicationUser user)
