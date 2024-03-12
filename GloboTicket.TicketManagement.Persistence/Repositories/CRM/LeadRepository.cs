@@ -161,31 +161,38 @@ namespace ERPCubes.Persistence.Repositories.CRM
                       Remarks = grouped.First().a.Remarks
                   }  ).ToListAsync();
 
-                //if (string.IsNullOrEmpty(obj.Sort))
-                //{
-                //    Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.CreatedDate) : Leads.OrderBy(a => a.CreatedDate);
-                //}
-                //else
-                //{
-                //    switch (obj.Sort.ToLower())
-                //    {
-                //        case "firstname":
-                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.FirstName) : Leads.OrderBy(a => a.FirstName);
-                //            break;
-                //        case "lastname":
-                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.LastName) : Leads.OrderBy(a => a.LastName);
-                //            break;
-                //        case "email":
-                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.Email) : Leads.OrderBy(a => a.Email);
-                //            break;
-                //        case "username":
-                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.UserName) : Leads.OrderBy(a => a.UserName);
-                //            break;
-                //        case "phonenumber":
-                //            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.PhoneNumber) : Leads.OrderBy(a => a.PhoneNumber);
-                //            break;
-                //    }
-                //}
+
+                if (string.IsNullOrEmpty(obj.Sort))
+                {
+                    Leads = Leads.OrderByDescending(a => a.CreatedDate).ToList();
+                }
+                {
+
+                    switch (obj.Sort)
+                    {
+                        case "name":
+                            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.FirstName).ToList() : Leads.OrderBy(a => a.FirstName).ToList();
+                            break;
+                        case "email":
+                            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.Email).ToList() : Leads.OrderBy(a => a.Email).ToList();
+                            break;
+                       case "productTitle":
+                           Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.ProductTitle).ToList() : Leads.OrderBy(a => a.ProductTitle).ToList();
+                          break;
+                       case "phone":
+                           Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.Mobile).ToList() : Leads.OrderBy(a => a.Mobile).ToList();
+                           break;
+                        case "leadStatus":
+                            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.StatusTitle).ToList() : Leads.OrderBy(a => a.StatusTitle).ToList();
+                            break;
+                        case "leadOwnerName":
+                            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.LeadOwnerName).ToList() : Leads.OrderBy(a => a.LeadOwnerName).ToList();
+                            break;
+                        case "createdDate":
+                            Leads = obj.Order.ToLower() == "desc" ? Leads.OrderByDescending(a => a.CreatedDate).ToList() : Leads.OrderBy(a => a.CreatedDate).ToList();
+                            break;
+                    }
+                }
                 int leadLength = Leads.Count;
 
                 int begin = obj.Page * obj.Size;
