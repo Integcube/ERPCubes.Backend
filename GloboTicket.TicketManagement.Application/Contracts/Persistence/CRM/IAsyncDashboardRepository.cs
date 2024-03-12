@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.Crm.Dashboard.Commands.DeleteDashboard;
 using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboard;
+using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboardWidgets;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using ERPCubes.Domain.Entities;
 using System;
@@ -14,6 +15,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
     {
         Task<List<GetDashboardVm>> GetAllDashboard(int TenantId, string Id);
         Task SaveDashboard(SaveDashboardCommand dashboard);
+        Task SaveDashboardWidget(SaveDashboardWidgetsCommand dashboard);       
         Task DeleteDashboard(DeleteDashboardCommand dashboard);
 
 

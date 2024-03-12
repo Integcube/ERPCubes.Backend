@@ -27,13 +27,22 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountToday;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewCountFilter;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewTodayFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountToday;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalCountFilter;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountToday;
 using ERPCubes.Application.Features.Tags.Queries.GetTagsList;
 using ERPCubes.Domain.Entities;
 using MediatR;
@@ -85,8 +94,16 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<GetTotalLostCountVm> GetLostLeadCount(int TenantId);
         Task<GetTotalWonCountVm> GetWonLeadCount(int TenantId);
         Task<GetLeadCountSummaryVm> GetLeadCountSummary(int TenantId);
+        Task<GetTotalCountFilterVm> GetTotalCountFilter(int TenantId, int daysAgo);
+        Task<GetNewCountFilterVm> GetNewCountFilter(int TenantId, int daysAgo);
+        Task<GetQualifiedCountFilterVm> GetQualifiedCountFilter(int TenantId, int daysAgo);
+        Task<GetLostCountFilterVm> GetLostCountFilter(int TenantId, int daysAgo);
+        Task<GetWonCountFilterVm> GetWonCountFilter(int TenantId, int daysAgo);
+        Task<GetLostCountTodayVm> GetLostCountToday(int TenantId);
+        Task<GetNewTodayFilterVm> GetNewTodayFilter(int TenantId);
+        Task<GetQualifiedCountTodayVm> GetQualifiedCountToday(int TenantId);
+        Task<GetWonCountTodayVm> GetWonCountToday(int TenantId);
 
-
-
+        
     }
 }

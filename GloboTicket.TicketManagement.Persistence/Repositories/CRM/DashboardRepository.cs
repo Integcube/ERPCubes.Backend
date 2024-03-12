@@ -2,9 +2,11 @@
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.Crm.Dashboard.Commands.DeleteDashboard;
 using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboard;
+using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboardWidgets;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -49,13 +51,16 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 List<GetDashboardVm> dashboardDetail = await(from a in _dbContext.CrmDashboard.Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
-                                                         select new GetDashboardVm
+                                                             join user in _dbContext.AppUser on a.CreatedBy equals user.Id
+                                                             select new GetDashboardVm
                                                          {
                                                              DashboardId = a.DashboardId,
                                                              Name = a.Name,
                                                              Status = a.Status,
-                                                             IsPrivate = a.IsPrivate,   
-                                                             Widgets = a.Widgets,
+                                                             IsPrivate = a.IsPrivate,
+                                                             Widgets= a.Widgets,
+                                                             CreatedBy= user.FirstName + " " + user.LastName,
+                                                             CreatedDate = a.CreatedDate,
                                                          }).OrderBy(a => a.Name).ToListAsync();
                 return dashboardDetail;
             }
@@ -65,45 +70,68 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task SaveDashboard(SaveDashboardCommand dashboard)
+        public async Task SaveDashboard(SaveDashboardCommand request)
         {
             try
             {
                 DateTime localDateTime = DateTime.Now;
-                if (dashboard.DashboardId == -1)
+                if (request.Dashboard.DashboardId == -1)
                 {
                     CrmDashboard addDashboard = new CrmDashboard();
-                    addDashboard.TenantId = dashboard.TenantId;
-                    addDashboard.Name = dashboard.Name;
-                    addDashboard.Status = dashboard.Status;
-                    addDashboard.IsPrivate = dashboard.IsPrivate;
-                    addDashboard.Widgets = dashboard.Widgets;
-                    addDashboard.CreatedBy = dashboard.Id;
+                    addDashboard.TenantId = request.TenantId;
+                    addDashboard.Name = request.Dashboard.Name;
+                    addDashboard.Status = request.Dashboard.Status;
+                    addDashboard.IsPrivate = request.Dashboard.IsPrivate;
+                    addDashboard.Widgets = request.Dashboard.Widgets;
+                    addDashboard.CreatedBy = request.Id;
+                    addDashboard.IsDeleted = 0;
                     addDashboard.CreatedDate = localDateTime.ToUniversalTime();
                     await _dbContext.AddAsync(addDashboard);
                     await _dbContext.SaveChangesAsync();
                 }
                 else
                 {
-                    var existingDashboard= await(from a in _dbContext.CrmDashboard.Where(a => a.DashboardId == dashboard.DashboardId)
+                    var existingDashboard= await(from a in _dbContext.CrmDashboard.Where(a => a.DashboardId == request.Dashboard.DashboardId)
                                                 select a).FirstAsync();
                     if (existingDashboard == null)
                     {
-                        throw new NotFoundException(dashboard.Name, dashboard.DashboardId);
+                        throw new NotFoundException(request.Dashboard.Name, request.Dashboard.DashboardId);
                     }
                     else
                     {
-                        existingDashboard.Name = dashboard.Name;
-                        existingDashboard.Status = dashboard.Status;
-                        existingDashboard.IsPrivate = dashboard.IsPrivate;
-                        existingDashboard.Widgets = dashboard.Widgets;
-                        existingDashboard.LastModifiedBy = dashboard.Id;
+                        existingDashboard.Name = request.Dashboard.Name;
+                        existingDashboard.Status = request.Dashboard.Status;
+                        existingDashboard.IsPrivate = request.Dashboard.IsPrivate;
+                        existingDashboard.Widgets = request.Dashboard.Widgets;
+                        existingDashboard.LastModifiedBy = request.Id;
                         existingDashboard.LastModifiedDate = localDateTime.ToUniversalTime();
                         await _dbContext.SaveChangesAsync();
                     }
 
                 }
 
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task SaveDashboardWidget(SaveDashboardWidgetsCommand dashboard)
+        {
+            try
+            {
+                var widgets = await (from a in _dbContext.CrmDashboard.Where(a => a.DashboardId == dashboard.DashboardId)
+                                     select a).FirstAsync();
+                if (widgets == null)
+                {
+                    throw new NotFoundException(dashboard.Widgets, dashboard.DashboardId);
+                }
+                else
+                {
+                    widgets.Widgets = dashboard.Widgets;
+                    await _dbContext.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {

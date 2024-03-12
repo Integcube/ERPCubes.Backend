@@ -30,7 +30,7 @@ namespace ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboard
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Saving dashboard {request.DashboardId} failed due to : {ex.Message}");
+                _logger.LogError($"Saving dashboard {request.Dashboard.DashboardId} failed due to : {ex.Message}");
                 throw new BadRequestException(ex.Message);
 
             }

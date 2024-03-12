@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.Crm.Dashboard.Commands.DeleteDashboard;
 using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboard;
+using ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboardWidgets;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,14 @@ namespace ERPCubesApi.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> SaveLead(SaveDashboardCommand dashboard)
+        {
+            var dtos = await _mediator.Send(dashboard);
+            return Ok(dtos);
+        }
+        [HttpPost("saveWidget", Name = "SaveDashboardWidget")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> SaveDashboardWidget(SaveDashboardWidgetsCommand dashboard)
         {
             var dtos = await _mediator.Send(dashboard);
             return Ok(dtos);

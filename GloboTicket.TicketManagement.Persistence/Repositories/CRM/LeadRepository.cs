@@ -54,6 +54,15 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
 using ERPCubes.Domain.Common;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountToday;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewTodayFilter;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountToday;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountToday;
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -1226,6 +1235,219 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 };
                 var results = await _dbContext.GetLeadCountSummary.FromSqlRaw(
                     "SELECT * FROM public.crmtotalleadsummary({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetTotalCountFilterVm> GetTotalCountFilter(int TenantId, int daysAgo)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var daysAgoPrm = new Npgsql.NpgsqlParameter("@p_days_ago", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = daysAgo
+                };
+                
+                var results = await _dbContext.GetTotalCountFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmtotalleadcountfilter({0},{1})", tenantIdPrm, daysAgoPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetNewCountFilterVm> GetNewCountFilter(int TenantId, int daysAgo)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var daysAgoPrm = new Npgsql.NpgsqlParameter("@p_days_ago", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = daysAgo
+                };
+
+                var results = await _dbContext.GetNewCountFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmnewleadcountfilter({0},{1})", tenantIdPrm, daysAgoPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetQualifiedCountFilterVm> GetQualifiedCountFilter(int TenantId, int daysAgo)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var daysAgoPrm = new Npgsql.NpgsqlParameter("@p_days_ago", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = daysAgo
+                };
+
+                var results = await _dbContext.GetQualifiedCountFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmqualifiedleadcountfilter({0},{1})", tenantIdPrm, daysAgoPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetLostCountFilterVm> GetLostCountFilter(int TenantId, int daysAgo)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var daysAgoPrm = new Npgsql.NpgsqlParameter("@p_days_ago", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = daysAgo
+                };
+
+                var results = await _dbContext.GetLostCountFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmlostleadcountfilter({0},{1})", tenantIdPrm, daysAgoPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetWonCountFilterVm> GetWonCountFilter(int TenantId, int daysAgo)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var daysAgoPrm = new Npgsql.NpgsqlParameter("@p_days_ago", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = daysAgo
+                };
+
+                var results = await _dbContext.GetWonCountFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmwonleadcountfilter({0},{1})", tenantIdPrm, daysAgoPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetLostCountTodayVm> GetLostCountToday(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                
+
+                var results = await _dbContext.GetLostCountToday.FromSqlRaw(
+                    "SELECT * FROM public.crmlosttodayfilter({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetNewTodayFilterVm> GetNewTodayFilter(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+
+
+                var results = await _dbContext.GetNewTodayFilter.FromSqlRaw(
+                    "SELECT * FROM public.crmnewtodayfilter({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetQualifiedCountTodayVm> GetQualifiedCountToday(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+
+
+                var results = await _dbContext.GetQualifiedCountToday.FromSqlRaw(
+                    "SELECT * FROM public.crmqualifiedtodayfilter({0})", tenantIdPrm)
+                    .FirstOrDefaultAsync();
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<GetWonCountTodayVm> GetWonCountToday(int TenantId)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+
+
+                var results = await _dbContext.GetWonCountToday.FromSqlRaw(
+                    "SELECT * FROM public.crmwontodayfilter({0})", tenantIdPrm)
                     .FirstOrDefaultAsync();
 
                 return results;

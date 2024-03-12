@@ -4,17 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards
+namespace ERPCubes.Application.Features.Crm.Dashboard.Commands.SaveDashboard
 {
-    public class GetDashboardVm
+    public class SaveDashboardDto
     {
         public int DashboardId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
-        public string CreatedBy { get; set; } = string.Empty;
-        public string Widgets { get; set; } = string.Empty;
         public int IsPrivate { get; set; }
-        public DateTime? CreatedDate { get; set; }
+        public string Widgets { get; set; } = string.Empty;
 
     }
 }
