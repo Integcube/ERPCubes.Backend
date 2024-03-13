@@ -1,6 +1,5 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System;

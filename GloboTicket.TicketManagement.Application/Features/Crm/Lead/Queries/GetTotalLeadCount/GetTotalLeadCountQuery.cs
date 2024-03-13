@@ -12,5 +12,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount
     {
         public string Id { get; set; } = string.Empty;
         public int TenantId { get; set; }
+        public int Days { get; set; }
+        public int Status { get; set; }
     }
 }

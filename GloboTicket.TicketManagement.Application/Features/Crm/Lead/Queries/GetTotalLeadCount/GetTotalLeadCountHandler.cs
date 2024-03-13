@@ -26,7 +26,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount
             try
             {
                 GetTotalLeadCountVm LeadCountByMonth = new GetTotalLeadCountVm();
-                LeadCountByMonth = await _leadRepository.GetTotalLeadCount(request.TenantId);
+                LeadCountByMonth = await _leadRepository.GetTotalLeadCount(request);
                 return LeadCountByMonth;
             }
             catch (Exception ex)

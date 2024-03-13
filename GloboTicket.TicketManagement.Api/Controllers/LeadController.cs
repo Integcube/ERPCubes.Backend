@@ -27,22 +27,9 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSource;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountToday;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewTodayFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountToday;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetScoreListQuery;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetStatusWiseLeads;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalCountFilter;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountToday;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -311,34 +298,7 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(lead);
             return Ok(dtos);
         }
-        [HttpPost("leadCountByNew", Name = "GetLeadCountByNew")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetLeadCountByNew(GetNewLeadCountQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("leadCountByQualified", Name = "GetLeadCountByQualified")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetQualifiedCount(GetTotalQualifiedCountQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("leadCountByLost", Name = "GetLeadCountByLost")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetLostCount(GetTotalLostCountQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("leadCountByWon", Name = "GetLeadCountByWon")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetWonCount(GetTotalWonCountQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
+
         [HttpPost("leadCountSummary", Name = "GetLeadCountBySummary")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> GetSummaryCount(GetLeadCountSummaryQuery lead)
@@ -346,68 +306,6 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(lead);
             return Ok(dtos);
         }
-        [HttpPost("totalCountFilter", Name = "GetTotalCountFilter")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetTotalCountFilter(GetTotalCountFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("newCountFilter", Name = "GetNewCountFilter")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetNewCountFilter(GetNewCountFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("qualifiedCountFilter", Name = "GetQualifiedCountFilter")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetQualifiedCountFilter(GetQualifiedCountFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("lostCountFilter", Name = "GetLostCountFilter")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetLostCountFilter(GetLostCountFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("wonCountFilter", Name = "GetWonCountFilter")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetWonCountFilter(GetWonCountFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("lostTodayFilter", Name = "GetLostCountToday")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetLostCountToday(GetLostCountTodayQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("newTodayFilter", Name = "GetNewCountToday")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetNewCountToday(GetNewTodayFilterQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("qualifiedTodayFilter", Name = "GetQualifiedCountToday")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetQualifiedCountToday(GetQualifiedCountTodayQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
-        [HttpPost("wonTodayFilter", Name = "GetWonCountToday")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> GetWonCountToday(GetWonCountTodayQuery lead)
-        {
-            var dtos = await _mediator.Send(lead);
-            return Ok(dtos);
-        }
+
     }
 }

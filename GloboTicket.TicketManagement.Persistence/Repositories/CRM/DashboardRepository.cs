@@ -61,7 +61,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                              Widgets= a.Widgets,
                                                              CreatedBy= user.FirstName + " " + user.LastName,
                                                              CreatedDate = a.CreatedDate,
-                                                         }).OrderBy(a => a.Name).ToListAsync();
+                                                         }).OrderBy(a => a.CreatedDate).ToListAsync();
                 return dashboardDetail;
             }
             catch (Exception ex)

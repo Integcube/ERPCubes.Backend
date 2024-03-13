@@ -11,20 +11,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceByCount;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadSourceWiseReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadStatus;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLostCountToday;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewLeadCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetNewTodayFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetQualifiedCountToday;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalCountFilter;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLostCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalQualifiedCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalWonCount;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountFilter;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetWonCountToday;
 using ERPCubes.Application.Features.Crm.Reports.Queries.GetCampaigWiseReport;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
@@ -50,24 +37,12 @@ namespace ERPCubes.Persistence
             modelBuilder.Entity<GetLeadOwnerWiseVm>().HasNoKey().ToView("crmleadownerwiserpt");
             modelBuilder.Entity<GetCampaigWiseReportQueryVm>().HasNoKey().ToView("crmcampaignwiserpt");
             modelBuilder.Entity<GetLeadByMonthListVm>().HasNoKey().ToView("CRMLeadMonthlyStatusWise");
-            modelBuilder.Entity<GetLeadCountByOwnerVm>().HasNoKey().ToView("crmleadcountbyowner");
-            modelBuilder.Entity<GetLeadCountByMonthVm>().HasNoKey().ToView("crmleadbymonthcount");
-            modelBuilder.Entity<GetLeadSourceByCountVm>().HasNoKey().ToView("crmleadsourcecount");
-            modelBuilder.Entity<GetTotalLeadCountVm>().HasNoKey().ToView("crmtotalleadcount");
-            modelBuilder.Entity<GetNewLeadCountVm>().HasNoKey().ToView("crmnewleadcount");
-            modelBuilder.Entity<GetTotalQualifiedCountVm>().HasNoKey().ToView("crmqualifiedleadcount");
-            modelBuilder.Entity<GetTotalLostCountVm>().HasNoKey().ToView("crmlostleadcount");
-            modelBuilder.Entity<GetTotalWonCountVm>().HasNoKey().ToView("crmwonleadcount");
-            modelBuilder.Entity<GetLeadCountSummaryVm>().HasNoKey().ToView("crmtotalleadsummary");
-            modelBuilder.Entity<GetTotalCountFilterVm>().HasNoKey().ToView("crmtotalleadcountfilter");
-            modelBuilder.Entity<GetNewCountFilterVm>().HasNoKey().ToView("crmnewleadcountfilter");
-            modelBuilder.Entity<GetQualifiedCountFilterVm>().HasNoKey().ToView("crmqualifiedleadcountfilter");
-            modelBuilder.Entity<GetLostCountFilterVm>().HasNoKey().ToView("crmlostleadcountfilter");
-            modelBuilder.Entity<GetWonCountFilterVm>().HasNoKey().ToView("crmwonleadcountfilter");
-            modelBuilder.Entity<GetLostCountTodayVm>().HasNoKey().ToView("crmlosttodayfilter");
-            modelBuilder.Entity<GetNewTodayFilterVm>().HasNoKey().ToView("crmnewtodayfilter");
-            modelBuilder.Entity<GetQualifiedCountTodayVm>().HasNoKey().ToView("crmqualifiedtodayfilter");
-            modelBuilder.Entity<GetWonCountTodayVm>().HasNoKey().ToView("crmwontodayfilter");
+            modelBuilder.Entity<GetLeadCountByOwnerVm>().HasNoKey().ToView("CrmLeadCountByOwnerGrph");
+            modelBuilder.Entity<GetLeadCountByMonthVm>().HasNoKey().ToView("CrmLeadByMonthCountGrph");
+            modelBuilder.Entity<GetLeadSourceByCountVm>().HasNoKey().ToView("CrmLeadSourceCountGrph");
+            modelBuilder.Entity<GetTotalLeadCountVm>().HasNoKey().ToView("CrmCountleadsGrp");
+            modelBuilder.Entity<GetLeadCountSummaryVm>().HasNoKey().ToView("CrmTotalLeadSummaryGrph");
+
 
 
             
@@ -134,20 +109,8 @@ namespace ERPCubes.Persistence
         public DbSet<GetLeadCountByMonthVm> GetLeadCountByMonth { get; set; }
         public DbSet<GetLeadSourceByCountVm> GetLeadSourceByCount { get; set; }
         public DbSet<GetTotalLeadCountVm> GetTotalLeadCount { get; set; }
-        public DbSet<GetNewLeadCountVm> GetNewLeadCount { get; set; }
-        public DbSet<GetTotalQualifiedCountVm> GetQualifiedLeadCount { get; set; }
-        public DbSet<GetTotalLostCountVm> GetLostLeadCount { get; set; }
-        public DbSet<GetTotalWonCountVm> GetWonLeadCount { get; set; }
+
         public DbSet<GetLeadCountSummaryVm> GetLeadCountSummary { get; set; }
-        public DbSet<GetTotalCountFilterVm> GetTotalCountFilter { get; set; }
-        public DbSet<GetNewCountFilterVm> GetNewCountFilter { get; set; }
-        public DbSet<GetQualifiedCountFilterVm> GetQualifiedCountFilter { get; set; }
-        public DbSet<GetLostCountFilterVm> GetLostCountFilter { get; set; }
-        public DbSet<GetWonCountFilterVm> GetWonCountFilter { get; set; }
-        public DbSet<GetLostCountTodayVm> GetLostCountToday { get; set; }
-        public DbSet<GetNewTodayFilterVm> GetNewTodayFilter { get; set; }
-        public DbSet<GetQualifiedCountTodayVm> GetQualifiedCountToday { get; set; }
-        public DbSet<GetWonCountTodayVm> GetWonCountToday { get; set; }
 
         
         public DbSet<CrmDashboard> CrmDashboard { get; set; }

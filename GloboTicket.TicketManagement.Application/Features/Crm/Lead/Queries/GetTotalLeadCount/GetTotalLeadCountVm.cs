@@ -8,7 +8,8 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetTotalLeadCount
 {
     public class GetTotalLeadCountVm
     {
-        public int TotalLeads { get; set; }
+        public int Count { get; set; }
+        public int NewCount { get; set; }
 
     }
 }
