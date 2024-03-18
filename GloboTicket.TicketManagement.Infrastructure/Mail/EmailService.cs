@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.Infrastructure;
 using ERPCubes.Application.Models.Mail;
+using ERPCubes.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SendGrid;
@@ -20,29 +21,39 @@ namespace ERPCubes.Infrastructure.Mail
 
         public async Task<bool> SendEmail(Email email)
         {
-            var client = new SendGridClient(_emailSettings.ApiKey);
-
-            var subject = email.Subject;
-            var to = new EmailAddress(email.To);
-            var emailBody = email.Body;
-
-            var from = new EmailAddress
+            try
             {
-                Email = _emailSettings.FromAddress,
-                Name = _emailSettings.FromName
-            };
 
-            var sendGridMessage = MailHelper.CreateSingleEmail(from, to, subject, emailBody, emailBody);
-            var response = await client.SendEmailAsync(sendGridMessage);
+                var client = new SendGridClient("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");
 
-            _logger.LogInformation("Email sent");
+                var subject = email.Subject;
+                var to = new EmailAddress(email.To);
+                var emailBody = email.Body;
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.OK)
-                return true;
+                var from = new EmailAddress
+                {
+                    Email = _emailSettings.FromAddress,
+                    Name = _emailSettings.FromName
+                };
 
-            _logger.LogError("Email sending failed");
+                var sendGridMessage = MailHelper.CreateSingleEmail(from, to, subject, emailBody, emailBody);
+                var response = await client.SendEmailAsync(sendGridMessage);
 
-            return false;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    _logger.LogInformation("Email sent " + from.Email);
+                    return true;
+                }
+                _logger.LogError("Email sending failed " + from.Email);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Email sending failed " + ex.Message);
+                return false;
+
+            }
         }
     }
 }

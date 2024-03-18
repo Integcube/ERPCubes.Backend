@@ -71,7 +71,7 @@ namespace ERPCubes.Identity.Services
 
         public async Task<RegistrationResponse> RegisterAsync(RegistrationRequest request)
         {
-            var existingUser = await _userManager.FindByNameAsync(request.UserName);
+            var existingUser = await _userManager.Users.SingleOrDefaultAsync(u => u.UserName == request.UserName && u.TenantId == request.TenantId);
 
             if (existingUser != null)
             {
@@ -91,7 +91,7 @@ namespace ERPCubes.Identity.Services
 
             };
 
-            var existingEmail = await _userManager.FindByEmailAsync(request.Email);
+            var existingEmail = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == request.Email && u.TenantId == request.TenantId);
 
             if (existingEmail == null)
             {
@@ -105,10 +105,6 @@ namespace ERPCubes.Identity.Services
                 {
 
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    // Log or handle errors as needed
-                    // For example, you might want to log the errors using a logging framework
-                    // logger.LogError($"User registration failed. Errors: {errors}");
-
                     throw new Exception($"{errors}");
                 }
             }
@@ -139,11 +135,11 @@ namespace ERPCubes.Identity.Services
                 existingUser.PhoneNumber = request.LastName;
                 existingUser.ModifiedBy = request.UserId;
                 existingUser.ModifiedOn = TodayDate;
-               
+
                 // Check if the email is being changed
-                if (!string.Equals(existingUser.NormalizedEmail, request.Email, StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(existingUser.NormalizedEmail, request.Email, StringComparison.OrdinalIgnoreCase) && existingUser.TenantId == request.TenantId)
                 {
-                    var existingEmail = await _userManager.FindByEmailAsync(request.Email);
+                    var existingEmail = await _userManager.Users.SingleOrDefaultAsync(u => u.Email == request.Email && u.TenantId == request.TenantId);
 
                     if (existingEmail != null && existingEmail.Id != existingUser.Id)
                     {
@@ -207,26 +203,27 @@ namespace ERPCubes.Identity.Services
                     NewObj.IsDeleted = 0;
                     NewObj.Owner = obj.FirstName;
                     NewObj.CreatedBy = obj.FirstName;
-                    NewObj.CreatedDate = DateTime.UtcNow; ;
+                    NewObj.CreatedDate = DateTime.UtcNow;
                     NewObj.TenantGuid = Guid.NewGuid();
 
                     _dbContext.Add(NewObj);
                     _dbContext.SaveChanges();
+                    _userManager.UserValidators.Clear();
 
-
-                    var user = new ApplicationUser();
-
+                    ApplicationUser user = new ApplicationUser();                 
                     user.FirstName = obj.FirstName;
                     user.LastName = obj.LastName;
                     user.UserName = obj.FirstName.ToLower() + "01";
                     user.PhoneNumber = "";
                     user.EmailConfirmed = true;
                     user.TenantId = NewObj.TenantId;
-
+                    user.CreatedOn = DateTime.UtcNow;
+                    user.Createdby = "-1";
+                    user.Email = obj.Email;
                     var result = await _userManager.CreateAsync(user, obj.Password);
-
                     var ob = await _dbContext.Tenant.FirstOrDefaultAsync(a => a.TenantId == NewObj.TenantId);
                     ob.Owner = user.Id;
+                   
                     _dbContext.SaveChanges();
                     await transaction.CommitAsync();
 
