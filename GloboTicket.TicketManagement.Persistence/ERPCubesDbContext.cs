@@ -109,13 +109,12 @@ namespace ERPCubes.Persistence
         public DbSet<GetLeadCountByMonthVm> GetLeadCountByMonth { get; set; }
         public DbSet<GetLeadSourceByCountVm> GetLeadSourceByCount { get; set; }
         public DbSet<GetTotalLeadCountVm> GetTotalLeadCount { get; set; }
-
         public DbSet<GetLeadCountSummaryVm> GetLeadCountSummary { get; set; }
-
-        
         public DbSet<CrmDashboard> CrmDashboard { get; set; }
-
-
+        public DbSet<CKExecCheckList> CKExecCheckList { get; set; }
+        public DbSet<CKCheckPoint> CKCheckPoint { get; set; }
+        public DbSet<CkCheckList> CkCheckList { get; set; }
+        public DbSet<CkUserCheckPoint> CkUserCheckPoint { get; set; }
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ERPCubes.Application.Contracts.Persistence;
+using ERPCubes.Application.Contracts.Persistence.CheckList;
 using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Contracts.Persistence.Facebook;
 using ERPCubes.Application.Contracts.Persistence.Notifications;
@@ -52,7 +53,8 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncChatbotRepository, ChatbotRepository>();
             services.AddScoped<IAsyncCrmSettingRepository, CrmSettingRepository>();
             services.AddScoped<IAsyncDashboardRepository, DashboardRepository>();
-
+            services.AddScoped<IAsyncAssignCheckListRepository, AssignCheckListRepository>();
+            
             return services;    
         }
     }
