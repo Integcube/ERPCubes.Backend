@@ -1,32 +1,17 @@
 using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CheckList;
-using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
-using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
-using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
-using ERPCubes.Application.Features.Crm.Call.Commands.DeleteCall;
-using ERPCubes.Application.Features.Crm.Call.Commands.SaveCall;
-using ERPCubes.Application.Features.Crm.Call.Queries.GetCallList;
-using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
-using ERPCubes.Identity;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static ERPCubes.Persistence.Repositories.CRM.CrmEnum;
+
 
 namespace ERPCubes.Persistence.Repositories.CRM
 {
@@ -38,6 +23,78 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             _dbContext = dbContext;
 
+        }
+
+        public async Task AssignCheckList(AssignCheckPointCommand request)
+        {
+            try
+            {
+                var filteredCheckPoints = request.List.Where(cp => cp.AssignTo != "-1").ToList();
+                if (filteredCheckPoints.Count() > 0)
+                {
+
+
+                    CKExecCheckList chkL = new CKExecCheckList();
+
+                    chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                    chkL.TenantId = request.TenantId;
+                    chkL.IsDeleted = 0;
+                    chkL.CreatedBy = request.Id;
+                    chkL.CLId = request.CLId;
+                    chkL.Remarks = request.Remarks;
+                    await _dbContext.AddAsync(chkL);
+                    await _dbContext.SaveChangesAsync();
+                    chkL.Code = "0000" + chkL.ExecId.ToString();
+
+
+                    foreach (var checkpoint in filteredCheckPoints)
+                    {
+
+                        CkUserCheckPoint add = new CkUserCheckPoint();
+                        add.ExecId = chkL.ExecId;
+                        add.CLId = chkL.CLId;
+                        add.CPId = checkpoint.CPId;
+                        add.AssignTo = checkpoint.AssignTo;
+                        add.DueDate = DateTime.Now.ToUniversalTime().AddDays(checkpoint.DueDays);
+                        add.CreatedDate = DateTime.Now.ToUniversalTime();
+                        add.TenantId = request.TenantId;
+                        add.IsDeleted = 0;
+                        add.CreatedBy = request.Id;
+                        await _dbContext.AddAsync(add);
+                        await _dbContext.SaveChangesAsync();
+
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task Delete(DeleteAssignCheckPointCommand request)
+        {
+            try
+            {
+                var obj = await (from a in _dbContext.CKExecCheckList.Where(a => a.ExecId == request.ExecId)
+                                        select a).FirstOrDefaultAsync();
+                if (obj == null)
+                {
+                    throw new NotFoundException("ExecId", request.ExecId);
+                }
+                else
+                {
+                    obj.IsDeleted = 1;
+
+                    var deleteSql = $"DELETE FROM \"CkUserCheckPoint\" WHERE \"ExecId\" = {request.ExecId}";
+                    await _dbContext.Database.ExecuteSqlRawAsync(deleteSql);
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
         public async Task<List<GetCheckListVm>> GetCheckList(GetCheckListQuery request)
@@ -73,11 +130,13 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                  {
                                      Title = b.Title,
                                      CLId = a.CLId,
+                                     CPId = b.CPId,
                                      DueDays = b.DueDays,
                                      IsRequired = b.IsRequired,
-                                     AssignTo= cp2==null ? "-1" : cp2.AssignTo,
-                                     ExecId= c2==null?-1: c2.ExecId
-                                 }).OrderBy(A => A.Title).ToListAsync();
+                                     AssignTo = cp2 == null ? "-1" : cp2.AssignTo,
+                                     ExecId = c2 == null ? -1 : c2.ExecId,
+                                     DueDate = cp2 == null ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(b.DueDays), TimeZoneInfo.Local) : cp2.DueDate
+            }).OrderBy(A => A.Title).ToListAsync();
 
                 return chp;
             }
@@ -104,7 +163,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                  CheckList = b.Title,
                                  CreatedBy = a.CreatedBy,
                                  CreatedDate = a.CreatedDate,
-                                 CreatedByName = c.FirstName + " " + c.LastName
+                                 CreatedByName = c.FirstName + " " + c.LastName,
+                                 Code=a.Code
                              });
 
 
@@ -113,7 +173,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     var searchTerm = request.Search.ToLower();
                     query = query.Where(a =>
                         a.CheckList.ToLower().Contains(searchTerm) ||
-                        a.Remarks.ToLower().Contains(searchTerm)
+                        a.Remarks.ToLower().Contains(searchTerm)||
+                        a.Code.ToLower().Contains(searchTerm)
+
                     );
                 }
 
@@ -134,7 +196,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         case "createdDate":
                             query = request.Order.ToLower() == "desc" ? query.OrderByDescending(a => a.CreatedDate) : query.OrderBy(a => a.CreatedDate);
                             break;
-
+                        case "code":
+                            query = request.Order.ToLower() == "desc" ? query.OrderByDescending(a => a.Code) : query.OrderBy(a => a.Code);
+                            break;
 
                     }
                 }
@@ -174,5 +238,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
 
         }
+
+
+
     }
 }

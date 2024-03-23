@@ -8,7 +8,7 @@ namespace ERPCubes.Domain.Entities
         [Key]
         public int UCPId { get; set; }
         public int TenantId { get; set; }
-        public string CPId { get; set; }
+        public int CPId { get; set; }
         public string AssignTo { get; set; }
         public DateTime DueDate { get; set; }
         public int ExecId { get; set; }

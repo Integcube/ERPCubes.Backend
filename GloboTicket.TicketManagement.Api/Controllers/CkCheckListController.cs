@@ -5,6 +5,8 @@ using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
@@ -51,5 +53,22 @@ namespace ERPCubesApi.Controllers
             var dto = await _mediator.Send(req);
             return Ok(dto);
         }
+
+        [HttpPost("assign", Name = "SaveCheckPoint")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> AssignCheckPoint(AssignCheckPointCommand req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
+
+        [HttpPost("delete", Name = "DeleteAssignCheckPoint")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> DeleteAssignCheckPoint(DeleteAssignCheckPointCommand req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
+        
     }
 }

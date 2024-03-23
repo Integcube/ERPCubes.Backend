@@ -15,9 +15,8 @@ namespace ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetChe
         public int IsRequired { get; set; }
         public string AssignTo { get; set; }
         public int ExecId { get; set; }
+        public int CPId { get; set; }
+        public DateTime DueDate { get; set; }
 
-        
     }
-
-
 }
