@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Identity.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ERPCubes.Identity
 {
@@ -15,6 +16,8 @@ namespace ERPCubes.Identity
         public DbSet<SocialUsers> SocialUsers { get; set; }
         public DbSet<SocialUserTokens> SocialUserTokens { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
+
+    
 
     }
 }
