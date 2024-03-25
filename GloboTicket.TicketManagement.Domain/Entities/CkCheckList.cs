@@ -14,5 +14,6 @@ namespace ERPCubes.Domain.Entities
         public int CLId { get; set; }
         public int TenantId { get; set; }
         public string Title { get; set; }
+        public string Description { get; set; }
     }
 }

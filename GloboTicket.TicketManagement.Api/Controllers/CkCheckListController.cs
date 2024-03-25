@@ -10,6 +10,8 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAss
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
+using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
+using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
@@ -32,7 +34,7 @@ namespace ERPCubesApi.Controllers
 
         [HttpPost("lazyall", Name = "LazyGetAssignCheckList")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<LazyGetAssignCheckListVm>> GetAll (LazyGetAssignCheckListQuery req)
+        public async Task<ActionResult<LazyGetAssignCheckListVm>> GetAll(LazyGetAssignCheckListQuery req)
         {
             var dto = await _mediator.Send(req);
             return Ok(dto);
@@ -69,6 +71,20 @@ namespace ERPCubesApi.Controllers
             var dto = await _mediator.Send(req);
             return Ok(dto);
         }
-        
+
+        [HttpPost("all", Name = "GetAllChecklists")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<GetChecklistVm>>> GetAllChecklist(GetChecklistQuery getChecklist)
+        {
+            var dtos = await _mediator.Send(getChecklist);
+            return Ok(dtos);
+        }
+        [HttpPost("save", Name = "SaveChecklists")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task SaveChecklist(SaveChecklistCommand saveChecklist)
+        {
+            var dtos = await _mediator.Send(saveChecklist);
+        }
     }
 }

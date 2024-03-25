@@ -54,7 +54,8 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncCrmSettingRepository, CrmSettingRepository>();
             services.AddScoped<IAsyncDashboardRepository, DashboardRepository>();
             services.AddScoped<IAsyncAssignCheckListRepository, AssignCheckListRepository>();
-            
+            services.AddScoped<IAsyncCreateCheckListRepository, CreateCheckListRepository>();
+
             return services;    
         }
     }
