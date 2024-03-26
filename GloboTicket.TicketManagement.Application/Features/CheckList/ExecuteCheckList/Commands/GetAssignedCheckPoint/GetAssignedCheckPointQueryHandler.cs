@@ -1,13 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CheckList;
 using ERPCubes.Application.Exceptions;
-using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckList;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckPoint
 {

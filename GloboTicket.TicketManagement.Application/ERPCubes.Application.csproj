@@ -31,7 +31,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Features\CheckList\ExecuteCheckList\Queries\SetStatus\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookLead\" />
 	  <Folder Include="Features\Facebook\Commands\SaveFacebookCampaign\" />
 	  <Folder Include="Features\Notification\Queries\" />
