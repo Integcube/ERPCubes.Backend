@@ -6,6 +6,7 @@ using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssigntToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
@@ -86,6 +87,14 @@ namespace ERPCubesApi.Controllers
         public async Task SaveChecklist(SaveChecklistCommand saveChecklist)
         {
             var dtos = await _mediator.Send(saveChecklist);
+        }
+
+        [HttpPost("assignTolead", Name = "AssignToLeadCheckPoint")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> AssignToLeadCheckPoint(AssigntToLeadsCheckPointCommand req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
         }
 
     }

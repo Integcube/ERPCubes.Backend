@@ -42,9 +42,30 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
 
 
-        public Task SetStatus(SetStatusCommand request)
+        public async Task SetStatus(SetStatusCommand request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //var existing= await _dbContext.CkUserCheckPointExec.FirstOrDefaultAsync(c => c.ExecId == request.ExecId && c.CPId == request.CpId && c.UserId==request.UserId);
+                // if(existing != null)
+                //{
+                //    CkUserCheckPointExec chkL = new CkUserCheckPointExec();
+                //    chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                //    chkL.TenantId = request.TenantId;
+                //    chkL.IsDeleted = 0;
+                //    chkL.CreatedBy = request.Id;
+                //    chkL.CLId = request.CLId;
+                //    chkL.Remarks = request.Remarks;
+                //    await _dbContext.AddAsync(chkL);
+                //    await _dbContext.SaveChangesAsync();
+
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
     }
 }

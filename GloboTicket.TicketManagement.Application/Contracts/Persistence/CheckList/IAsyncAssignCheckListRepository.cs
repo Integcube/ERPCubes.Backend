@@ -1,5 +1,6 @@
 ﻿using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssigntToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
@@ -14,6 +15,8 @@ namespace ERPCubes.Application.Contracts.Persistence.CheckList
         Task<List<GetCheckPointVm>> GetCheckPoint(GetCheckPointQuery request);
         Task AssignCheckList(AssignCheckPointCommand request);
         Task Delete(DeleteAssignCheckPointCommand request);
+        Task AssignToLeads(AssigntToLeadsCheckPointCommand request);
         
+
     }
 }

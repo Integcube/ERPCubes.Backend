@@ -10,7 +10,11 @@ namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Queries.SetSt
     public class SetStatusCommand:IRequest
     {
         public int ExecId { get; set; }
-        public int ChpId { get; set; }
-        public int UserId { get; set; }
+        public int CpId { get; set; }
+        public string UserId { get; set; }
+        public int TenantId { get; set; }
+        public string Id { get; set; }
+        
+
     }
 }

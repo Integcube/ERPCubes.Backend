@@ -2,6 +2,7 @@ using ERPCubes.Application.Contracts.Persistence;
 using ERPCubes.Application.Contracts.Persistence.CheckList;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssigntToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
@@ -90,6 +91,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
+        }
+
+        public async Task AssignToLeads(AssigntToLeadsCheckPointCommand request)
+        {
+
+            var obj = await (from a in _dbContext.CkContactCheckList.Where(a => a.CLId == request.CLId)
+                             select a).FirstOrDefaultAsync();
+            if (obj==null)
+            {
+                CkContactCheckList chkL = new CkContactCheckList();
+                chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                chkL.TenantId = request.TenantId;
+                chkL.IsDeleted = 0;
+                chkL.CreatedBy = request.Id;
+                chkL.CLId = request.CLId;
+                chkL.ContactTypeId = 1;
+                chkL.StatusId = 1;
+                await _dbContext.AddAsync(chkL);
+                await _dbContext.SaveChangesAsync();
+            }
+            
         }
 
         public async Task Delete(DeleteAssignCheckPointCommand request)
