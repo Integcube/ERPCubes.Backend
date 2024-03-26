@@ -29,8 +29,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var filteredCheckPoints = request.List.Where(cp => cp.AssignTo != "-1").ToList();
-                if (filteredCheckPoints.Count() > 0)
+                //var filteredCheckPoints = request.List.Where(cp => cp.AssignTo != "-1").ToList();
+                if (request.ExecId == -1)
                 {
 
 
@@ -47,7 +47,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     chkL.Code = "0000" + chkL.ExecId.ToString();
 
 
-                    foreach (var checkpoint in filteredCheckPoints)
+                    foreach (var checkpoint in request.List)
                     {
 
                         CkUserCheckPoint add = new CkUserCheckPoint();
@@ -77,7 +77,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             try
             {
                 var obj = await (from a in _dbContext.CKExecCheckList.Where(a => a.ExecId == request.ExecId)
-                                        select a).FirstOrDefaultAsync();
+                                 select a).FirstOrDefaultAsync();
                 if (obj == null)
                 {
                     throw new NotFoundException("ExecId", request.ExecId);
@@ -120,25 +120,40 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
             try
             {
-                var chp = await (from a in _dbContext.CkCheckList.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.CLId == request.CLId)
-                                 join b in _dbContext.CKCheckPoint on a.CLId equals b.CLId
-                                 join c in _dbContext.CKExecCheckList.Where(a => a.ExecId == request.ExecId) on a.CLId equals c.CLId into abc
-                                 from c2 in abc.DefaultIfEmpty()
-                                 join cp in _dbContext.CkUserCheckPoint.Where(a => a.ExecId == request.ExecId) on c2.ExecId equals cp.ExecId into CHP
-                                 from cp2 in CHP.DefaultIfEmpty()
-                                 select new GetCheckPointVm
-                                 {
-                                     Title = b.Title,
-                                     CLId = a.CLId,
-                                     CPId = b.CPId,
-                                     DueDays = b.DueDays,
-                                     IsRequired = b.IsRequired,
-                                     AssignTo = cp2 == null ? "-1" : cp2.AssignTo,
-                                     ExecId = c2 == null ? -1 : c2.ExecId,
-                                     DueDate = cp2 == null ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow.AddDays(b.DueDays), TimeZoneInfo.Local) : cp2.DueDate
-            }).OrderBy(A => A.Title).ToListAsync();
-
-                return chp;
+                if (request.ExecId == -1)
+                {
+                    var chp2 = await (from a in _dbContext.CKCheckPoint.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.CLId == request.CLId)
+                                      select new GetCheckPointVm
+                                      {
+                                          Title = a.Title,
+                                          CLId = a.CLId,
+                                          CPId = a.CPId,
+                                          DueDays = a.DueDays,
+                                          IsRequired = a.IsRequired,
+                                          AssignTo = "-1",
+                                          ExecId = -1,
+                                          DueDate = DateTimeOffset.UtcNow.AddDays(a.DueDays)
+                                      }).OrderBy(A => A.CPId).ToListAsync();
+                    return chp2;
+                }
+                else
+                {
+                    var chp = await (from c in _dbContext.CKExecCheckList.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.ExecId == request.ExecId)
+                                     join cp in _dbContext.CkUserCheckPoint on c.ExecId equals cp.ExecId
+                                     join a in _dbContext.CKCheckPoint on cp.CPId equals a.CPId
+                                     select new GetCheckPointVm
+                                     {
+                                         Title = a.Title,
+                                         CLId = a.CLId,
+                                         CPId = a.CPId,
+                                         DueDays = a.DueDays,
+                                         IsRequired = a.IsRequired,
+                                         AssignTo = cp.AssignTo,
+                                         ExecId = cp.ExecId,
+                                         DueDate = cp.DueDate
+                                     }).OrderBy(A => A.CPId).ToListAsync();
+                    return chp;
+                }
             }
             catch (Exception ex)
             {
@@ -164,7 +179,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                  CreatedBy = a.CreatedBy,
                                  CreatedDate = a.CreatedDate,
                                  CreatedByName = c.FirstName + " " + c.LastName,
-                                 Code=a.Code
+                                 Code = a.Code
                              });
 
 
@@ -173,7 +188,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     var searchTerm = request.Search.ToLower();
                     query = query.Where(a =>
                         a.CheckList.ToLower().Contains(searchTerm) ||
-                        a.Remarks.ToLower().Contains(searchTerm)||
+                        a.Remarks.ToLower().Contains(searchTerm) ||
                         a.Code.ToLower().Contains(searchTerm)
 
                     );
