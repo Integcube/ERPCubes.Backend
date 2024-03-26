@@ -29,7 +29,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                //var filteredCheckPoints = request.List.Where(cp => cp.AssignTo != "-1").ToList();
                 if (request.ExecId == -1)
                 {
 
@@ -63,6 +62,27 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         await _dbContext.AddAsync(add);
                         await _dbContext.SaveChangesAsync();
 
+                    }
+                }
+                else
+                {
+                    var existingCheckList = await _dbContext.CKExecCheckList.FirstOrDefaultAsync(c => c.ExecId == request.ExecId);
+                    if (existingCheckList != null)
+                    {
+                        existingCheckList.Remarks = request.Remarks; 
+                        _dbContext.CKExecCheckList.Update(existingCheckList);
+                        await _dbContext.SaveChangesAsync();
+                        foreach (var checkpoint in request.List)
+                        {
+                            var existingUserCheckPoint = await _dbContext.CkUserCheckPoint.FirstOrDefaultAsync(c => c.ExecId == request.ExecId && c.CPId == checkpoint.CPId);
+                            if (existingUserCheckPoint != null)
+                            {
+                                existingUserCheckPoint.AssignTo = checkpoint.AssignTo;
+                                existingUserCheckPoint.DueDate = DateTime.Now.ToUniversalTime().AddDays(checkpoint.DueDays);
+                                _dbContext.CkUserCheckPoint.Update(existingUserCheckPoint);
+                            }
+                            await _dbContext.SaveChangesAsync();
+                        }
                     }
                 }
             }

@@ -115,6 +115,7 @@ namespace ERPCubes.Persistence
         public DbSet<CKCheckPoint> CKCheckPoint { get; set; }
         public DbSet<CkCheckList> CkCheckList { get; set; }
         public DbSet<CkUserCheckPoint> CkUserCheckPoint { get; set; }
-
+        public DbSet<CkUserCheckPointExec> CkUserCheckPointExec { get; set; }
+        
     }
 }
