@@ -20,6 +20,7 @@ namespace ERPCubes.Domain.Entities
         public int DueDays { get; set; }
         public int IsRequired { get; set; }
         public int TenantId { get; set; }
+        public int Priority { get; set; }
     }
 
 }

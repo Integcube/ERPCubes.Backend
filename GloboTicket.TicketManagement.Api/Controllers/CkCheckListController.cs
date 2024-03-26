@@ -15,6 +15,7 @@ using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
+using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -86,5 +87,6 @@ namespace ERPCubesApi.Controllers
         {
             var dtos = await _mediator.Send(saveChecklist);
         }
+
     }
 }

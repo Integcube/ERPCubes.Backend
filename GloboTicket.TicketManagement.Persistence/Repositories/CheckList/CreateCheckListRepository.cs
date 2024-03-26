@@ -69,12 +69,14 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         var checkpointEntity = new CKCheckPoint
                         {
                             CLId = checklist.CLId,
-
                             CreatedDate = localDateTime.ToUniversalTime(),
                             CreatedBy = request.Id,
                             TenantId = request.TenantId,
                             IsDeleted = 0,
                             Description = checkpointDto.Description,
+                            DueDays = checkpointDto.DueDays,
+                            IsRequired = checkpointDto.IsRequired,
+                            Priority = checkpointDto.Priority,
                         };
                         await _dbContext.AddAsync(checkpointEntity);
                         await _dbContext.SaveChangesAsync();
@@ -92,7 +94,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     }
                     else
                     {
-                        checklist.Title = request.Checklist.Title;
                         checklist.Description = request.Checklist.Description;
                         //checklist.LastModifiedDate = localDateTime.ToUniversalTime();
                         //checklist.LastModifiedBy = request.Id;
@@ -119,6 +120,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                 TenantId = request.TenantId,
                                 IsDeleted = 0,
                                 Description = checkpointDto.Description,
+                                DueDays= checkpointDto.DueDays,
+                                //IsRequired= checkpointDto.IsRequired,
+                                Priority= checkpointDto.Priority,
+                                
                             };
                             await _dbContext.AddAsync(checkpointEntity);
                             await _dbContext.SaveChangesAsync();
@@ -131,5 +136,6 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 throw new BadRequestException(ex.Message);
             }
         }
+
     }
 }
