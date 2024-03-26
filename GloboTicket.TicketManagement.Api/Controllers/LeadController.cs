@@ -12,6 +12,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadAttachments;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
@@ -307,5 +308,12 @@ namespace ERPCubesApi.Controllers
             return Ok(dtos);
         }
 
+        [HttpPost("getcheckpointss", Name = "GetCheckPoints")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetCheckPointLeadVm>> GetCheckPoint(GetCheckPointLeadQuery req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
     }
 }

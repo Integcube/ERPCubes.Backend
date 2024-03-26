@@ -8,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Domain.Entities
 {
-    public class CkContactCheckList:AuditableEntity
+    public class CkContactCheckListExec:AuditableEntity
     {
         [Key]
-        public int CCLId { get; set; }
+        public int ExecCCLId { get; set; }
         public int TenantId { get; set; }
-        public int CLId { get; set; }
-        public int StatusId { get; set; }
+        public int Status { get; set; }
+        public int ContactId { get; set; }
         public int ContactTypeId { get; set; }
-
+        public int CPId { get; set; }
+        
     }
 }
