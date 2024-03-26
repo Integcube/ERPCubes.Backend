@@ -12,6 +12,7 @@ namespace ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount
     {
         public int TenantId { get; set; }
         public string Id { get; set; } = String.Empty;
+        public string Provider { get; set; } = String.Empty;
         public List<SaveBulkAdAccountDto> AdAccount { get; set; } = new List<SaveBulkAdAccountDto>();
 
     }

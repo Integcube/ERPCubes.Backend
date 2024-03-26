@@ -16,6 +16,7 @@ namespace ERPCubes.Domain.Entities
         public int IsSelected { get; set; }
         public string SocialId { get; set; } = String.Empty;
         public int TenantId { get; set; }
+        public string Provider { get; set; }
 
     }
 }

@@ -1,11 +1,10 @@
-﻿using ERPCubes.Application.Features.Google.Commands.SaveAuth;
-using Google.Apis.Auth.OAuth2.Responses;
+﻿
+using ERPCubes.Application.Features.Google.Commands.SaveAuth;
+using ERPCubes.Application.Models.Mail;
 using MediatR;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace ERPCubesApi.Controllers
 {
@@ -18,150 +17,163 @@ namespace ERPCubesApi.Controllers
         {
             _mediator = mediator;
         }
+        private readonly string _clientId = "106482018435-sv6nech68f9qkhbpeejsucab67urdpff.apps.googleusercontent.com";
+        private readonly string _clientSecret = "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";
+        private readonly string _redirectUri = "https://localhost:7020/api/ConnectGoogle/callback";
+        private readonly string _scope = "https://www.googleapis.com/auth/adwords openid email profile";
+        private readonly string _tokenEndpoint = "https://oauth2.googleapis.com/token";
 
-        public class Dto
+
+        [HttpGet("authorize")]
+        public IActionResult Authorize(string tenantId, string userId)
         {
-            public int TenantId { get; set; }
-            public string Id { get; set; }
-        }
-        [HttpPost("Connect")]
-        public async Task<IActionResult> Connect(Dto reg)
-        {
-            var stateString = $"tenantId={reg.TenantId}&id={reg.Id}";
-            var googleAuthUrl = "https://accounts.google.com/o/oauth2/v2/auth" +
-                "?client_id=37203354676-7mtk0bipf5q7ivdgd1pnlnc9d0m7008r.apps.googleusercontent.com" +
-                "&redirect_uri=https://localhost:7020/api/ConnectGoogle/callback" +
-                "&response_type=code" +
-                "&scope=email profile openid https://www.googleapis.com/auth/adwords" + // Include Google Ads API scope here
-                $"&state={Uri.EscapeDataString(stateString)}";
-
-            var obj = new
-            {
-                googleAuthUrl
-            };
-
-            return Ok(obj);
+            var stateString = $"{tenantId};{userId}";
+            var authorizationUrl = $"https://accounts.google.com/o/oauth2/v2/auth" +
+                $"?client_id={_clientId}" +
+                $"&redirect_uri={_redirectUri}" +
+                $"&scope={_scope}" +
+                 $"&response_type=code" +
+                $"&access_type=offline" +
+                $"&state={stateString}";
+            return Ok(new { AuthorizationUrl = authorizationUrl });
         }
 
         [HttpGet("callback")]
-        public async Task<IActionResult> Callback(string code, string state)
+        public async Task<IActionResult> CallbackAsync([FromQuery] string code, [FromQuery] string state)
         {
             if (string.IsNullOrEmpty(code))
             {
                 return BadRequest("Missing authorization code.");
             }
-            string decodedState = Uri.UnescapeDataString(state);
-
-            string[] keyValuePairs = decodedState.Split('&');
-
-            // Define variables to store parsed values
             int tenantId = 0;
-            string id = null;
-            // Parse the key-value pairs to extract the values
-            foreach (var pair in keyValuePairs)
+            var userId = "";
+            var stateParts = state.Split(';');
+            if (stateParts.Length >= 1)
             {
-                string[] keyValue = pair.Split('=');
-
-                if (keyValue.Length == 2)
-                {
-                    if (keyValue[0] == "tenantId")
-                    {
-                        int.TryParse(keyValue[1], out tenantId);
-                    }
-                    else if (keyValue[0] == "id")
-                    {
-                      id = keyValue[1];
-                    }
-                }
+                tenantId = int.Parse(stateParts[0]);
+                userId = stateParts[1];
             }
-
-         
-
-            var clientId = "37203354676-7mtk0bipf5q7ivdgd1pnlnc9d0m7008r.apps.googleusercontent.com";
-            var clientSecret = "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";
-            var redirectUri = "https://localhost:7020/api/ConnectGoogle/callback";
-
-            var Token = await ExchangeCodeForAccessToken(clientId, clientSecret, redirectUri, code);
-
-            if (Token == null)
-            {
-                // Handle token exchange failure
-                return BadRequest("Failed to retrieve access token from Google.");
-            }
-
-            // Store the accessToken securely (e.g., in a database) or use it for further API calls
-            var UserInfo = await GetUserInfo(Token.AccessToken);
-            var obj = new SaveGoogleAuthUserCommand
-            {
-               TenantId = tenantId,
-               Id = id,
-               IdToken = Token.IdToken,
-               AuthCode = code,
-               AuthToken = Token.AccessToken,
-               User = UserInfo
-            };
-             await _mediator.Send(obj);
-            if (Token.AccessToken == null)
-            {
-                // Handle token exchange failure
-                return BadRequest("Failed to retrieve access token from Google.");
-            }
-            return Ok("Access token obtained from Google!");
+            var accessToken = await ExchangeCodeForTokenAsync(code);
+            //var userInfo = await GetUserInfoAsync(accessToken);
+            //SaveGoogleAuthUserCommand data = new SaveGoogleAuthUserCommand
+            //{
+            //    TenantId = tenantId,
+            //    Id = userId,
+            //    AuthToken = accessToken,
+            //    AuthCode = code,
+            //    IdToken = accessToken,
+            //    User = new GoogleAuthUser
+            //    {
+            //        Sub = userInfo.Id,
+            //        Email = userInfo.Email,
+            //        Name = userInfo.Given_Name + " " + userInfo.Family_Name,
+            //        Family_Name = userInfo.Family_Name,
+            //        Given_Name = userInfo.Given_Name,
+            //        Picture = userInfo.Picture,
+            //    },
+            //};
+            //this._mediator.Send(data);
+            string htmlContent = @"
+<!DOCTYPE html>
+<html lang=""en"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>Login Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
         }
-        private async Task<TokenResponse> ExchangeCodeForAccessToken(string clientId, string clientSecret, string redirectUri, string code)
+        .tick-icon {
+            width: 100px;
+            height: 100px;
+            fill: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Successful!</h1>
+    <svg class=""tick-icon"" viewBox=""0 0 24 24"">
+        <path fill=""currentColor"" d=""M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z""/>
+    </svg>
+    <button id=""closeButton"">Close</button>
+    <script>
+        document.getElementById('closeButton').addEventListener('click', function() {
+            // Emit an event here that your listener will listen to
+            // Example: You can use window.postMessage() to send a message to the parent window
+            // and then listen for this message in your listener
+            window.opener.postMessage({ type: 'authenticationSuccess' }, '*');
+            window.close(); // Close the popup window
+        });
+    </script>
+</body>
+</html>
+";
+
+            return Content(htmlContent, "text/html");
+        }
+        private async Task<Dictionary<string, string>> ExchangeCodeForTokenAsync(string code)
         {
             using var httpClient = new HttpClient();
-
-            var tokenEndpoint = "https://oauth2.googleapis.com/token";
             var requestBody = new Dictionary<string, string>
-    {
-        { "code", code },
-        { "client_id", clientId },
-        { "client_secret", clientSecret },
-        { "redirect_uri", redirectUri },
-        { "grant_type", "authorization_code" },
-        { "access_type", "offline" }, // Request refresh token
-        { "prompt", "consent" } // Ensure the consent screen is displayed to get a refresh token
-    };
-
-            var requestContent = new FormUrlEncodedContent(requestBody);
-
-            var tokenResponse = await httpClient.PostAsync(tokenEndpoint, requestContent);
-            if (tokenResponse.IsSuccessStatusCode)
             {
-                var responseContent = await tokenResponse.Content.ReadAsStringAsync();
-                var responseData = JsonConvert.DeserializeObject<dynamic>(responseContent);
-                var accessToken = responseData.access_token;
-                var idToken = responseData.id_token;
+                ["code"] = code,
+                ["client_id"] = _clientId,
+                ["client_secret"] = _clientSecret,
+                ["redirect_uri"] = _redirectUri,
+                ["grant_type"] = "authorization_code"
+            };
 
-                var token = new TokenResponse
-                {
-                    AccessToken = accessToken,
-                    IdToken = idToken
-                };
+            var response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(requestBody));
+            response.EnsureSuccessStatusCode();
 
-                return token;
-            }
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var responseData = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseContent);
 
-            return null; // Handle error cases accordingly
+            return responseData;
         }
-        private async Task<GoogleAuthUser> GetUserInfo(string accessToken)
+        //private async Task<string> ExchangeCodeForTokenAsync(string code)
+        //{
+        //    using var httpClient = new HttpClient();
+        //    var requestBody = new Dictionary<string, string>
+        //    {
+        //        ["code"] = code,
+        //        ["client_id"] = _clientId,
+        //        ["client_secret"] = _clientSecret,
+        //        ["redirect_uri"] = _redirectUri,
+        //        ["grant_type"] = "authorization_code"
+        //    };
+
+        //    var response = await httpClient.PostAsync(_tokenEndpoint, new FormUrlEncodedContent(requestBody));
+        //    response.EnsureSuccessStatusCode();
+
+        //    var responseContent = await response.Content.ReadAsStringAsync();
+        //    var responseData = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseContent);
+
+        //    return responseData["access_token"];
+        //}
+        private async Task<UserInfo> GetUserInfoAsync(string accessToken)
         {
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var userInfoEndpoint = "https://www.googleapis.com/oauth2/v3/userinfo";
-            var response = await httpClient.GetAsync(userInfoEndpoint);
+            var response = await httpClient.GetAsync("https://www.googleapis.com/oauth2/v2/userinfo");
+            response.EnsureSuccessStatusCode();
 
-            if (response.IsSuccessStatusCode)
-            {
-                var userInfoJson = await response.Content.ReadAsStringAsync();
-                var userInfo = JsonConvert.DeserializeObject<GoogleAuthUser>(userInfoJson);
-                return userInfo;
-            }
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var userInfo = JsonConvert.DeserializeObject<UserInfo>(responseContent);
 
-            return null; // Handle error cases accordingly
+            return userInfo;
         }
-      
+
+        public class UserInfo
+        {
+            public string Id { get; set; }
+            public string Email { get; set; }
+            public string Given_Name { get; set; }
+            public string Family_Name { get; set; }
+            public string Picture { get; set; }
+        }
     }
 }

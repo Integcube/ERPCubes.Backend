@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Contracts.Persistence.CRM
 {
-    public interface IAsyncAdAccountRepository : IAsyncRepository<CrmAdAccount>
+    public interface IAsyncAdAccountRepository 
     {
         Task SaveAdAccount(SaveAdAccountCommand ad);
         Task SaveAdAccountBulk(SaveBulkAdAccountCommand ad);

@@ -10,9 +10,8 @@ namespace ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount
     {
         public string AccountId { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
-        public int IsSelected { get; set; }
+        public bool IsSelected { get; set; }
         public string SocialId { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
-        public int TenantId { get; set; }
+        public string Provider { get; set; } = string.Empty;
     }
 }

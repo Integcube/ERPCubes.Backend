@@ -1,15 +1,11 @@
-﻿using ERPCubes.Application.Features.Google.Queries.GetAuthCode;
-using Google.Ads.GoogleAds.Config;
-using Google.Ads.GoogleAds.Lib;
-using Google.Ads.GoogleAds.V10.Errors;
-using Google.Ads.GoogleAds.V10.Services;
-using Google.Api.Gax;
+﻿using ERPCubes.Application.Features.Crm.AdAccount.Commands.BulkSaveAdAccount;
+using ERPCubes.Application.Features.Google.Queries.GetAuthCode;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace ERPCubesApi.Controllers
 {
@@ -17,25 +13,62 @@ namespace ERPCubesApi.Controllers
     [ApiController]
     public class GoogleAdsController : ControllerBase
     {
+        private readonly string _clientId = "106482018435-sv6nech68f9qkhbpeejsucab67urdpff.apps.googleusercontent.com";
+        private readonly string _clientSecret = "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";
+        private readonly string _redirectUri = "https://localhost:7020/api/ConnectGoogle/callback";
+        private readonly string _scope = "https://www.googleapis.com/auth/adwords openid email profile";
+        private readonly string _tokenEndpoint = "https://oauth2.googleapis.com/token";
+        private readonly string _developerToken = "5XD7GOppiWxT8n5nfpS0sQ";
+
         private readonly IMediator _mediator;
+
         public GoogleAdsController(IMediator mediator)
         {
             _mediator = mediator;
+        }
+        [HttpPost("saveAdAccount")]
+        public async Task<IActionResult> SaveAdsAccounts(SaveBulkAdAccountCommand request)
+        {
+            try
+            {
+                 await _mediator.Send(request);
+                GetAuthCodeQuery data = new GetAuthCodeQuery
+                {
+                    Id = request.Id,
+                    TenantId = request.TenantId,
+                    Provider = request.Provider
+                };
+                var accessToken = await _mediator.Send(data);
+                foreach (var account in request.AdAccount)
+                {
+                    if(account.IsSelected == true)
+                    {
+                        var response = await GetCampaignInfoForCustomer(account.AccountId, accessToken.ToString());
+
+                    }
+
+                }
+                   
+                    return Ok();
+            }
+
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPost("AdAccount")]
         public async Task<IActionResult> GetAdsAccounts(GetAuthCodeQuery request)
         {
             try
             {
+                List<SaveBulkAdAccountDto> managerAccount = new List<SaveBulkAdAccountDto>();
                 var accessToken = await _mediator.Send(request);
-
                 using var httpClient = new HttpClient();
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-                httpClient.DefaultRequestHeaders.Add("developer-token", "5XD7GOppiWxT8n5nfpS0sQ");
-
-                var adsAccountListEndpoint = "https://googleads.googleapis.com/v15/customers:listAccessibleCustomers";
+                httpClient.DefaultRequestHeaders.Add("developer-token", _developerToken);
+                var adsAccountListEndpoint = "https://googleads.googleapis.com/v16/customers:listAccessibleCustomers";
                 var response = await httpClient.GetAsync(adsAccountListEndpoint);
-
                 if (response.IsSuccessStatusCode)
                 {
                     var accountListJson = await response.Content.ReadAsStringAsync();
@@ -52,22 +85,39 @@ namespace ERPCubesApi.Controllers
                                 var str = resource.ToString();
                                 var parts = str.Split('/');
                                 var customerId = parts[1];
+                                SaveBulkAdAccountDto account = new SaveBulkAdAccountDto
+                                {
+                                    AccountId = customerId,
+                                    Title = customerId,
+                                    IsSelected = false,
+                                    SocialId = customerId,
+                                    Provider = "GOOGLE"
+                                };
+                                managerAccount.Add(account);
 
-                                // Get campaign info for the current customer ID
-                                var campaignInfo = await GetCampaignInfoForCustomer(customerId, accessToken);
-                                customerDetails.Add(campaignInfo);
                             }
                             catch (Exception ex)
                             {
-                                // Log or handle specific customer-related errors here
                                 Console.WriteLine($"Error processing customer: {ex.Message}");
                             }
                         }
+                        SaveBulkAdAccountCommand adCommand = new SaveBulkAdAccountCommand()
+                        {
+                            TenantId = request.TenantId,
+                            Id = request.Id,
+                            AdAccount = managerAccount
+                        };
                     }
-
-                    return BadRequest("Failed to retrieve Ads Account ID");
+                    else
+                    {
+                        return Ok();
+                    }
                 }
-                return Ok();
+                else
+                {
+                    Console.WriteLine($"Error processing customer");
+                }
+                return Ok(managerAccount);
             }
 
             catch (Exception ex)
@@ -75,7 +125,6 @@ namespace ERPCubesApi.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
         private async Task<string> GetCampaignInfoForCustomer(string customerId, string accessToken)
         {
@@ -115,7 +164,5 @@ namespace ERPCubesApi.Controllers
                 return $"Error retrieving campaign info for customer ID {customerId}: {ex.Message}";
             }
         }
-
-
     }
 }

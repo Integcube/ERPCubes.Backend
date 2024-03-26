@@ -7,16 +7,9 @@ using ERPCubes.Application.Features.AppUser.Commands.UpdateUser;
 using ERPCubes.Application.Features.AppUser.Queries.GetDeletedUserList;
 using ERPCubes.Application.Features.AppUser.Queries.LazyGetUserList;
 using ERPCubes.Application.Features.AppUser.Queries.GetUserList;
-using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
-using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
 using ERPCubes.Domain.Common;
-using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
-using ERPCubes.Identity.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace ERPCubes.Persistence.Repositories
 {
