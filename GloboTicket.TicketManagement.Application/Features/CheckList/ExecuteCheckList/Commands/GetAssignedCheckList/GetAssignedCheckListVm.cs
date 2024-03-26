@@ -8,5 +8,12 @@ namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetA
 {
     public class GetAssignedCheckListVm
     {
+        public string Title { get; set; }
+        public string CreatedBy { get; set; }
+        public string Description { get; set; }
+        public DateTime AssignedDate { get; set; }
+        public int CLId { get; set; }
+        public int ExecId { get; set; }
+        public string Remarks { get; set; }
     }
 }

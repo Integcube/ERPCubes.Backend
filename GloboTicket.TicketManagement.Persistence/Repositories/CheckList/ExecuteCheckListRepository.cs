@@ -10,6 +10,7 @@ using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
+using ERPCubes.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -25,19 +26,63 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
         }
 
-        public Task<List<GetAssignedCheckListVm>> GetAssignedCheckList(GetAssignedCheckListQuery request)
+        public async Task<List<GetAssignedCheckListVm>> GetAssignedCheckList(GetAssignedCheckListQuery request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var checklistDetail = await (from a in _dbContext.CkCheckList
+                                             where a.TenantId == request.TenantId && a.IsDeleted == 0
+                                             join b in _dbContext.CKExecCheckList.Where(b => b.IsDeleted == 0) on a.CLId equals b.CLId
+                                             join c in _dbContext.CkUserCheckPoint.Where(c => c.IsDeleted == 0 && c.AssignTo == request.Id) on b.ExecId equals c.ExecId
+                                             join u in _dbContext.AppUser on b.CreatedBy equals u.Id
+                                             select new GetAssignedCheckListVm
+                                             {
+                                                 Title = a.Title,
+                                                 CreatedBy = u.FirstName+" "+ u.LastName,
+                                                 Description = a.Description,
+                                                 AssignedDate = b.CreatedDate,
+                                                 CLId = a.CLId,
+                                                 ExecId = b.ExecId,
+                                                 Remarks = b.Remarks,
+                                             }).Distinct().OrderBy(a => a.AssignedDate).ToListAsync();
+
+                return checklistDetail;
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception("An error occurred while fetching assigned checklists.", ex);
+            }
         }
 
-        public Task<List<GetAssignedCheckPointVm>> GetAssignedCheckPoint(GetAssignedCheckPointQuery request)
+        public async Task<List<GetAssignedCheckPointVm>> GetAssignedCheckPoint(GetAssignedCheckPointQuery request)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var checklistDetail = await (from a in _dbContext.CKExecCheckList.Where(b => b.ExecId == request.ExecId)
+                                             join c in _dbContext.CkUserCheckPoint.Where(c => c.IsDeleted == 0 && c.AssignTo == request.Id) on a.ExecId equals c.ExecId
+                                             join e in _dbContext.CKCheckPoint.Where(c => c.IsDeleted == 0) on c.CPId equals e.CPId
+                                             join d in _dbContext.CkUserCheckPointExec.Where(c => c.IsDeleted == 0) on new { c.ExecId, c.CPId, UserId = request.Id } equals new { d.ExecId, d.CPId, d.UserId } into all
+                                             from dd in all.DefaultIfEmpty()
+                                             select new GetAssignedCheckPointVm
+                                             {
+                                                 CLId = a.CLId,
+                                                 CPId = c.CPId,
+                                                 Title = e.Title,
+                                                 Description = e.Description,
+                                                 IsRequired = e.IsRequired,
+                                                 DueDays = e.DueDays,
+                                                 DueDate = e.CreatedDate.AddDays(e.DueDays),
+                                                 Status = dd==null?-1: dd.Status,
+                                                 Priority = (int)(e.Priority==null?-1: e.Priority),
+                                             }).Distinct().OrderBy(a => a.DueDate).ToListAsync();
 
-        public Task SaveAssignedChecklist(SaveChecklistCommand request)
-        {
-            throw new NotImplementedException();
+                return checklistDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
 

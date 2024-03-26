@@ -9,7 +9,7 @@ namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetA
 {
     public class GetAssignedCheckPointQuery:IRequest<List<GetAssignedCheckPointVm>>
     {
-        public string UserId { get; set; }
+        public string Id { get; set; }
         public int TenantId { get; set; }
         public int ExecId { get; set; }
     }
