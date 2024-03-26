@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckList
 {
-    internal class GetAssignedCheckListVm
+    public class GetAssignedCheckListVm
     {
     }
 }
