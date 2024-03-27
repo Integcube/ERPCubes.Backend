@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CheckList;
 using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
@@ -30,13 +31,36 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                              join user in _dbContext.AppUser on a.CreatedBy equals user.Id
                                                              select new GetChecklistVm
                                                              {
-                                                                 CLId = a.CLId,
+                                                                 ClId = a.CLId,
                                                                  Title = a.Title,
                                                                  Description=a.Description,
                                                                  CreatedBy = user.FirstName + " " + user.LastName,
                                                                  //CreatedDate = a.CreatedDate,
-                                                             }).OrderByDescending(a => a.CLId).ToListAsync();
+                                                             }).OrderByDescending(a => a.ClId).ToListAsync();
                 return checklistDetail;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
+
+        public async Task<List<GetCheckpointsVm>> GetAllCheckpoint(int TenantId, string Id,int CLId)
+        {
+            try
+            {
+                List<GetCheckpointsVm> checkpointDetail = await(from a in _dbContext.CKCheckPoint.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.CLId== CLId)
+                                                             select new GetCheckpointsVm
+                                                             {
+                                                                 CLId=a.CLId,
+                                                                 CPId = a.CPId,
+                                                                 Title = a.Title,
+                                                                 Description = a.Description,
+                                                                 IsRequired=a.IsRequired,
+                                                                 Priority=a.Priority,
+                                                                 //CreatedDate = a.CreatedDate,
+                                                             }).OrderByDescending(a => a.CLId).ToListAsync();
+                return checkpointDetail;
             }
             catch (Exception ex)
             {

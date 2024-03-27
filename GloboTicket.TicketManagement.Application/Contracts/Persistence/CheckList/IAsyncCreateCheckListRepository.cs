@@ -1,4 +1,5 @@
-﻿using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
+﻿using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
+using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using ERPCubes.Application.Features.Crm.Task.Commands.UpdateTaskPriority;
@@ -14,6 +15,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CheckList
     public interface IAsyncCreateCheckListRepository
     {
         Task<List<GetChecklistVm>> GetAllChecklist(int TenantId, string Id);
+        Task<List<GetCheckpointsVm>> GetAllCheckpoint(int TenantId, string Id, int CLId);
 
         Task SaveChecklist(SaveChecklistCommand request);
 
