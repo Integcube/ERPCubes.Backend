@@ -11,6 +11,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
@@ -79,5 +80,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CRM
         Task<GetTotalLeadCountVm> GetTotalLeadCount(GetTotalLeadCountQuery request);
         Task<GetLeadCountSummaryVm> GetLeadCountSummary(int TenantId);
         Task<List<GetCheckPointLeadVm>> GetCheckPoint(GetCheckPointLeadQuery request);
+        Task SetCheckPointStatus(SetCheckPointStatusCommand request);
+        
     }
 }

@@ -51,6 +51,7 @@ using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountSummary;
 using ERPCubes.Domain.Common;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
 
 
 namespace ERPCubes.Persistence.Repositories.CRM
@@ -1176,7 +1177,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 var chp = await (from c in _dbContext.CkContactCheckList.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.ContactTypeId == 1)
                                  join a in _dbContext.CKCheckPoint on c.CLId equals a.CLId
-                                 join cc in _dbContext.CkContactCheckListExec.Where(a=>a.ContactId==request.ContactId) on a.CPId equals cc.CPId into abc
+                                 join cc in _dbContext.CkContactCheckListExec.Where(a => a.ContactId == request.ContactId) on a.CPId equals cc.CPId into abc
                                  from ab in abc.DefaultIfEmpty()
                                  select new GetCheckPointLeadVm
                                  {
@@ -1184,9 +1185,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                      CLId = a.CLId,
                                      CPId = a.CPId,
                                      DueDays = a.DueDays,
-                                     IsRequired = a.IsRequired,
                                      DueDate = DateTime.UtcNow.AddDays(a.DueDays),
                                      Status = ab == null ? 0 : ab.Status,
+                                     IsRequired = a.IsRequired==1?"Yes":"No",
+                                     Priority=a.Priority,
                                  }).OrderBy(A => A.CPId).ToListAsync();
 
                 return chp;
@@ -1197,5 +1199,32 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
 
         }
+
+        public async Task SetCheckPointStatus(SetCheckPointStatusCommand request)
+        {
+            var existing = await _dbContext.CkContactCheckListExec.FirstOrDefaultAsync(c => c.CPId == request.CpId && c.ContactId==request.ContactId && c.ContactTypeId==1);
+            if (existing == null)
+            {
+                CkContactCheckListExec chkL = new CkContactCheckListExec();
+                chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                chkL.TenantId = request.TenantId;
+                chkL.IsDeleted = 0;
+                chkL.CreatedBy = request.Id;
+                chkL.Status = request.StatusId;
+                chkL.ContactId=request.ContactId;
+                chkL.ContactTypeId=request.ContactTypeId;
+                chkL.CPId = request.CpId;
+                await _dbContext.AddAsync(chkL);
+                await _dbContext.SaveChangesAsync();
+
+            }
+            else{
+                existing.LastModifiedDate = DateTime.Now.ToUniversalTime();
+                existing.LastModifiedBy = request.Id;
+                existing.Status = request.StatusId;
+                await _dbContext.SaveChangesAsync();
+            }
+        }
+    
     }
 }

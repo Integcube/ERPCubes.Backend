@@ -1,3 +1,4 @@
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssigntToLeadsCheckPoint;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkAssignLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkRestoreLeads;
 using ERPCubes.Application.Features.Crm.Lead.Commands.BulkSaveLead;
@@ -11,6 +12,7 @@ using ERPCubes.Application.Features.Crm.Lead.Commands.SaveCopyQuestion;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLead;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScore;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SaveLeadScoreQuestion;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCalculateleadScore;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetDeletedLeads;
@@ -315,5 +317,16 @@ namespace ERPCubesApi.Controllers
             var dto = await _mediator.Send(req);
             return Ok(dto);
         }
+
+        [HttpPost("setstatus", Name = "SetStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> SetStatus(SetCheckPointStatusCommand req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
+
+
+
     }
 }

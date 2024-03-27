@@ -12,10 +12,13 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint
         public int CLId { get; set; }
         public string Title { get; set; }
         public int DueDays { get; set; }
-        public int IsRequired { get; set; }
+        public string IsRequired { get; set; }
         public int CPId { get; set; }
         public DateTimeOffset DueDate { get; set; }
         public int Status { get; set; }
+        public int? Priority { get; set; }
+        
+
 
     }
 }
