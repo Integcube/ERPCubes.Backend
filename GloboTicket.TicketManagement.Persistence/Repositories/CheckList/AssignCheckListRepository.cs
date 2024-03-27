@@ -170,6 +170,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                           Title = a.Title,
                                           CLId = a.CLId,
                                           CPId = a.CPId,
+                                          Description = a.Description,
                                           DueDays = a.DueDays,
                                           IsRequired = a.IsRequired,
                                           AssignTo = "-1",

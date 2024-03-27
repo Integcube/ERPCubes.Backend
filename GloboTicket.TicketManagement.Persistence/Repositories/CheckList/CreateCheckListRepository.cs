@@ -35,7 +35,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                  Description=a.Description,
                                                                  CreatedBy = user.FirstName + " " + user.LastName,
                                                                  //CreatedDate = a.CreatedDate,
-                                                             }).OrderBy(a => a.Title).ToListAsync();
+                                                             }).OrderByDescending(a => a.CLId).ToListAsync();
                 return checklistDetail;
             }
             catch (Exception ex)
@@ -73,7 +73,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                             CreatedBy = request.Id,
                             TenantId = request.TenantId,
                             IsDeleted = 0,
-                            Description = checkpointDto.Description,
+                            Title = checkpointDto.Title,
                             DueDays = checkpointDto.DueDays,
                             IsRequired = checkpointDto.IsRequired,
                             Priority = checkpointDto.Priority,
@@ -119,7 +119,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                 CreatedBy = request.Id,
                                 TenantId = request.TenantId,
                                 IsDeleted = 0,
-                                Description = checkpointDto.Description,
+                                Title = checkpointDto.Title,
                                 DueDays= checkpointDto.DueDays,
                                 //IsRequired= checkpointDto.IsRequired,
                                 Priority= checkpointDto.Priority,

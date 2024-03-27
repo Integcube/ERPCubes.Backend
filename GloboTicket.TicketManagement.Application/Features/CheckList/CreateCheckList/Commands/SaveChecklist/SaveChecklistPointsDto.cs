@@ -8,7 +8,7 @@ namespace ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist
 {
     public class SaveChecklistPointsDto
     {
-        public string Description { get; set; } = String.Empty;
+        public string Title { get; set; } = String.Empty;
         public int DueDays { get; set; }
         public int Priority { get; set; }
         public int IsRequired { get; set; }
