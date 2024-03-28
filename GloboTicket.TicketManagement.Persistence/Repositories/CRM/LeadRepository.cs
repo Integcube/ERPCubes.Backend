@@ -1202,29 +1202,37 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         public async Task SetCheckPointStatus(SetCheckPointStatusCommand request)
         {
-            var existing = await _dbContext.CkContactCheckListExec.FirstOrDefaultAsync(c => c.CPId == request.CpId && c.ContactId==request.ContactId && c.ContactTypeId==1);
-            if (existing == null)
+            try
             {
-                CkContactCheckListExec chkL = new CkContactCheckListExec();
-                chkL.CreatedDate = DateTime.Now.ToUniversalTime();
-                chkL.TenantId = request.TenantId;
-                chkL.IsDeleted = 0;
-                chkL.CreatedBy = request.Id;
-                chkL.Status = request.StatusId;
-                chkL.ContactId=request.ContactId;
-                chkL.ContactTypeId=request.ContactTypeId;
-                chkL.CPId = request.CpId;
-                await _dbContext.AddAsync(chkL);
-                await _dbContext.SaveChangesAsync();
+                var existing = await _dbContext.CkContactCheckListExec.FirstOrDefaultAsync(c => c.CPId == request.CpId && c.ContactId == request.ContactId && c.ContactTypeId == 1);
+                if (existing == null)
+                {
+                    CkContactCheckListExec chkL = new CkContactCheckListExec();
+                    chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                    chkL.TenantId = request.TenantId;
+                    chkL.IsDeleted = 0;
+                    chkL.CreatedBy = request.Id;
+                    chkL.Status = request.StatusId;
+                    chkL.ContactId = request.ContactId;
+                    chkL.ContactTypeId = request.ContactTypeId;
+                    chkL.CPId = request.CpId;
+                    await _dbContext.AddAsync(chkL);
+                    await _dbContext.SaveChangesAsync();
 
+                }
+                else
+                {
+                    existing.LastModifiedDate = DateTime.Now.ToUniversalTime();
+                    existing.LastModifiedBy = request.Id;
+                    existing.Status = request.StatusId;
+                    await _dbContext.SaveChangesAsync();
+                }
             }
-            else{
-                existing.LastModifiedDate = DateTime.Now.ToUniversalTime();
-                existing.LastModifiedBy = request.Id;
-                existing.Status = request.StatusId;
-                await _dbContext.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
             }
-        }
-    
     }
+
+}
 }
