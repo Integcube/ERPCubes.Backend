@@ -11,5 +11,6 @@ namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetA
     {
         public string Id { get; set; }
         public int TenantId { get; set; }
+        public string UserId { get; set; }
     }
 }

@@ -30,8 +30,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                var checklistDetail = await (from a in _dbContext.CkCheckList
-                                             where a.TenantId == request.TenantId && a.IsDeleted == 0
+                var checklistDetail = await (from a in _dbContext.CkCheckList.Where(a=>a.TenantId == request.TenantId && a.IsDeleted == 0)
                                              join b in _dbContext.CKExecCheckList.Where(b => b.IsDeleted == 0) on a.CLId equals b.CLId
                                              join c in _dbContext.CkUserCheckPoint.Where(c => c.IsDeleted == 0 && c.AssignTo == request.Id) on b.ExecId equals c.ExecId
                                              join u in _dbContext.AppUser on b.CreatedBy equals u.Id
@@ -91,26 +90,36 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                //var existing= await _dbContext.CkUserCheckPointExec.FirstOrDefaultAsync(c => c.ExecId == request.ExecId && c.CPId == request.CpId && c.UserId==request.UserId);
-                // if(existing != null)
-                //{
-                //    CkUserCheckPointExec chkL = new CkUserCheckPointExec();
-                //    chkL.CreatedDate = DateTime.Now.ToUniversalTime();
-                //    chkL.TenantId = request.TenantId;
-                //    chkL.IsDeleted = 0;
-                //    chkL.CreatedBy = request.Id;
-                //    chkL.CLId = request.CLId;
-                //    chkL.Remarks = request.Remarks;
-                //    await _dbContext.AddAsync(chkL);
-                //    await _dbContext.SaveChangesAsync();
+                var existing = await _dbContext.CkUserCheckPointExec.FirstOrDefaultAsync(c => c.CPId == request.CPId && c.ExecId == request.ExecId && c.TenantId == request.TenantId && c.UserId == request.Id);
+                if (existing == null)
+                {
+                    CkUserCheckPointExec chkL = new CkUserCheckPointExec();
+                    chkL.CreatedDate = DateTime.Now.ToUniversalTime();
+                    chkL.TenantId = request.TenantId;
+                    chkL.IsDeleted = 0;
+                    chkL.CreatedBy = request.Id;
+                    chkL.Status = request.StatusId;
+                    chkL.CPId = request.CPId;
+                    chkL.ExecId = request.ExecId;
+                    chkL.UserId = request.Id;
+                    chkL.ExecId = request.ExecId;
+                    await _dbContext.AddAsync(chkL);
+                    await _dbContext.SaveChangesAsync();
 
-                //}
-
+                }
+                else
+                {
+                    existing.LastModifiedDate = DateTime.Now.ToUniversalTime();
+                    existing.LastModifiedBy = request.Id;
+                    existing.Status = request.StatusId;
+                    await _dbContext.SaveChangesAsync();
+                }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 throw new BadRequestException(ex.Message);
             }
+
         }
     }
 }

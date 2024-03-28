@@ -14,8 +14,10 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAss
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckList;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckPoint;
+using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Queries.SetStatus;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
+using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
@@ -124,6 +126,13 @@ namespace ERPCubesApi.Controllers
         [HttpPost("getcheckpoints", Name = "GetAllCheckPoint")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<GetCheckpointsVm>> GetAllCheckPoint(GetCheckpointQuery req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
+        [HttpPost("setcheckpointstatus", Name = "SetCheckpointStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> SetStatus(SetStatusCommand req)
         {
             var dto = await _mediator.Send(req);
             return Ok(dto);
