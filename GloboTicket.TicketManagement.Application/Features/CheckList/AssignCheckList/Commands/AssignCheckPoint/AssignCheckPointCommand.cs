@@ -17,8 +17,8 @@ namespace ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.Assig
         public int CLId { get; set; }
         public string Remarks { get; set; }
         public int ExecId { get; set; }
-
-
+        public string Referenceno { get; set; }
+        
     }
 
 

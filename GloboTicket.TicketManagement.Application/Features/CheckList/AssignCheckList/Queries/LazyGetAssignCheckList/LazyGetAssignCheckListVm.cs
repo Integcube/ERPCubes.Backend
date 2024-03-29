@@ -24,8 +24,9 @@ namespace ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGe
         public string CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
         public string Code { get; set; }
-
+        public string Referenceno { get; set; }
         
+
     }
 
 }

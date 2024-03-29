@@ -15,5 +15,7 @@ namespace ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetChe
         public string Id { get; set; }
         public int ExecId { get; set; }
         public int CLId { get; set; }
+        public string userId { get; set; }
+        
     }
 }

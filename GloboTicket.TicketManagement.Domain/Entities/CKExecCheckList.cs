@@ -18,5 +18,7 @@ namespace ERPCubes.Domain.Entities
         public string Remarks { get; set; }
         public int TenantId { get; set; }
         public string Code { get; set; }
+        public string Referenceno { get; set; }
+        
     }
 }

@@ -42,9 +42,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     chkL.CreatedBy = request.Id;
                     chkL.CLId = request.CLId;
                     chkL.Remarks = request.Remarks;
+                    chkL.Referenceno = request.Referenceno;
                     await _dbContext.AddAsync(chkL);
                     await _dbContext.SaveChangesAsync();
                     chkL.Code = "0000" + chkL.ExecId.ToString();
+                   
 
 
                     foreach (var checkpoint in request.List)
@@ -70,7 +72,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     var existingCheckList = await _dbContext.CKExecCheckList.FirstOrDefaultAsync(c => c.ExecId == request.ExecId);
                     if (existingCheckList != null)
                     {
-                        existingCheckList.Remarks = request.Remarks; 
+                        existingCheckList.Remarks = request.Remarks;
+                        existingCheckList.Referenceno = request.Referenceno;
+                        
                         _dbContext.CKExecCheckList.Update(existingCheckList);
                         await _dbContext.SaveChangesAsync();
                         foreach (var checkpoint in request.List)
@@ -173,7 +177,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                           Description = a.Description,
                                           DueDays = a.DueDays,
                                           IsRequired = a.IsRequired,
-                                          AssignTo = "-1",
+                                          AssignTo = request.userId,
                                           ExecId = -1,
                                           DueDate = DateTimeOffset.UtcNow.AddDays(a.DueDays)
                                       }).OrderBy(A => A.CPId).ToListAsync();
@@ -191,7 +195,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                          CPId = a.CPId,
                                          DueDays = a.DueDays,
                                          IsRequired = a.IsRequired,
-                                         AssignTo = cp.AssignTo,
+                                         AssignTo = cp.AssignTo == "-1" ? request.userId : cp.AssignTo,
                                          ExecId = cp.ExecId,
                                          DueDate = cp.DueDate
                                      }).OrderBy(A => A.CPId).ToListAsync();
@@ -222,7 +226,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                  CreatedBy = a.CreatedBy,
                                  CreatedDate = a.CreatedDate,
                                  CreatedByName = c.FirstName + " " + c.LastName,
-                                 Code = a.Code
+                                 Code = a.Code,
+                                 Referenceno = a.Referenceno,
+                                 
                              });
 
 
@@ -257,6 +263,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         case "code":
                             query = request.Order.ToLower() == "desc" ? query.OrderByDescending(a => a.Code) : query.OrderBy(a => a.Code);
                             break;
+                        case "referenceno":
+                            query = request.Order.ToLower() == "desc" ? query.OrderByDescending(a => a.Referenceno) : query.OrderBy(a => a.Referenceno);
+                            break;
+                            
 
                     }
                 }
