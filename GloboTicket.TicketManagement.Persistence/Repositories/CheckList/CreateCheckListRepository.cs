@@ -84,6 +84,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                  IsRequired=a.IsRequired,
                                                                  Priority=a.Priority,
                                                                  //CreatedDate = a.CreatedDate,
+                                                                 IsDeleted=a.IsDeleted
                                                              }).OrderByDescending(a => a.CLId).ToListAsync();
                 return checkpointDetail;
             }
@@ -145,38 +146,51 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     {
                         checklist.Title = request.Checklist.Title;
                         checklist.Description = request.Checklist.Description;
-                        //checklist.LastModifiedDate = localDateTime.ToUniversalTime();
-                        //checklist.LastModifiedBy = request.Id;
+                        checklist.LastModifiedDate = localDateTime.ToUniversalTime();
+                        checklist.LastModifiedBy = request.Id;
                         checklist.TenantId = request.TenantId;
                         await _dbContext.SaveChangesAsync();
 
-                     
                        
-                        CKCheckPoint? checkpoints = await (from a in _dbContext.CKCheckPoint.Where(a => a.CLId == request.Checklist.CLId)
-                                                         select a).FirstOrDefaultAsync();
-                        if (checkpoints != null)
-                        {
-                            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"CKCheckPoint\" WHERE \"CLId\" = {0}", checkpoints.CLId);
-
-                        }
-                        foreach (var checkpointDto in request.Checklist?.Checkpoints ?? new List<SaveChecklistPointsDto>())
+                        foreach (var checkpointDto in request.Checklist?.Checkpoints?? new List<SaveChecklistPointsDto>())
                         {
 
-                            var checkpointEntity = new CKCheckPoint
+                            if (checkpointDto.CpId == -1)
                             {
-                                CLId = checklist.CLId,
-                                CreatedDate = localDateTime.ToUniversalTime(),
-                                CreatedBy = request.Id,
-                                TenantId = request.TenantId,
-                                IsDeleted = 0,
-                                Title = checkpointDto.Title,
-                                DueDays= checkpointDto.DueDays,
-                                IsRequired = checkpointDto.IsRequired,
-                                Priority = checkpointDto.Priority,
-                                
-                            };
-                            await _dbContext.AddAsync(checkpointEntity);
+                                var checkpointEntity = new CKCheckPoint
+                                {
+
+
+                                    CLId = checklist.CLId,
+                                    CreatedDate = localDateTime.ToUniversalTime(),
+                                    CreatedBy = request.Id,
+                                    TenantId = request.TenantId,
+                                    IsDeleted = 0,
+                                    Title = checkpointDto.Title,
+                                    DueDays = checkpointDto.DueDays,
+                                    IsRequired = checkpointDto.IsRequired,
+                                    Priority = checkpointDto.Priority,
+
+                                };
+                                await _dbContext.AddAsync(checkpointEntity);
+                            }
+                            else
+                            {
+                                CKCheckPoint checkpoints = await (from a in _dbContext.CKCheckPoint.Where(a => a.CPId == checkpointDto.CpId)
+                                                                  select a).FirstOrDefaultAsync();
+
+                                checkpoints.Title = checkpointDto.Title;
+                                checkpoints.DueDays = checkpointDto.DueDays;
+                                checkpoints.Priority= checkpointDto.Priority;
+                                checkpoints.IsRequired= checkpointDto.IsRequired;
+                                checkpoints.LastModifiedBy = request.Id;
+                                checkpoints.IsDeleted = checkpointDto.IsDeleted;
+                                checkpoints.LastModifiedDate= localDateTime.ToUniversalTime();
+
+                            }
+
                             await _dbContext.SaveChangesAsync();
+
                         }
                     }
                 }

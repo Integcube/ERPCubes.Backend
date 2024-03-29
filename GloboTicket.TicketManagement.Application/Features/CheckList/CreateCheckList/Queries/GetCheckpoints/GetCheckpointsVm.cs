@@ -15,5 +15,7 @@ namespace ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetChe
         public int IsRequired { get; set; }
         public int? Priority { get; set; }
         public int CPId { get; set; }
+        public int IsDeleted { get; set; }
+        
     }
 }

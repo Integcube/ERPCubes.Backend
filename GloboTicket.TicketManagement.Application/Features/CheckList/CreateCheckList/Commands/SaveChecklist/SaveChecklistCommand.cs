@@ -12,6 +12,6 @@ namespace ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist
     {
         public int TenantId { get; set; }
         public string Id { get; set; }
-        public SaveChecklistDto Checklist { get; set; } = new SaveChecklistDto();
+        public SaveChecklistDto Checklist { get; set; } 
     }
 }
