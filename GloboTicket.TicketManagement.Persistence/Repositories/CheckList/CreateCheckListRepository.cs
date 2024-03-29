@@ -1,6 +1,7 @@
 ﻿using ERPCubes.Application.Contracts.Persistence.CheckList;
 using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
+using ERPCubes.Application.Features.CheckList.CreateCheckList.DeleteCreateChecklist;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
@@ -21,6 +22,30 @@ namespace ERPCubes.Persistence.Repositories.CRM
     {
         public CreateCheckListRepository(ERPCubesDbContext dbContext, ERPCubesIdentityDbContext dbContextIdentity) : base(dbContext, dbContextIdentity)
         {
+        }
+
+        public async Task Delete(DeleteCreateChecklistCommand request)
+        {
+            try
+            {
+                var deleteChecklist = await (from a in _dbContext.CkCheckList.Where(a => a.CLId == request.CLId)
+                                             select a).FirstOrDefaultAsync();
+                if (deleteChecklist == null)
+                {
+                    throw new NotFoundException("checklist", request);
+                }
+                else
+                {
+                    deleteChecklist.IsDeleted = 1;
+                    //deleteDashboard.DeletedBy = dashboard.Id;
+                    //deleteDashboard.DeletedDate = DateTime.Now.ToUniversalTime();
+                    await _dbContext.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
         public async Task<List<GetChecklistVm>> GetAllChecklist(int TenantId, string Id)
@@ -118,6 +143,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     }
                     else
                     {
+                        checklist.Title = request.Checklist.Title;
                         checklist.Description = request.Checklist.Description;
                         //checklist.LastModifiedDate = localDateTime.ToUniversalTime();
                         //checklist.LastModifiedBy = request.Id;
@@ -128,11 +154,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                        
                         CKCheckPoint? checkpoints = await (from a in _dbContext.CKCheckPoint.Where(a => a.CLId == request.Checklist.CLId)
                                                          select a).FirstOrDefaultAsync();
-                        //if (checkpoints != null)
-                        //{
-                        //    await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"CrmNoteTasks\" WHERE \"NoteId\" = {0}", noteTasks.NoteId);
+                        if (checkpoints != null)
+                        {
+                            await _dbContext.Database.ExecuteSqlRawAsync("DELETE FROM \"CKCheckPoint\" WHERE \"CLId\" = {0}", checkpoints.CLId);
 
-                        //}
+                        }
                         foreach (var checkpointDto in request.Checklist?.Checkpoints ?? new List<SaveChecklistPointsDto>())
                         {
 
@@ -145,8 +171,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                 IsDeleted = 0,
                                 Title = checkpointDto.Title,
                                 DueDays= checkpointDto.DueDays,
-                                //IsRequired= checkpointDto.IsRequired,
-                                Priority= checkpointDto.Priority,
+                                IsRequired = checkpointDto.IsRequired,
+                                Priority = checkpointDto.Priority,
                                 
                             };
                             await _dbContext.AddAsync(checkpointEntity);
