@@ -16,5 +16,9 @@ namespace ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetA
         public int ExecId { get; set; }
         public string Remarks { get; set; }
         public int  Status { get; set; }
+        public string Referenceno { get; set; }
+        public string Code { get; set; }
+        
+
     }
 }

@@ -15,5 +15,6 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint
         public string Id { get; set; }
         public int ContactId { get; set; }
         
+
     }
 }

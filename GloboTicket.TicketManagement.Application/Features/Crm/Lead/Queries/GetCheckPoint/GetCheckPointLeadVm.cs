@@ -14,7 +14,7 @@ namespace ERPCubes.Application.Features.Crm.Lead.Queries.GetCheckPoint
         public int DueDays { get; set; }
         public string IsRequired { get; set; }
         public int CPId { get; set; }
-        public DateTimeOffset DueDate { get; set; }
+        public DateTime DueDate { get; set; }
         public int Status { get; set; }
         public int? Priority { get; set; }
         

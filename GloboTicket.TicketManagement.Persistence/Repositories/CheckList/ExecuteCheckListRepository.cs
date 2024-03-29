@@ -43,6 +43,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                  CLId = a.CLId,
                                                  ExecId = b.ExecId,
                                                  Remarks = b.Remarks,
+                                                 Referenceno = b.Referenceno,
+                                                 Code=b.Code,
                                              }).Distinct().OrderBy(a => a.AssignedDate).ToListAsync();
 
                 return checklistDetail;

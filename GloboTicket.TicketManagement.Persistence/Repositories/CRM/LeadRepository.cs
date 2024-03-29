@@ -1175,6 +1175,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
+                CrmLead lead = await (from a in _dbContext.CrmLead.Where(a => a.LeadId == request.ContactId)
+                                          select a).FirstAsync();
+                DateTime createddate = lead.CreatedDate.ToUniversalTime();
+
                 var chp = await (from c in _dbContext.CkContactCheckList.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.ContactTypeId == 1)
                                  join a in _dbContext.CKCheckPoint on c.CLId equals a.CLId
                                  join cc in _dbContext.CkContactCheckListExec.Where(a => a.ContactId == request.ContactId) on a.CPId equals cc.CPId into abc
@@ -1185,7 +1189,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                      CLId = a.CLId,
                                      CPId = a.CPId,
                                      DueDays = a.DueDays,
-                                     DueDate = DateTime.UtcNow.AddDays(a.DueDays),
+                                     DueDate =createddate.AddDays(a.DueDays),
                                      Status = ab == null ? 0 : ab.Status,
                                      IsRequired = a.IsRequired==1?"Yes":"No",
                                      Priority=a.Priority,
