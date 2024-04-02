@@ -4,6 +4,7 @@ using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssignCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.AssigntToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.UnassignToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
@@ -307,7 +308,21 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
+        public async Task UnassignToLeads(UnassignToLeadsCheckPointCommand request)
+        {
+            var obj = await (from a in _dbContext.CkContactCheckList.Where(a => a.CLId == request.CLId)
+                             select a).FirstOrDefaultAsync();
 
-
+            obj.CreatedDate = DateTime.Now.ToUniversalTime();
+            obj.TenantId = request.TenantId;
+            obj.IsDeleted = 1;
+            obj.CreatedBy = request.Id;
+            obj.CLId = request.CLId;
+            obj.ContactTypeId = 1;
+            obj.StatusId = 1;
+                await _dbContext.AddAsync(obj);
+                await _dbContext.SaveChangesAsync();
+            
+        }
     }
 }

@@ -83,6 +83,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                                                  Description = a.Description,
                                                                  IsRequired=a.IsRequired,
                                                                  Priority=a.Priority,
+                                                                 DueDays=a.DueDays,
                                                                  //CreatedDate = a.CreatedDate,
                                                                  IsDeleted=a.IsDeleted
                                                              }).OrderByDescending(a => a.CLId).ToListAsync();
