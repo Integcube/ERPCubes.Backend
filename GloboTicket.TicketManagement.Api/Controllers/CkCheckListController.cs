@@ -11,15 +11,18 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAss
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.UnassignToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcutedCheckListbyId;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.DeleteCreateChecklist;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
+using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCreateCheckListbyId;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckList;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckPoint;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Queries.SetStatus;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Features.Crm.Product.Commands.BulkRestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Commands.RestoreProduct;
 using ERPCubes.Application.Features.Crm.Product.Queries.GetDeletedProductList;
@@ -149,9 +152,31 @@ namespace ERPCubesApi.Controllers
         [HttpPost("deleteAssignedChecklist", Name = "DeleteAssignedChecklist")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> DeleteAssignedChecklist(UnassignToLeadsCheckPointCommand req)
+
+        [HttpPost("getchecklistbyId", Name = "GetExcutedCheckListbyId")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetExcutedCheckListbyIdVm>> GetExcutedCheckListbyId(GetExcutedCheckListbyIdQuery req)
         {
             var dto = await _mediator.Send(req);
             return Ok(dto);
         }
+
+        [HttpPost("getcreatechecklistbyId", Name = "GetCreateCheckListbyId")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<GetExcutedCheckListbyIdVm>> GetCreateCheckListbyId(GetCreateCheckListbyIdQuery req)
+        {
+            var dto = await _mediator.Send(req);
+            return Ok(dto);
+        }
+
+        [HttpPost("checklistReport", Name = "CheckListReport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> CheckListReport(GetleadPiplineReportQuery leadReport)
+        {
+            var dtos = await _mediator.Send(leadReport);
+            return Ok(dtos);
+        }
+
+
     }
 }

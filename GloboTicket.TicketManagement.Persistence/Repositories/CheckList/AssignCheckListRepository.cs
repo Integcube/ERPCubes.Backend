@@ -7,6 +7,7 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAss
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.UnassignToLeadsCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckList;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcutedCheckListbyId;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Models.Mail;
@@ -47,7 +48,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     await _dbContext.AddAsync(chkL);
                     await _dbContext.SaveChangesAsync();
                     chkL.Code = "0000" + chkL.ExecId.ToString();
-                   
+
 
 
                     foreach (var checkpoint in request.List)
@@ -75,7 +76,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     {
                         existingCheckList.Remarks = request.Remarks;
                         existingCheckList.Referenceno = request.Referenceno;
-                        
+
                         _dbContext.CKExecCheckList.Update(existingCheckList);
                         await _dbContext.SaveChangesAsync();
                         foreach (var checkpoint in request.List)
@@ -103,7 +104,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
             var obj = await (from a in _dbContext.CkContactCheckList.Where(a => a.CLId == request.CLId)
                              select a).FirstOrDefaultAsync();
-            if (obj==null)
+            if (obj == null)
             {
                 CkContactCheckList chkL = new CkContactCheckList();
                 chkL.CreatedDate = DateTime.Now.ToUniversalTime();
@@ -116,7 +117,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 await _dbContext.AddAsync(chkL);
                 await _dbContext.SaveChangesAsync();
             }
-            
+
         }
 
         public async Task Delete(DeleteAssignCheckPointCommand request)
@@ -209,6 +210,22 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<GetExcutedCheckListbyIdVm> GetExcutedCheckListbyId(GetExcutedCheckListbyIdQuery request)
+        {
+            var query = await _dbContext.CKExecCheckList.Where(a => a.TenantId == request.TenantId && a.ExecId == request.ExecId)
+                            .Select(a => new GetExcutedCheckListbyIdVm
+                            {
+                            ExecId = a.ExecId,
+                            CLId = a.CLId,
+                            Remarks = a.Remarks,
+                            TenantId = a.TenantId,
+                            Code = a.Code,
+                            Referenceno = a.Referenceno
+                           }).FirstOrDefaultAsync();
+
+            return query;
+        }
+
         public async Task<LazyGetAssignCheckListVm> LazyGetAssignCheckList(LazyGetAssignCheckListQuery request)
         {
 
@@ -229,7 +246,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                                  CreatedByName = c.FirstName + " " + c.LastName,
                                  Code = a.Code,
                                  Referenceno = a.Referenceno,
-                                 
+
                              });
 
 
@@ -267,7 +284,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         case "referenceno":
                             query = request.Order.ToLower() == "desc" ? query.OrderByDescending(a => a.Referenceno) : query.OrderBy(a => a.Referenceno);
                             break;
-                            
+
 
                     }
                 }

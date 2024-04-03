@@ -1,6 +1,8 @@
 ﻿using ERPCubes.Application.Features.CheckList.AssignCheckList.Commands.DeleteAssignCheckPoint;
+using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcutedCheckListbyId;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.DeleteCreateChecklist;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
+using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCreateCheckListbyId;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
@@ -21,6 +23,7 @@ namespace ERPCubes.Application.Contracts.Persistence.CheckList
 
         Task SaveChecklist(SaveChecklistCommand request);
         Task Delete(DeleteCreateChecklistCommand request);
+        Task<GetCreateCheckListbyIdVm> GetCreateCheckListbyId(GetCreateCheckListbyIdQuery request);
 
 
     }

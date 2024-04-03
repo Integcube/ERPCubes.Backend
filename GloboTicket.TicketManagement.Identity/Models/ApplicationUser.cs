@@ -14,5 +14,6 @@ namespace ERPCubes.Identity.Models
         public DateTime? ModifiedOn { get; set; }
         public string DeletedBy { get; set; }
         public DateTime? DeletedDate { get; set; }
+
     }
 }

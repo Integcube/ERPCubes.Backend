@@ -3,12 +3,14 @@ using ERPCubes.Application.Contracts.Persistence.CRM;
 using ERPCubes.Application.Exceptions;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.DeleteCreateChecklist;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
+using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCreateCheckListbyId;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Dashboard.Queries.GetDashboards;
 using ERPCubes.Application.Features.Notes.Commands.SaveNote;
 using ERPCubes.Domain.Entities;
 using ERPCubes.Identity;
+using ERPCubes.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -93,6 +95,20 @@ namespace ERPCubes.Persistence.Repositories.CRM
             {
                 throw new BadRequestException(ex.Message);
             }
+        }
+
+        public async Task<GetCreateCheckListbyIdVm> GetCreateCheckListbyId(GetCreateCheckListbyIdQuery request)
+        {
+            var checklist = await (from a in _dbContext.CkCheckList.Where(a => a.TenantId == request.TenantId && a.IsDeleted == 0 && a.CLId == request.CLId)
+                                   join user in _dbContext.AppUser on a.CreatedBy equals user.Id
+                                   select new GetCreateCheckListbyIdVm
+                                   {
+                                       ClId = a.CLId,
+                                       Title = a.Title,
+                                       Description = a.Description,
+
+                                   }).FirstOrDefaultAsync();
+            return checklist;
         }
 
         public async Task SaveChecklist(SaveChecklistCommand request)
