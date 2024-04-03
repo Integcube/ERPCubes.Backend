@@ -20,6 +20,7 @@ using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssig
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Commands.GetAssignedCheckPoint;
 using ERPCubes.Application.Features.CheckList.ExecuteCheckList.Queries.SetStatus;
 using ERPCubes.Application.Features.Crm.Checklist.Command.SaveChecklist;
+using ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists;
 using ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
@@ -149,9 +150,13 @@ namespace ERPCubesApi.Controllers
             var dto = await _mediator.Send(req);
             return Ok(dto);
         }
-        [HttpPost("deleteAssignedChecklist", Name = "DeleteAssignedChecklist")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> DeleteAssignedChecklist(UnassignToLeadsCheckPointCommand req)
+        //[HttpPost("deleteAssignedChecklist", Name = "DeleteAssignedChecklist")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public async Task<ActionResult> DeleteAssignedChecklist(UnassignToLeadsCheckPointCommand req)
+        //{
+
+        //}
+
 
         [HttpPost("getchecklistbyId", Name = "GetExcutedCheckListbyId")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -171,7 +176,7 @@ namespace ERPCubesApi.Controllers
 
         [HttpPost("checklistReport", Name = "CheckListReport")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> CheckListReport(GetleadPiplineReportQuery leadReport)
+        public async Task<ActionResult> CheckListReport(CheckListReportQuery leadReport)
         {
             var dtos = await _mediator.Send(leadReport);
             return Ok(dtos);

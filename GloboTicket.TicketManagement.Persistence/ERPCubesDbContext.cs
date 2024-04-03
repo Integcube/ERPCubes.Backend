@@ -1,6 +1,7 @@
 using ERPCubes.Application.Contracts;
 using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
+using ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByMonth;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadCountByOwner;
@@ -42,10 +43,11 @@ namespace ERPCubes.Persistence
             modelBuilder.Entity<GetLeadSourceByCountVm>().HasNoKey().ToView("CrmLeadSourceCountGrph");
             modelBuilder.Entity<GetTotalLeadCountVm>().HasNoKey().ToView("CrmCountleadsGrp");
             modelBuilder.Entity<GetLeadCountSummaryVm>().HasNoKey().ToView("CrmTotalLeadSummaryGrph");
-
-
-
+            modelBuilder.Entity<CheckListReportVm>().HasNoKey().ToView("CkCheckListReport");
             
+
+
+
 
             base.OnModelCreating(modelBuilder);
         }
@@ -118,7 +120,8 @@ namespace ERPCubes.Persistence
         public DbSet<CkUserCheckPointExec> CkUserCheckPointExec { get; set; }
         public DbSet<CkContactCheckList> CkContactCheckList { get; set; }
         public DbSet<CkContactCheckListExec> CkContactCheckListExec { get; set; }
-    
+        public DbSet<CheckListReportVm> CheckListReportVm { get; set; }
 
+        
     }
 }

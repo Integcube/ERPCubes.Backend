@@ -337,9 +337,9 @@ namespace ERPCubes.Persistence.Repositories.CRM
             obj.CLId = request.CLId;
             obj.ContactTypeId = 1;
             obj.StatusId = 1;
-                await _dbContext.AddAsync(obj);
-                await _dbContext.SaveChangesAsync();
-            
+            await _dbContext.AddAsync(obj);
+            await _dbContext.SaveChangesAsync();
+
+            }
         }
     }
-}

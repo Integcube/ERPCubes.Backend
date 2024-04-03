@@ -56,6 +56,7 @@ namespace ERPCubes.Persistence
             services.AddScoped<IAsyncAssignCheckListRepository, AssignCheckListRepository>();
             services.AddScoped<IAsyncCreateCheckListRepository, CreateCheckListRepository>();
             services.AddScoped<IAsyncExecuteCheckListRepository, ExecuteCheckListRepository>();
+            services.AddScoped<IAsyncCheckListReportRepository, CheckListReportsRepository>();
             
             return services;    
         }

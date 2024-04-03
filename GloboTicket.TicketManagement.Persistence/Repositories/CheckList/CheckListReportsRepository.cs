@@ -10,6 +10,7 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcuted
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
+using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
 using ERPCubes.Application.Models.Mail;
 using ERPCubes.Domain.Common;
 using ERPCubes.Domain.Entities;
@@ -27,12 +28,23 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
         }
 
-        public Task<List<CheckListReportVm>> CheckListReport(CheckListReportQuery request)
+        public async Task<List<CheckListReportVm>> CheckListReport(CheckListReportQuery request)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@TenantId", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = request.TenantId
+                };
+                var results = await _dbContext.CheckListReportVm.FromSqlRaw("SELECT * FROM \"CkCheckListReport\"(@TenantId)", tenantIdPrm).ToListAsync();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
         }
 
-      
 
 
     }

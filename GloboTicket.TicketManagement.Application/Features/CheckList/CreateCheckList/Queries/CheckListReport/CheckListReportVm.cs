@@ -8,11 +8,12 @@ namespace ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport
 {
     public class CheckListReportVm
     {
-        public int ClId { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public string CreatedBy { get; set; } = string.Empty;
-        //public DateTime? CreatedDate { get; set; }
-
+        public int ExecId { get; set; }
+        public string Referenceno { get; set; }
+        public string Title { get; set; }
+        public int Total { get; set; } 
+        public int ExecutedCount { get; set; }
+        public int NotExecutedCount { get; set; } 
+        public  decimal ExecutedPercentage { get; set; }
     }
 }
