@@ -8,6 +8,7 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckLi
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcutedCheckListbyId;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
+using ERPCubes.Application.Features.CheckList.ChecklistReports.Queries.ExecutedLeadChecklistReport;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetLeadList;
 using ERPCubes.Application.Features.Crm.Lead.Queries.GetleadPiplineReport;
@@ -45,7 +46,33 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
+        public async Task<List<ExecutedLeadChecklistReportVm>> ExecutedLeadCheckListReport(int TenantId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                var tenantIdPrm = new Npgsql.NpgsqlParameter("@p_tenantid", NpgsqlTypes.NpgsqlDbType.Integer)
+                {
+                    Value = TenantId
+                };
+                var startDatePrm = new Npgsql.NpgsqlParameter("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = startDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = endDate
+                };
+               
+                var results = await _dbContext.ExecutedLeadChecklistReport.FromSqlRaw(
+                    "SELECT * FROM public.\"CkExcutedCheckListLeadWiseRpt\"({0},{1},{2})", startDatePrm, endDatePrm, tenantIdPrm)
+                    .ToListAsync();
 
-
+                return results;
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException(ex.Message);
+            }
+        }
     }
 }

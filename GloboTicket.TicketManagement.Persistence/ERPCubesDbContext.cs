@@ -1,4 +1,5 @@
 using ERPCubes.Application.Contracts;
+using ERPCubes.Application.Features.CheckList.ChecklistReports.Queries.ExecutedLeadChecklistReport;
 using ERPCubes.Application.Features.Crm.Activity.Queries.GetUserActivityReport;
 using ERPCubes.Application.Features.Crm.Call.Queries.GetCallScenariosList;
 using ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport;
@@ -44,7 +45,8 @@ namespace ERPCubes.Persistence
             modelBuilder.Entity<GetTotalLeadCountVm>().HasNoKey().ToView("CrmCountleadsGrp");
             modelBuilder.Entity<GetLeadCountSummaryVm>().HasNoKey().ToView("CrmTotalLeadSummaryGrph");
             modelBuilder.Entity<CheckListReportVm>().HasNoKey().ToView("CkCheckListReport");
-            
+            modelBuilder.Entity<ExecutedLeadChecklistReportVm>().HasNoKey().ToView("CkExcutedCheckListLeadWiseRpt");
+
 
 
 
@@ -121,7 +123,8 @@ namespace ERPCubes.Persistence
         public DbSet<CkContactCheckList> CkContactCheckList { get; set; }
         public DbSet<CkContactCheckListExec> CkContactCheckListExec { get; set; }
         public DbSet<CheckListReportVm> CheckListReportVm { get; set; }
+        public DbSet<ExecutedLeadChecklistReportVm> ExecutedLeadChecklistReport { get; set; }
 
-        
+
     }
 }

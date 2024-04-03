@@ -12,6 +12,7 @@ using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckLi
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetCheckPoint;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.GetExcutedCheckListbyId;
 using ERPCubes.Application.Features.CheckList.AssignCheckList.Queries.LazyGetAssignCheckList;
+using ERPCubes.Application.Features.CheckList.ChecklistReports.Queries.ExecutedLeadChecklistReport;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.DeleteCreateChecklist;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCheckpoints;
 using ERPCubes.Application.Features.CheckList.CreateCheckList.Queries.GetCreateCheckListbyId;
@@ -180,7 +181,13 @@ namespace ERPCubesApi.Controllers
             var dtos = await _mediator.Send(leadReport);
             return Ok(dtos);
         }
-
+        [HttpPost("executeChecklistReport", Name = "ExecuteCheckListReport")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> ExecuteCheckListReport(ExecutedLeadChecklistReportQuery leadReport)
+        {
+            var dtos = await _mediator.Send(leadReport);
+            return Ok(dtos);
+        }
 
     }
 }
