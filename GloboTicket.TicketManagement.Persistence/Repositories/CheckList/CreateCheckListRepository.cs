@@ -54,16 +54,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
         {
             try
             {
-                List<GetChecklistVm> checklistDetail = await(from a in _dbContext.CkCheckList.Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
-                                                             join user in _dbContext.AppUser on a.CreatedBy equals user.Id
-                                                             select new GetChecklistVm
-                                                             {
-                                                                 ClId = a.CLId,
-                                                                 Title = a.Title,
-                                                                 Description=a.Description,
-                                                                 CreatedBy = user.FirstName + " " + user.LastName,
-                                                                 //CreatedDate = a.CreatedDate,
-                                                             }).OrderByDescending(a => a.ClId).ToListAsync();
+                List<GetChecklistVm> checklistDetail = await (from a in _dbContext.CkCheckList.Where(a => a.TenantId == TenantId && a.IsDeleted == 0)
+                                                              join user in _dbContext.AppUser on a.CreatedBy equals user.Id
+                                                              join ckcontact in _dbContext.CkContactCheckList.Where(a=>a.IsDeleted==0) on a.CLId equals ckcontact.CLId into abc
+                                                              from cont in abc.DefaultIfEmpty()
+                                                              select new GetChecklistVm
+                                                              {
+                                                                  ClId = a.CLId,
+                                                                  Title = a.Title,
+                                                                  Description = a.Description,
+                                                                  CreatedBy = user.FirstName + " " + user.LastName,
+                                                                  IAssign = cont == null ? 0 : 1
+                                                              }).OrderByDescending(a => a.ClId).ToListAsync();
                 return checklistDetail;
             }
             catch (Exception ex)
@@ -72,23 +74,23 @@ namespace ERPCubes.Persistence.Repositories.CRM
             }
         }
 
-        public async Task<List<GetCheckpointsVm>> GetAllCheckpoint(int TenantId, string Id,int CLId)
+        public async Task<List<GetCheckpointsVm>> GetAllCheckpoint(int TenantId, string Id, int CLId)
         {
             try
             {
-                List<GetCheckpointsVm> checkpointDetail = await(from a in _dbContext.CKCheckPoint.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.CLId== CLId)
-                                                             select new GetCheckpointsVm
-                                                             {
-                                                                 CLId=a.CLId,
-                                                                 CPId = a.CPId,
-                                                                 Title = a.Title,
-                                                                 Description = a.Description,
-                                                                 IsRequired=a.IsRequired,
-                                                                 Priority=a.Priority,
-                                                                 DueDays=a.DueDays,
-                                                                 //CreatedDate = a.CreatedDate,
-                                                                 IsDeleted=a.IsDeleted
-                                                             }).OrderByDescending(a => a.CLId).ToListAsync();
+                List<GetCheckpointsVm> checkpointDetail = await (from a in _dbContext.CKCheckPoint.Where(a => a.TenantId == TenantId && a.IsDeleted == 0 && a.CLId == CLId)
+                                                                 select new GetCheckpointsVm
+                                                                 {
+                                                                     CLId = a.CLId,
+                                                                     CPId = a.CPId,
+                                                                     Title = a.Title,
+                                                                     Description = a.Description,
+                                                                     IsRequired = a.IsRequired,
+                                                                     Priority = a.Priority,
+                                                                     DueDays = a.DueDays,
+                                                                     //CreatedDate = a.CreatedDate,
+                                                                     IsDeleted = a.IsDeleted
+                                                                 }).OrderByDescending(a => a.CLId).ToListAsync();
                 return checkpointDetail;
             }
             catch (Exception ex)
@@ -129,7 +131,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     await _dbContext.AddAsync(checklist);
                     await _dbContext.SaveChangesAsync();
 
-                
+
                     foreach (var checkpointDto in request.Checklist?.Checkpoints ?? new List<SaveChecklistPointsDto>())
                     {
 
@@ -154,7 +156,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     var checklist = await (from a in _dbContext.CkCheckList.Where(a => a.CLId == request.Checklist.CLId)
-                                      select a).FirstOrDefaultAsync();
+                                           select a).FirstOrDefaultAsync();
                     if (checklist == null)
                     {
                         throw new NotFoundException(request.Checklist.Title, request.Checklist.CLId);
@@ -168,8 +170,8 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         checklist.TenantId = request.TenantId;
                         await _dbContext.SaveChangesAsync();
 
-                       
-                        foreach (var checkpointDto in request.Checklist?.Checkpoints?? new List<SaveChecklistPointsDto>())
+
+                        foreach (var checkpointDto in request.Checklist?.Checkpoints ?? new List<SaveChecklistPointsDto>())
                         {
 
                             if (checkpointDto.CpId == -1)
@@ -198,11 +200,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
 
                                 checkpoints.Title = checkpointDto.Title;
                                 checkpoints.DueDays = checkpointDto.DueDays;
-                                checkpoints.Priority= checkpointDto.Priority;
-                                checkpoints.IsRequired= checkpointDto.IsRequired;
+                                checkpoints.Priority = checkpointDto.Priority;
+                                checkpoints.IsRequired = checkpointDto.IsRequired;
                                 checkpoints.LastModifiedBy = request.Id;
                                 checkpoints.IsDeleted = checkpointDto.IsDeleted;
-                                checkpoints.LastModifiedDate= localDateTime.ToUniversalTime();
+                                checkpoints.LastModifiedDate = localDateTime.ToUniversalTime();
 
                             }
 

@@ -12,7 +12,8 @@ namespace ERPCubes.Application.Features.Crm.Checklist.Queries.GetChecklists
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string CreatedBy { get; set; } = string.Empty;
-        //public DateTime? CreatedDate { get; set; }
+        public int IAssign { get; set; }
+
 
     }
 }
