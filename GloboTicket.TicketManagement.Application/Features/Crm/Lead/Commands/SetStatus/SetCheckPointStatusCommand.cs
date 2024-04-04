@@ -15,6 +15,8 @@ namespace ERPCubes.Application.Features.Crm.Lead.Commands.SetStatus
         public int StatusId { get; set; }
         public int ContactId { get; set; }
         public int ContactTypeId { get; set; }
+        public string CompletedBy { get; set; }
+        public DateTime CompletedOn { get; set; }
       
     }
 }

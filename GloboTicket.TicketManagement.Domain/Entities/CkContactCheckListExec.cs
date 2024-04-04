@@ -17,6 +17,8 @@ namespace ERPCubes.Domain.Entities
         public int ContactId { get; set; }
         public int ContactTypeId { get; set; }
         public int CPId { get; set; }
+        public string CompletedBy { get; set; }
+        public DateTime? CompletedOn { get; set; }
         
     }
 }
