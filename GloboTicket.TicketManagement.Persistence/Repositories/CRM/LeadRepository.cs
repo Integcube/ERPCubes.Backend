@@ -1234,14 +1234,20 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 else
                 {
                     CkContactCheckListExec ck = await _dbContext.CkContactCheckListExec.FirstOrDefaultAsync(a => a.CPId == request.CpId);
-                    if (ck != null)
+                    if (ck != null && ck.CompletedOn!=null && ck.CompletedBy!=null)
                     {
                         ck.CompletedBy = null;
                         ck.CompletedOn = null;
 
                         await _dbContext.SaveChangesAsync();
                     }
+                    else
+                    {
+                        existing.CompletedOn= DateTime.Now.ToUniversalTime();
+                        existing.CompletedBy= request.Id;
+                        await _dbContext.SaveChangesAsync();
 
+                    }
                     existing.LastModifiedDate = DateTime.Now.ToUniversalTime();
                     existing.LastModifiedBy = request.Id;
                     existing.Status = request.StatusId;
