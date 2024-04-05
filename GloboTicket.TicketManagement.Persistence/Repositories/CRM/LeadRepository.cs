@@ -1233,11 +1233,10 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 }
                 else
                 {
-                    CkContactCheckListExec ck = await _dbContext.CkContactCheckListExec.FirstOrDefaultAsync(a => a.CPId == request.CpId);
-                    if (ck != null && ck.CompletedOn!=null && ck.CompletedBy!=null)
+                    if (existing != null && existing.CompletedOn!=null && existing.CompletedBy!=null)
                     {
-                        ck.CompletedBy = null;
-                        ck.CompletedOn = null;
+                        existing.CompletedBy = null;
+                        existing.CompletedOn = null;
 
                         await _dbContext.SaveChangesAsync();
                     }
