@@ -11,5 +11,8 @@ namespace ERPCubes.Application.Features.Crm.Checklist.Queries.CheckListReport
     {
         public string Id { get; set; } = String.Empty;
         public int TenantId { get; set; }
+        public int StartDate { get; set; }
+        public int EndDate { get; set; }
+
     }
 }

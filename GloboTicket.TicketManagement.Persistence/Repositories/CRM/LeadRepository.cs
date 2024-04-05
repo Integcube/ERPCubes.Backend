@@ -500,6 +500,11 @@ namespace ERPCubes.Persistence.Repositories.CRM
                         LeadObj.Remarks = Lead.Remarks;
 
                         await _dbContext.SaveChangesAsync();
+
+                       
+
+
+
                     }
 
                 }
@@ -530,7 +535,7 @@ namespace ERPCubes.Persistence.Repositories.CRM
                     LeadObj.Remarks = Lead.Remarks;
                     await _dbContext.AddAsync(LeadObj);
                     await _dbContext.SaveChangesAsync();
-
+                    var result = _dbContext.Database.ExecuteSqlRaw("SELECT public.\"CkInsertIntoCKContactCheckListExec\"({0}, {1})", LeadObj.LeadId, Id);
                 }
             }
             catch (Exception e)

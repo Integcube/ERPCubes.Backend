@@ -14,5 +14,7 @@ namespace ERPCubes.Application.Features.CheckList.ChecklistReports.Queries.Execu
         public int NotExecutedCheckpoints { get; set; }
         public int ExecutedPercentage { get; set; }
         public int OverdueCheckpoints { get; set; }
+        public int TotalCheckpoints { get; set; }
+        
     }
 }

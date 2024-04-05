@@ -37,7 +37,18 @@ namespace ERPCubes.Persistence.Repositories.CRM
                 {
                     Value = request.TenantId
                 };
-                var results = await _dbContext.CheckListReportVm.FromSqlRaw("SELECT * FROM \"CkCheckListReport\"(@TenantId)", tenantIdPrm).ToListAsync();
+
+                var startDatePrm = new Npgsql.NpgsqlParameter("@p_startdate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = request.StartDate
+                };
+                var endDatePrm = new Npgsql.NpgsqlParameter("@p_enddate", NpgsqlTypes.NpgsqlDbType.Date)
+                {
+                    Value = request.EndDate
+                };
+
+
+                var results = await _dbContext.CheckListReportVm.FromSqlRaw("SELECT * FROM \"CkCheckListReport\"({0},{1},{2})", tenantIdPrm, startDatePrm, endDatePrm).ToListAsync();
                 return results;
             }
             catch (Exception ex)
